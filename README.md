@@ -1,4 +1,4 @@
-# Track-MDP: Reinforcement Learning for Target Tracking with Controlled Sensing
+<!-- # Track-MDP: Reinforcement Learning for Target Tracking with Controlled Sensing
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -182,4 +182,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Happy Tracking!** 🎯
+**Happy Tracking!** 🎯 -->
+
+
+## Track-MDP for IoBT-MAX testing site (WIP)
