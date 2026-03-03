@@ -12,6 +12,7 @@ Usage:
 import os
 import sys
 import numpy as np
+import pdb
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,8 +21,11 @@ sys.path.insert(0, project_root)
 from src.core.environment import learning_grid_sarsa_0
 from src.core.gym_wrapper import grid_environment
 from src.evaluation.evaluator import evaluate_policy
+from src.core.iobt_environment import learning_iobt_sarsa
 import ray
 from ray.rllib.algorithms.ppo import PPOConfig
+from ray.tune.registry import register_env
+from src.core.gym_wrapper import iobt_gym_wrapper
 
 
 def small_grid_example():
@@ -246,6 +250,109 @@ def custom_reward_example():
     return qobj
 
 
+def iobt_max_environment_grid(): # preexisting grid version of the iobt max environment
+    """
+    Configuration for the IoBT-MAX testbed at R2C2.
+    10 Sensor Nodes + 1 Terminal/Exit State.
+    """
+    print("\n" + "="*60)
+    print("IoBT-MAX TESTBED ENVIRONMENT (R2C2 SITE)")
+    print("="*60)
+
+    
+    qobj = learning_grid_sarsa_0(
+        run_number=1004,
+        N=4,                       
+        num_trans=10,  # originally 5                  
+        # state_trans_cum_prob=[0.05, 0.14, 0.23, 0.32, 0.41, 0.50, 0.59, 0.68, 0.77, 0.86, 0.95], # originally [0.1, 0.3, 0.6, 0.9, 1.0]
+        state_trans_cum_prob=[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.90] , # originally [0.1, 0.3, 0.6, 0.9, 1.0]
+        max_sensors=10,  # originally 11                 
+        max_sensors_null=10, # originally 11
+        time_limit=1,                   
+        time_limit_max=1
+    )
+
+    print(f"IoBT-MAX Configuration:")
+    print(f"  Nodes Deployed: 11 fixed structures ")
+    print(f"  Total Grid Cells: {qobj.N * qobj.N}")
+    print(f"  Mobility: Fully connected (Any-to-Any movement)")
+    print(f"  Primary Sensors: Zed 2i RGBD, TI mmWave Radar")
+
+    episode_lengths = []
+    
+    for episode in range(5):
+        qobj.grid_env.reset_object_state()
+        steps = 0
+        
+        while qobj.grid_env.object_pos < qobj.N * qobj.N and steps < 50:
+            qobj.grid_env.object_move()
+            steps += 1
+        
+        episode_lengths.append(steps)
+        status = "terminal" if qobj.grid_env.object_pos == qobj.N * qobj.N else "timeout"
+        print(f"  Episode {episode + 1}: {steps} steps ({status})")
+    
+    avg_length = np.mean(episode_lengths)
+    print(f"  Average episode length: {avg_length:.2f} steps")
+    
+    return qobj
+
+def iobt_max_environment():
+    """
+    Configuration for the IoBT-MAX testbed at R2C2.
+    10 Sensor Nodes + 1 Terminal/Exit State (Fully Connected K-10 Graph).
+    """
+    print("\n" + "="*60)
+    print("IoBT-MAX TESTBED ENVIRONMENT (K-10 GRAPH)")
+    print("="*60)
+
+    # 10% chance of reaching terminal state at each step (0.9 to 1.0)
+    iobt_transitions = [0.09, 0.18, 0.27, 0.36, 0.45, 0.54, 0.63, 0.72, 0.81, 0.90]
+    # iobt_transitions = [0.18, 0.36, 0.54, 0.72, 0.90]
+
+    qobj = learning_iobt_sarsa(
+        run_number=2026,
+        num_nodes=10,
+        state_trans_cum_prob=iobt_transitions,
+        max_sensors=6,       # RESTRICTED to 2 to prevent Action Space explosion
+        max_sensors_null=6, 
+        time_limit=4,
+        time_limit_max=4
+    )
+    
+    # Adding a dummy 'N' property just in case the underlying Gym Wrapper 
+    # (grid_environment) explicitly looks for qobj.N during initialization.
+    qobj.N = qobj.num_nodes
+
+    print(f"IoBT-MAX Configuration:")
+    print(f"  Nodes Deployed: {qobj.num_nodes} fixed structures (R2C2)")
+    print(f"  Mobility: Fully connected graph (Any-to-Any movement)")
+    print(f"  Max Sensors allowed per step: {qobj.max_sensors}")
+    print(f"  Total Actions available: {qobj.total_actions}")
+
+    # Quick mobility test to ensure termination works
+    print(f"\nMobility Test (5 episodes):")
+    print("-" * 30)
+    episode_lengths = []
+    
+    for episode in range(5):
+        qobj.grid_env.reset_object_state()
+        steps = 0
+        
+        while qobj.grid_env.object_pos < qobj.num_nodes and steps < 50:
+            qobj.grid_env.object_move()
+            steps += 1
+            
+        episode_lengths.append(steps)
+        status = "terminal" if qobj.grid_env.object_pos == qobj.num_nodes else "timeout"
+        print(f"  Episode {episode + 1}: {steps} steps ({status})")
+    
+    avg_length = np.mean(episode_lengths)
+    print(f"  Average episode length: {avg_length:.2f} steps")
+
+    return qobj
+
+
 def train_custom_environment(qobj):
     """
     Example of training on a custom environment.
@@ -320,42 +427,134 @@ def train_custom_environment(qobj):
         if ray.is_initialized():
             ray.shutdown()
 
-def iobt_max_environment():
+
+def train_iobt_environment(qobj):
     """
-    Configuration for the IoBT-MAX testbed at R2C2.
-    10 Sensor Nodes + 1 Terminal/Exit State.
+    Example of training on the non-spatial IoBT environment.
+    Updated to handle num_nodes instead of N, and forces episode horizons.
     """
     print("\n" + "="*60)
-    print("IoBT-MAX TESTBED ENVIRONMENT (R2C2 SITE)")
+    print("TRAINING ON IOBT-MAX ENVIRONMENT")
     print("="*60)
-
-    N_size = 4 # 4*3 = 12 cells
     
-    # The object can move from each cell to any other cell.
-    iobt_transitions = [0.1, 0.3, 0.6, 0.9, 1.0] 
+    try:
+        # Initialize Ray
+        ray.init(ignore_reinit_error=True)
+        
+        # 1. Register the environment explicitly
+        register_env("iobt_env_graph", lambda config: iobt_gym_wrapper(config))
+        
+        # Create environment config
+        env_config = {
+            "qobj": qobj,
+            "time_limit_schedule": [100],  
+            "time_limit_max": qobj.time_limit_max
+        }
+        
+        # Create PPO configuration
+        config = PPOConfig()
+        
+        # 2. Pass the registered string name instead of the class
+        config = config.environment("iobt_env_graph", env_config=env_config)
+        config = config.training(lr=0.001, grad_clip=30.0)
+        config = config.resources(num_gpus=0)
+        config = config.env_runners(num_env_runners=0) 
+        config = config.api_stack(enable_rl_module_and_learner=False, enable_env_runner_and_connector_v2=False)
+        
+        # Build algorithm
+        algo = config.build()
+        
+        print(f"Training Configuration:")
+        print(f"  Algorithm: PPO")
+        print(f"  Learning Rate: 0.001")
+        print(f"  Graph Nodes: {qobj.num_nodes}")
+        print(f"  Action Space: MultiDiscrete")
+        
+        # Run short training
+        print(f"\nRunning short training (10 iterations for demo)...")
+        # pdb.set_trace()
+        for i in range(10):
+            result = algo.train()
+            
+            # Handle metric location change
+            if 'episode_reward_mean' in result:
+                reward_mean = result['episode_reward_mean']
+                len_mean = result['episode_len_mean']
+            else:
+                reward_mean = result.get('env_runners', {}).get('episode_reward_mean', 0.0)
+                len_mean = result.get('env_runners', {}).get('episode_len_mean', 0.0)
+                
+            print(f"  Iteration {i+1:2d}: reward_mean = {reward_mean:8.4f}, "
+                  f"episode_len_mean = {len_mean:6.2f}")
+        
+        print(f"\nQuick Evaluation (10 episodes):")
+        eval_env = iobt_gym_wrapper(env_config)
+        success_rates = []
+        sensors_per_step = []
 
-    qobj = learning_grid_sarsa_0(
-        run_number=2026,
-        N=N_size,                       
-        num_trans=5,                    
-        state_trans_cum_prob=iobt_transitions,
-        max_sensors=11,                 
-        max_sensors_null=11,
-        time_limit=2,                   
-        time_limit_max=5
-    )
+        for _ in range(10):
+            obs, _ = eval_env.reset()
+            done = False
+            objects_found = 0
+            total_steps = 0
+            total_sensors_used = 0
 
-    qobj.grid_env.sensor_rew = -0.25 
-    qobj.grid_env.tracking_rew = 1.5  
-    qobj.grid_env.tracking_miss_rew = -0.5 
+            while not done and total_steps < 50:
+                # 1. Get action from the trained policy
+                action = algo.compute_single_action(obs, explore=False)
+                
+                # 2. Decode the action to find exactly WHICH sensors were turned on
+                action_idx = int(action)
+                num_sensors_active = 0
+                active_sensor_indices = []
+                
+                q_state = qobj.current_state
+                comb_dict = qobj.grid_env.combination_dict_null if q_state == qobj.missing_state else qobj.grid_env.combination_dict[qobj.time_delay]
+                
+                for num_sensors in sorted(comb_dict.keys()):
+                    combs = comb_dict[num_sensors]
+                    if action_idx < len(combs):
+                        num_sensors_active = num_sensors
+                        active_sensor_indices = combs[action_idx]
+                        break
+                    action_idx -= len(combs)
 
-    print(f"IoBT-MAX Configuration:")
-    print(f"  Nodes Deployed: 11 fixed structures ")
-    print(f"  Total Grid Cells: {qobj.N * qobj.N}")
-    print(f"  Mobility: Fully connected (Any-to-Any movement)")
-    print(f"  Primary Sensors: Zed 2i RGBD, TI mmWave Radar")
+                # 3. Explicitly check if the target is found BEFORE taking the step
+                # We reach into the base environment to get the ground truth position
+                current_target_pos = eval_env.unwrapped.qobj.grid_env.object_pos
+                
+                # If target is not in terminal state AND its position is in our active sensors
+                if current_target_pos < qobj.num_nodes and current_target_pos in active_sensor_indices:
+                    objects_found += 1
+                    
+                total_sensors_used += num_sensors_active
+                total_steps += 1
+
+                # 4. Take the environment step to transition to the next state
+                obs, reward, done, truncated, info = eval_env.step(action)
+
+            # Record episode metrics
+            if total_steps > 0:
+                success_rates.append(objects_found / total_steps)
+                sensors_per_step.append(total_sensors_used / total_steps)
+
+        accuracy = np.mean(success_rates) if success_rates else 0.0
+        sensors = np.mean(sensors_per_step) if sensors_per_step else 0.0
+
+        print(f"  Tracking Accuracy: {accuracy:.4f} ({accuracy*100:.2f}%)")
+        print(f"  Avg Sensors/Step: {sensors:.2f}")
+        
+        print(f"\n✅ IoBT-MAX environment training completed successfully!")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Training failed: {e}")
+        return False
     
-    return qobj
+    finally:
+        if ray.is_initialized():
+            ray.shutdown()
 
 
 def main():
@@ -418,7 +617,10 @@ def main():
         name, env = environments[choice]
         print(f"\nTraining on {name}...")
         
-        success = train_custom_environment(env)
+        if choice == '5':
+            success = train_iobt_environment(env)
+        else:
+            success = train_custom_environment(env)
         
         if success:
             print(f"\n🎉 Training on {name} completed successfully!")
