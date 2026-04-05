@@ -203,7 +203,7 @@ def train(visualization_mode='none', viz_config=None):
             print("episode reward mean:", i, reward_mean)
             mean_ppo.append(reward_mean)
             
-            if (i+1) % 50 == 0:
+            if (i+1) % 10 == 0:
                 save_dir = "./agent_run{}_ppo".format(run_number)
                 algo.save(save_dir)
                 

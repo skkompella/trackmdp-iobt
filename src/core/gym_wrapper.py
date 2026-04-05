@@ -9,7 +9,6 @@ import gymnasium as gym
 import numpy as np
 import random as rnd 
 from gymnasium.utils import seeding
-from gymnasium.spaces import Discrete, Box
 
 try:
     from ..visualization.renderer import TrackingRenderer
@@ -164,72 +163,6 @@ class grid_environment(gym.Env):
     
     def reset_object_state(self):
         self.qobj.grid_env.object_pos = rnd.sample(list(np.arange(self.qobj.N**2)), 1)[0]
-
-
-class iobt_gym_wrapper(gym.Env):
-    """
-    Custom Gymnasium Wrapper for the IoBT-MAX graph environment.
-    Strictly uses Gymnasium to satisfy RLlib's internal type checkers.
-    """
-    def __init__(self, env_config):
-        super().__init__()  # Crucial for Gymnasium environments
-        self.qobj = env_config["qobj"]
-        self.time_limit_max = env_config["time_limit_max"]
-        
-        # Action Space: Ensure it is explicitly cast to an integer
-        max_actions = int(max(self.qobj.total_actions, self.qobj.total_actions_null))
-        self.action_space = Discrete(max_actions)
-        
-        # Observation Space: explicitly define bounds and dtype
-        self.observation_space = Box(
-            low=np.array([0, 0], dtype=np.float32), 
-            high=np.array([self.qobj.missing_state, self.time_limit_max], dtype=np.int32), 
-            dtype=np.float32
-        )
-        
-    def reset(self, *, seed=None, options=None):
-        super().reset(seed=seed)
-        self.qobj.current_state = self.qobj.missing_state
-        self.qobj.time_delay = self.time_limit_max
-        self.qobj.grid_env.reset_object_state()
-        return np.array([self.qobj.current_state, self.qobj.time_delay], dtype=np.float32), {}
-        
-    def step(self, action):
-        action_sensors = np.zeros(self.qobj.num_nodes, dtype=int)
-        
-        if self.qobj.current_state == self.qobj.missing_state:
-            comb_dict = self.qobj.grid_env.combination_dict_null
-        else:
-            comb_dict = self.qobj.grid_env.combination_dict[self.qobj.time_delay]
-        
-        action_idx = int(action)
-        selected_comb = None
-        
-        for num_sensors in sorted(comb_dict.keys()):
-            combs = comb_dict[num_sensors]
-            if action_idx < len(combs):
-                selected_comb = combs[action_idx]
-                break
-            action_idx -= len(combs)
-            
-        if selected_comb is not None:
-            for idx in selected_comb:
-                action_sensors[idx] = 1
-                
-        reward, next_state, terminal, time_delay_sense = self.qobj.grid_env.get_reward_next_state(
-            self.qobj.current_state, action_sensors, self.qobj.time_delay
-        )
-        
-        time_delay_sense = min(time_delay_sense, self.time_limit_max)
-        
-        self.qobj.current_state = next_state
-        self.qobj.time_delay = time_delay_sense
-        
-        done = bool(terminal)
-        truncated = False
-        
-        # Returns exactly 5 values: obs, reward, terminated, truncated, info
-        return np.array([self.qobj.current_state, self.qobj.time_delay], dtype=np.float32), reward, done, truncated, {}
 
 
 # For backward compatibility
