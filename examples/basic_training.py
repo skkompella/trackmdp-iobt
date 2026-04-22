@@ -67,8 +67,8 @@ def basic_training_example():
     
     try:
         # Create environment (same parameters as training)
-        run_number = 194
-        N, num_trans = 10, 4
+        run_number = 193 
+        N, num_trans = 3, 4
         terminal_st_prob = 0.005
         state_prob_run = 0.15
         state_trans_cum_prob = [

@@ -95,9 +95,9 @@ DEFAULTS = {
     "ppo_lr":              1e-4,
     "ppo_train_batch":     4000,
     # Rainbow DQN
-    "dqn_num_workers":     2,
+    "dqn_num_workers":     4,
     "dqn_lr":              5e-4,
-    "dqn_train_batch":     32,
+    "dqn_train_batch":     64,
     "dqn_n_step":          3,
     "dqn_num_atoms":       51,
     "dqn_v_min":           -200.0,

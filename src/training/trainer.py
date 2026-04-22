@@ -91,7 +91,7 @@ def _run_visualization(algo, environment, iteration, viz_config, context=""):
         return True
 
 
-def train(visualization_mode='none', viz_config=None):
+def train(visualization_mode='none', viz_config=None, run_number=198, N=10): # Legacy: def train(visualization_mode='none', viz_config=None):
     """
     Main training function with integrated visualization options.
     
@@ -128,8 +128,8 @@ def train(visualization_mode='none', viz_config=None):
         print("Using 'evaluation' mode instead - visualization will show during evaluation episodes.")
         visualization_mode = 'evaluation'
     
-    run_number = 194  # 99999 for testing
-    run_number_load = 194
+    run_number = 198  # 99999 for testing
+    run_number_load = 198
     
     print(f"\n Run number = {run_number}")
     print(f" Visualization mode = {visualization_mode}")

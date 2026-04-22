@@ -31,7 +31,9 @@ if _PROJECT_ROOT not in sys.path:
 import ray
 from ray.rllib.algorithms.ppo import PPO
 
-from src.core.iobt_new_env import learning_grid_sarsa_0
+# from src.core.iobt_new_env import learning_grid_sarsa_0
+# from src.core.iobt_equal_env import learning_grid_sarsa_0
+from src.core.iobt_6node_env import learning_grid_sarsa_0
 
 
 # ===========================================================================
@@ -39,14 +41,14 @@ from src.core.iobt_new_env import learning_grid_sarsa_0
 # ===========================================================================
 
 DEFAULTS = {
-    "run_number":      195,
-    "N":               4,
+    "run_number":      193,
+    "N":               3,
     "num_trans":       6,
     "max_sensors":     6,
     "max_sensors_null": 6,
     "time_limit":      1,
     "time_limit_max":  1,
-    "max_episode_steps": 100,
+    "max_episode_steps": 1000,
 }
 
 # Replicate gym_wrapper.py's augment_vec for time_limit_max=1:

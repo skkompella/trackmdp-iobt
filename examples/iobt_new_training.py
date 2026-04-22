@@ -17,7 +17,9 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 from src.training.trainer import train 
 from src.evaluation.evaluator import evaluate_policy
-from src.core.iobt_new_env import learning_grid_sarsa_0
+# from src.core.iobt_new_env import learning_grid_sarsa_0
+# from src.core.iobt_equal_env import learning_grid_sarsa_0
+from src.core.iobt_6node_env import learning_grid_sarsa_0
 from src.core.gym_wrapper import grid_environment
 import ray
 from ray.rllib.algorithms.ppo import PPOConfig, PPO
@@ -67,7 +69,7 @@ def basic_training_example():
     
     try:        
         # Initialize shared environment parameters for the 4x4 IoBT map
-        run_number = 195  # Changed run number to avoid overwriting original 10x10 model
+        run_number = 197  # Changed run number to avoid overwriting original 10x10 model
         N, num_trans = 4, 6
         terminal_st_prob = 0.005
         state_prob_run = 0.15
