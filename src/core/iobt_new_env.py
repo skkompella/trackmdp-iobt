@@ -38,7 +38,8 @@ class iobt_env(grid_env):
         # Setup constants
         self.N = 4
         self.num_trans = 6
-        state_trans_cum_prob = [round((i+1)/self.num_trans, 4) for i in range(self.num_trans)]
+        state_trans_cum_prob = [round((i+1)/self.num_trans, 4) 
+                                for i in range(self.num_trans)]
         
         # Initialize parent (which will automatically call our overridden val_to_grid)
         super().__init__(self.N, self.num_trans, state_trans_cum_prob, 

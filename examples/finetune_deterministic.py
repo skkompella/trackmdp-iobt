@@ -124,7 +124,7 @@ RECT_DEFAULTS = {
     # Environment
     "env":             "rect",
     "run_number":      200,
-    "new_run":         None,
+    "new_run":         301,
     "nrows":           2,
     "ncols":           3,
     "num_trans":       4,
@@ -261,6 +261,94 @@ class CircularLearner:
 
 
 # ===========================================================================
+# Rectangular grid — transition-matrix environment
+# ===========================================================================
+
+class TransitionMatrixGridEnv(grid_env_rect):
+    """
+    grid_env_rect with object_move() overridden to sample the next cell from
+    an empirical transition matrix T[i, j] = P(move to j | currently at i).
+    Terminal is always 0; the object never leaves the grid.
+    """
+
+    def __init__(self, nrows, ncols, num_trans, state_trans_cum_prob,
+                 max_sensors, max_sensors_null, missing_state, time_limit,
+                 transition_matrix):
+        super().__init__(nrows, ncols, num_trans, state_trans_cum_prob,
+                         max_sensors, max_sensors_null, missing_state, time_limit)
+        T = np.asarray(transition_matrix, dtype=np.float64)
+        assert T.shape == (self.n_cells, self.n_cells), \
+            f"Transition matrix must be {self.n_cells}×{self.n_cells}, got {T.shape}"
+        self._T = T
+
+    def reset_object_state(self):
+        self.object_pos = int(np.random.randint(self.n_cells))
+
+    def object_move(self):
+        row = self._T[self.object_pos].copy()
+        s = row.sum()
+        if s == 0:
+            # Cell never observed as source — uniform over all other cells
+            row[:] = 1.0
+            row[self.object_pos] = 0.0
+            s = row.sum()
+        row /= s
+        self.object_pos = int(np.random.choice(self.n_cells, p=row))
+        return 0
+
+    def get_reward_next_state(self, current_state, current_action, time_delay):
+        reward, next_state, _, new_delay = super().get_reward_next_state(
+            current_state, current_action, time_delay
+        )
+        return reward, next_state, 0, new_delay
+
+
+class TransitionMatrixLearner:
+    """Wraps TransitionMatrixGridEnv to match the qobj interface."""
+
+    def __init__(self, run_number, nrows, ncols, num_trans, state_trans_cum_prob,
+                 max_sensors, max_sensors_null, time_limit, time_limit_max,
+                 transition_matrix):
+        self.run_number     = run_number
+        self.nrows          = nrows
+        self.ncols          = ncols
+        self.N              = ncols
+        self.n_cells        = nrows * ncols
+        self.num_trans      = num_trans
+        self.prob_list_cum  = state_trans_cum_prob
+        self.time_limit     = time_limit
+        self.time_limit_max = time_limit_max
+        self.missing_state  = self.n_cells * (time_limit_max + 1) + 1
+
+        self.grid_env = TransitionMatrixGridEnv(
+            nrows, ncols, num_trans, state_trans_cum_prob,
+            max_sensors, max_sensors_null, self.missing_state, time_limit,
+            transition_matrix,
+        )
+
+        self.exploration_epsilon = 0.15
+        self.total_actions       = self.grid_env.action_space_size
+        self.total_actions_null  = self.grid_env.action_space_size_null
+        self.current_state       = self.missing_state
+        self.current_action      = 0
+        self.next_state          = 0
+        self.next_action         = 0
+        self.time_delay          = 0
+        self.max_sensors         = max_sensors
+        self.sarsa_step_size     = 0.1
+        self.gamma               = 1
+        self.no_of_episodes      = 1
+        self.episode_start       = 0
+        self.file_save_directory = ""
+        self.save_directory      = None
+
+    def update_time_limit(self, new_time_limit):
+        self.time_limit = new_time_limit
+        self.grid_env.time_limit = new_time_limit
+        self.grid_env.valid_q_indices_dict = self.grid_env.get_valid_q_indices_dict()
+
+
+# ===========================================================================
 # IoBT 10-node graph — circular environment
 # ===========================================================================
 
@@ -347,6 +435,106 @@ class CircularIoBTLearner:
         self.time_limit = new_time_limit
         self.grid_env.time_limit = new_time_limit
         self.grid_env.valid_q_indices_dict = self.grid_env.get_valid_q_indices_dict()
+
+
+# ===========================================================================
+# IoBT 10-node graph — transition-matrix environment
+# ===========================================================================
+
+class TransitionMatrixIoBTEnv(iobt_env):
+    """
+    iobt_env with object_move() overridden to sample from an empirical
+    transition matrix.  Terminal is always 0.
+
+    NOTE: _T must be set BEFORE super().__init__() because iobt_env.__init__
+    calls reset_object_state() at the end.
+    """
+
+    def __init__(self, max_sensors, max_sensors_null, missing_state, time_limit,
+                 transition_matrix):
+        T = np.asarray(transition_matrix, dtype=np.float64)
+        assert T.shape == (IOBT_NUM_NODES, IOBT_NUM_NODES), \
+            f"IoBT transition matrix must be {IOBT_NUM_NODES}×{IOBT_NUM_NODES}, got {T.shape}"
+        self._T = T
+        super().__init__(max_sensors, max_sensors_null, missing_state, time_limit)
+
+    def reset_object_state(self):
+        self.object_pos = int(np.random.randint(IOBT_NUM_NODES))
+
+    def object_move(self):
+        row = self._T[self.object_pos].copy()
+        s = row.sum()
+        if s == 0:
+            row[:] = 1.0
+            row[self.object_pos] = 0.0
+            s = row.sum()
+        row /= s
+        self.object_pos = int(np.random.choice(IOBT_NUM_NODES, p=row))
+        return 0
+
+    def get_reward_next_state(self, current_state, current_action, time_delay):
+        reward, next_state, _, new_delay = super().get_reward_next_state(
+            current_state, current_action, time_delay
+        )
+        return reward, next_state, 0, new_delay
+
+
+class TransitionMatrixIoBTLearner:
+    """Wraps TransitionMatrixIoBTEnv to match the qobj interface."""
+
+    def __init__(self, run_number, num_trans, max_sensors, max_sensors_null,
+                 time_limit, time_limit_max, transition_matrix):
+        self.run_number     = run_number
+        self.N              = IOBT_N
+        self.n_cells        = IOBT_NUM_NODES
+        self.num_trans      = num_trans
+        self.time_limit     = time_limit
+        self.time_limit_max = time_limit_max
+        self.missing_state  = IOBT_N * IOBT_N * (time_limit_max + 1) + 1
+
+        self.grid_env = TransitionMatrixIoBTEnv(
+            max_sensors, max_sensors_null, self.missing_state, time_limit,
+            transition_matrix,
+        )
+
+        self.exploration_epsilon = 0.15
+        self.total_actions       = self.grid_env.action_space_size
+        self.total_actions_null  = self.grid_env.action_space_size_null
+        self.current_state       = self.missing_state
+        self.current_action      = 0
+        self.next_state          = 0
+        self.next_action         = 0
+        self.time_delay          = 0
+        self.max_sensors         = max_sensors
+        self.sarsa_step_size     = 0.1
+        self.gamma               = 1
+        self.no_of_episodes      = 1
+        self.episode_start       = 0
+        self.file_save_directory = ""
+        self.save_directory      = None
+
+    def update_time_limit(self, new_time_limit):
+        self.time_limit = new_time_limit
+        self.grid_env.time_limit = new_time_limit
+        self.grid_env.valid_q_indices_dict = self.grid_env.get_valid_q_indices_dict()
+
+
+# ===========================================================================
+# Transition matrix helpers
+# ===========================================================================
+
+def make_random_transition_matrix(n_cells):
+    """
+    Generate a random row-stochastic n_cells×n_cells transition matrix with
+    no self-loops: T[i, i] = 0, each row sums to 1.
+    Off-diagonal entries drawn from Dirichlet(1, ..., 1).
+    """
+    T = np.zeros((n_cells, n_cells), dtype=np.float64)
+    for i in range(n_cells):
+        off = np.random.dirichlet(np.ones(n_cells - 1))
+        cols = [j for j in range(n_cells) if j != i]
+        T[i, cols] = off
+    return T
 
 
 # ===========================================================================
@@ -528,11 +716,14 @@ def validate_circle_iobt(circle_path):
 # Fine-tune
 # ===========================================================================
 
-def finetune(cfg, source_checkpoint, new_run, circle_path, eval_only=False):
+def finetune(cfg, source_checkpoint, new_run, circle_path=None,
+             transition_matrix=None, eval_only=False,
+             output_dir=None, eval_finetuned=False):
     env_mode      = cfg["env"]
     time_limit    = cfg["time_limit"]
     time_limit_max = cfg["time_limit_max"]
-    save_dir      = f"./agent_run{new_run}_ppo"
+    save_dir      = output_dir or os.path.join(project_root, "runs",
+                                                f"agent_run{new_run}_ppo")
 
     terminal_prob  = 0.005
     state_prob_run = 0.15
@@ -542,26 +733,45 @@ def finetune(cfg, source_checkpoint, new_run, circle_path, eval_only=False):
     ]
     cum_prob += [cum_prob[-1] + state_prob_run]
 
-    # ── Build env + wrapper depending on mode ────────────────────────────────
+    use_transition = transition_matrix is not None
+
+    # ── Build env + wrapper depending on mode and movement model ─────────────
     if env_mode == "iobt":
-        qobj = CircularIoBTLearner(
-            cfg["run_number"], cfg["num_trans"],
-            cfg["max_sensors"], cfg["max_sensors_null"],
-            time_limit, time_limit_max,
-            circle_path,
-        )
+        if use_transition:
+            qobj = TransitionMatrixIoBTLearner(
+                cfg["run_number"], cfg["num_trans"],
+                cfg["max_sensors"], cfg["max_sensors_null"],
+                time_limit, time_limit_max,
+                transition_matrix,
+            )
+        else:
+            qobj = CircularIoBTLearner(
+                cfg["run_number"], cfg["num_trans"],
+                cfg["max_sensors"], cfg["max_sensors_null"],
+                time_limit, time_limit_max,
+                circle_path,
+            )
         # n_cells for obs uses N*N (backing grid), matching gym_wrapper.py
         cfg["n_cells"]       = IOBT_N * IOBT_N
         cfg["missing_state"] = IOBT_N * IOBT_N * (time_limit_max + 1) + 1
         env_wrapper_cls = grid_environment
     else:
-        qobj = CircularLearner(
-            cfg["run_number"], cfg["nrows"], cfg["ncols"],
-            cfg["num_trans"], cum_prob,
-            cfg["max_sensors"], cfg["max_sensors_null"],
-            time_limit, time_limit_max,
-            circle_path,
-        )
+        if use_transition:
+            qobj = TransitionMatrixLearner(
+                cfg["run_number"], cfg["nrows"], cfg["ncols"],
+                cfg["num_trans"], cum_prob,
+                cfg["max_sensors"], cfg["max_sensors_null"],
+                time_limit, time_limit_max,
+                transition_matrix,
+            )
+        else:
+            qobj = CircularLearner(
+                cfg["run_number"], cfg["nrows"], cfg["ncols"],
+                cfg["num_trans"], cum_prob,
+                cfg["max_sensors"], cfg["max_sensors_null"],
+                time_limit, time_limit_max,
+                circle_path,
+            )
         cfg["n_cells"]       = cfg["nrows"] * cfg["ncols"]
         cfg["missing_state"] = cfg["n_cells"] * (time_limit_max + 1) + 1
         env_wrapper_cls = grid_environment_rect
@@ -583,7 +793,20 @@ def finetune(cfg, source_checkpoint, new_run, circle_path, eval_only=False):
         print(f"Loading checkpoint: {source_checkpoint}")
         algo    = PPO.from_checkpoint(source_checkpoint)
         metrics = evaluate_policy(algo, qobj.grid_env, cfg)
-        _print_metrics("EVAL", metrics)
+        _print_metrics("EVAL (source)", metrics)
+        return
+
+    if eval_finetuned:
+        ft_ckpt, _ = find_latest_checkpoint(new_run, save_dir=save_dir)
+        if ft_ckpt is None:
+            print(f"[ERROR] No fine-tuned checkpoint found in {save_dir}")
+            print("        Run fine-tuning first, then use --eval-finetuned.")
+            return
+        print(f"Loading fine-tuned checkpoint: {ft_ckpt}")
+        algo = PPO.from_checkpoint(ft_ckpt)
+        eval_cfg = dict(cfg, eval_episodes=1)
+        metrics  = evaluate_policy(algo, qobj.grid_env, eval_cfg)
+        _print_metrics("EVAL (fine-tuned, 1 episode)", metrics)
         return
 
     # ── Build fast-convergence PPO config ─────────────────────────────────
@@ -685,7 +908,11 @@ def finetune(cfg, source_checkpoint, new_run, circle_path, eval_only=False):
     print(f"  Mode              : {env_mode.upper()}")
     print(f"  Source checkpoint : {source_checkpoint}")
     print(f"  New checkpoints   : {save_dir}")
-    print(f"  Circle path       : {circle_path}")
+    if use_transition:
+        n = transition_matrix.shape[0]
+        print(f"  Movement model    : Transition matrix ({n}×{n})")
+    else:
+        print(f"  Circle path       : {circle_path}")
     print(f"  Baseline accuracy : {baseline['tracking_accuracy']:.4f}")
     print(f"  Best accuracy     : {best_accuracy:.4f}  ({best_accuracy*100:.2f}%)")
     print(f"  Best checkpoint   : {best_ckpt}")
@@ -747,6 +974,10 @@ Examples
     parser.add_argument("--save-dir",    type=str,   default=None)
     parser.add_argument("--circle",      type=str,   default=None,
                         help="Comma-separated circle path, e.g. '0,4,3,6,2,1'")
+    parser.add_argument("--transition",  type=str,   default=None,
+                        help="Path to .npy transition matrix file (n_cells×n_cells, row-stochastic)")
+    parser.add_argument("--random-transition", action="store_true",
+                        help="Use a randomly generated transition matrix instead of a circle path")
     parser.add_argument("--nrows",       type=int,   default=None)
     parser.add_argument("--ncols",       type=int,   default=None)
     parser.add_argument("--iterations",  type=int,   default=None)
@@ -755,7 +986,13 @@ Examples
     parser.add_argument("--entropy",     type=float, default=None)
     parser.add_argument("--eval-episodes", type=int, default=None)
     parser.add_argument("--max-ep-steps", type=int,  default=None)
-    parser.add_argument("--eval-only",   action="store_true")
+    parser.add_argument("--eval-only",       action="store_true",
+                        help="Evaluate the source checkpoint without training")
+    parser.add_argument("--eval-finetuned",  action="store_true",
+                        help="Load the saved fine-tuned checkpoint and run 1-episode eval")
+    parser.add_argument("--output",          type=str, default=None,
+                        help="Output directory for the fine-tuned checkpoint "
+                             "(default: {project_root}/runs/agent_run{new_run}_ppo)")
     args = parser.parse_args()
 
     # ── Pick defaults for the selected env mode ───────────────────────────
@@ -772,29 +1009,46 @@ Examples
     if args.eval_episodes is not None: cfg["eval_episodes"]    = args.eval_episodes
     if args.max_ep_steps  is not None: cfg["max_ep_steps"]     = args.max_ep_steps
 
-    new_run = args.new_run if args.new_run is not None else cfg["run_number"] + 1
+    new_run = args.new_run if args.new_run is not None else cfg["run_number"]
 
-    # ── Resolve circle path ───────────────────────────────────────────────
-    if args.circle:
-        try:
-            circle_path = [int(x.strip()) for x in args.circle.split(",")]
-        except ValueError:
-            print(f"[ERROR] --circle must be comma-separated integers, got: {args.circle}")
+    # ── Determine movement model: transition matrix or circle path ────────
+    if args.random_transition or args.transition:
+        if args.transition:
+            T_path = os.path.abspath(args.transition)
+            if not os.path.exists(T_path):
+                print(f"[ERROR] Transition matrix file not found: {T_path}")
+                sys.exit(1)
+            transition_matrix = np.load(T_path)
+            print(f"[INFO] Loaded transition matrix from: {T_path}  shape={transition_matrix.shape}")
+        else:
+            n_cells = (IOBT_NUM_NODES if args.env == "iobt"
+                       else cfg["nrows"] * cfg["ncols"])
+            transition_matrix = make_random_transition_matrix(n_cells)
+            print(f"[INFO] Generated random transition matrix  shape={transition_matrix.shape}")
+        circle_path = None
+    else:
+        # Circle mode (original behaviour)
+        if args.circle:
+            try:
+                circle_path = [int(x.strip()) for x in args.circle.split(",")]
+            except ValueError:
+                print(f"[ERROR] --circle must be comma-separated integers, got: {args.circle}")
+                sys.exit(1)
+        elif args.env == "iobt":
+            circle_path = list(IOBT_CIRCLE_PATH)
+        else:
+            circle_path = list(RECT_CIRCLE_PATH)
+
+        # Validate circle
+        if args.env == "iobt":
+            ok, msg = validate_circle_iobt(circle_path)
+        else:
+            ok, msg = validate_circle_rect(circle_path, cfg["nrows"], cfg["ncols"])
+        if not ok:
+            print(f"[ERROR] Circle path invalid: {msg}")
+            print(f"  circle_path = {circle_path}")
             sys.exit(1)
-    elif args.env == "iobt":
-        circle_path = list(IOBT_CIRCLE_PATH)
-    else:
-        circle_path = list(RECT_CIRCLE_PATH)
-
-    # ── Validate circle ───────────────────────────────────────────────────
-    if args.env == "iobt":
-        ok, msg = validate_circle_iobt(circle_path)
-    else:
-        ok, msg = validate_circle_rect(circle_path, cfg["nrows"], cfg["ncols"])
-    if not ok:
-        print(f"[ERROR] Circle path invalid: {msg}")
-        print(f"  circle_path = {circle_path}")
-        sys.exit(1)
+        transition_matrix = None
 
     # ── Locate source checkpoint ──────────────────────────────────────────
     if args.checkpoint:
@@ -822,19 +1076,43 @@ Examples
         print(f"  Graph             : IoBT 10-node (Camp Buckner)")
     else:
         print(f"  Grid              : {cfg['nrows']} × {cfg['ncols']}")
-    print(f"  Circle path       : {circle_path}")
+    if transition_matrix is not None:
+        n = transition_matrix.shape[0]
+        print(f"  Movement model    : Transition matrix ({n}×{n})")
+    else:
+        print(f"  Circle path       : {circle_path}")
     print(f"  Iterations        : {cfg['training_iterations']}")
     print(f"  Eval every        : {cfg['eval_interval']} iteration(s)")
     print(f"  Max ep steps      : {cfg['max_ep_steps']}")
+    if transition_matrix is not None:
+        print()
+        print("  Transition matrix (rows = from, cols = to):")
+        n = transition_matrix.shape[0]
+        header = "       " + "".join(f"  [{j}]" for j in range(n))
+        print(header)
+        for i, row in enumerate(transition_matrix):
+            print(f"    [{i}]  " + "".join(f"{v:6.3f}" for v in row))
     print()
     print("  Fast-convergence PPO hyperparameters:")
     for k in ("lr", "train_batch_size", "num_sgd_iter", "sgd_minibatch_size",
               "clip_param", "entropy_coeff", "rollout_fragment_length", "num_workers"):
         print(f"    {k:30s}: {cfg[k]}")
-    print(f"  Mode              : {'eval only' if args.eval_only else 'fine-tune'}")
+    output_dir = args.output or os.path.join(
+        project_root, "runs", f"agent_run{new_run}_ppo"
+    )
+    if args.eval_finetuned:
+        mode_label = "eval fine-tuned (1 episode)"
+    elif args.eval_only:
+        mode_label = "eval source only"
+    else:
+        mode_label = "fine-tune"
+    print(f"  Output dir        : {output_dir}")
+    print(f"  Mode              : {mode_label}")
 
     try:
-        finetune(cfg, source_ckpt, new_run, circle_path, eval_only=args.eval_only)
+        finetune(cfg, source_ckpt, new_run, circle_path=circle_path,
+                 transition_matrix=transition_matrix, eval_only=args.eval_only,
+                 output_dir=output_dir, eval_finetuned=args.eval_finetuned)
     finally:
         if ray.is_initialized():
             ray.shutdown()
