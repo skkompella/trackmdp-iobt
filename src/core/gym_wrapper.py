@@ -34,26 +34,37 @@ class grid_environment(gym.Env):
         self.qobj = env_config['qobj']
         self.time_limit_schedule = env_config['time_limit_schedule']
         self.time_limit_max = env_config['time_limit_max']
+        self.no_moore_constraint = env_config.get('no_moore_constraint', False)
 
         self.missing_state = self.qobj.missing_state
-        
-        action_space_sz = ((2*self.time_limit_max) + 3)**2
-        
+
+        # n_cells: full backing grid for action space (N×N for square grids)
+        self._n_cells = self.qobj.N * self.qobj.N
+
+        # Action space: all cells when no_moore, else (2t+3)² Moore window
+        if self.no_moore_constraint:
+            action_space_sz = self._n_cells
+        else:
+            action_space_sz = ((2*self.time_limit_max) + 3)**2
+
         self.action_space = gym.spaces.MultiDiscrete([2]*(action_space_sz))
 
-        ##### Augment vec 
+        ##### Augment vec
+        if self.no_moore_constraint:
+            self.augment_vec_1 = [self._n_cells] * (self.time_limit_max + 1)
+        else:
+            self.augment_vec_1 = [(2*i+ 3)**2 for i in range(self.time_limit_max+1)]
         augment_vec = [0]
-        self.augment_vec_1 = [(2*i+ 3)**2 for i in range(self.time_limit_max+1)]
         for aval in self.augment_vec_1:
             augment_vec = augment_vec + [augment_vec[-1] + aval]
-            
+
         self.augment_vec = augment_vec
-        
+
         self.actions_list = []
-        
+
         self.observation_space = gym.spaces.Tuple((
                                      gym.spaces.Discrete((self.qobj.N**2 +1)),
-                                     gym.spaces.Discrete(self.qobj.time_limit_max+1), 
+                                     gym.spaces.Discrete(self.qobj.time_limit_max+1),
                                      gym.spaces.MultiDiscrete([2]*augment_vec[-1])   ))
 
         self.current_state = self.missing_state
@@ -122,7 +133,7 @@ class grid_environment(gym.Env):
     def step(self, action):
 
         if self.current_state == self.missing_state:
-            action_bool = [1 for i in np.arange(((2*self.time_limit_max) + 3)**2)] 
+            action_bool = [1] * self.augment_vec_1[0]
         else:
             action_bool = action
 
@@ -162,7 +173,9 @@ class grid_environment(gym.Env):
         pass
     
     def reset_object_state(self):
-        self.qobj.grid_env.object_pos = rnd.sample(list(np.arange(self.qobj.N**2)), 1)[0]
+        # Delegate to the env's own reset so subclasses (e.g. RealIoBTEnv)
+        # can manage their own sequence state correctly.
+        self.qobj.grid_env.reset_object_state()
 
 
 # For backward compatibility

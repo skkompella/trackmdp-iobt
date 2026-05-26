@@ -41,6 +41,15 @@ sys.path.insert(0, project_root)
 N_CELLS  = 6     # 2×3 grid
 NROWS, NCOLS = 2, 3
 
+NODE_IDS            = [11, 12, 13, 14, 15, 16]   # cell i = NODE_IDS[i]
+_IOBT_DATA          = os.path.join(project_root, "iobt_data")
+DEFAULT_SESSION     = "20260416_154037"
+DEFAULT_NODES_TXT   = os.path.join(_IOBT_DATA, "node_positions.txt")
+DEFAULT_PATH_LOSS   = os.path.join(_IOBT_DATA, "path_loss_params_20260416.json")
+DEFAULT_FLAC_DIR    = _IOBT_DATA
+DEFAULT_STEP_S      = 0.5
+DEFAULT_RSSI_WINDOW = 1   # set >1 to apply a rolling-dB average before inference
+
 
 # ===========================================================================
 # Data loading — single file
@@ -68,6 +77,126 @@ def load_positions(filepath: str) -> np.ndarray:
     print(f"  Cell occupancy [0-5]: {counts.tolist()}")
     print(f"  Dominant cell: {int(counts.argmax())}  "
           f"({counts.max()/len(positions)*100:.1f}% of time)")
+    return positions
+
+
+# ===========================================================================
+# Data loading — Bayesian RSSI inference from FLAC
+# ===========================================================================
+
+def load_positions_from_flac(flac_dir, session, nodes_txt, path_loss_json,
+                              step_s=0.5, rssi_window=1) -> np.ndarray:
+    """
+    Run Bayesian path-loss inference on FLAC files for one session.
+
+    For each 0.5-s window, converts linear power → dB for each node, evaluates
+    the Gaussian posterior over a 20×20 hypothesis grid, and returns the cell
+    index (0-5) of the nearest node to the MAP hypothesis.
+
+    Returns int32 (T,) — same shape as load_positions(), compatible with all
+    downstream processing (min-dwell, transition matrix, cycle extraction).
+    """
+    from collections import deque
+    from pathlib import Path as _Path
+    sys.path.insert(0, os.path.join(project_root, "collection"))
+    from flac_to_trackmdp import (
+        discover_flac_files, load_node_positions_ordered, load_path_loss,
+        build_hypothesis_grid, compute_power_per_step, compute_posterior_top1,
+    )
+
+    flac_files = discover_flac_files(_Path(flac_dir), session=session)
+    missing = [nid for nid in NODE_IDS if nid not in flac_files]
+    if missing:
+        raise FileNotFoundError(f"Missing FLAC for nodes: {missing}")
+    print(f"  Found {len(flac_files)} FLAC files for session '{session}'")
+
+    node_xy = load_node_positions_ordered(_Path(nodes_txt), NODE_IDS)
+    P0, ETA, SIG2, MASK = load_path_loss(_Path(path_loss_json), NODE_IDS)
+    print(f"  Loaded path-loss params: {os.path.basename(path_loss_json)}")
+
+    hypos, dist, nearest_idx, _H, _W = build_hypothesis_grid(node_xy)
+
+    power_arrays = {}
+    for nid in NODE_IDS:
+        pwr = compute_power_per_step(flac_files[nid], step_s)
+        power_arrays[nid] = pwr
+        print(f"    node {nid}: {len(pwr)} steps")
+    T = min(len(power_arrays[nid]) for nid in NODE_IDS)
+    print(f"  Using {T} steps (shortest file).")
+
+    buffers  = {nid: deque(maxlen=rssi_window) for nid in NODE_IDS}
+    positions = np.zeros(T, dtype=np.int32)
+    prev_cell = 0
+    for t in range(T):
+        rss_map = {}
+        for nid in NODE_IDS:
+            db = 10.0 * np.log10(max(float(power_arrays[nid][t]), 1e-12))
+            buffers[nid].append(db)
+            rss_map[nid] = float(np.mean(buffers[nid]))
+
+        top1 = compute_posterior_top1(rss_map, NODE_IDS, dist, nearest_idx,
+                                      P0, ETA, SIG2, MASK, hypos)
+        if top1 is not None:
+            prev_cell = NODE_IDS.index(top1)
+        positions[t] = prev_cell
+
+    counts = np.bincount(positions, minlength=N_CELLS)
+    print(f"  Cell occupancy [0-5]: {counts.tolist()}")
+    print(f"  Dominant cell: {int(counts.argmax())}  "
+          f"({counts.max()/T*100:.1f}% of time)")
+    return positions
+
+
+# ===========================================================================
+# Data loading — supervised nearest-centroid classifier
+# ===========================================================================
+
+def load_positions_supervised(flac_dir, session, nodes_txt, gps_csv,
+                               step_s=0.5) -> np.ndarray:
+    """
+    Train a nearest-centroid classifier on GPS-labelled RSSI vectors, then
+    apply it to all FLAC timesteps.  Returns int32 (T,) cell indices 0-5.
+    """
+    from pathlib import Path as _Path
+    sys.path.insert(0, os.path.join(project_root, "collection"))
+    from flac_to_trackmdp import (
+        discover_flac_files, load_node_positions_ordered, load_gps_track,
+        _parse_session_start, build_training_pairs,
+        fit_supervised_classifier, predict_supervised_sequence,
+        compute_power_per_step,
+    )
+
+    flac_files = discover_flac_files(_Path(flac_dir), session=session)
+    missing = [nid for nid in NODE_IDS if nid not in flac_files]
+    if missing:
+        raise FileNotFoundError(f"Missing FLAC for nodes: {missing}")
+    print(f"  Found {len(flac_files)} FLAC files for session '{session}'")
+
+    node_xy    = load_node_positions_ordered(_Path(nodes_txt), NODE_IDS)
+    gps_df     = load_gps_track(_Path(gps_csv))
+    flac_start = _parse_session_start(session)
+
+    print("  Computing audio power …")
+    power_arrays = {}
+    for nid in NODE_IDS:
+        pwr = compute_power_per_step(flac_files[nid], step_s)
+        power_arrays[nid] = pwr
+        print(f"    node {nid}: {len(pwr)} steps")
+    T = min(len(power_arrays[nid]) for nid in NODE_IDS)
+
+    distances, rssi_db, _ = build_training_pairs(
+        gps_df, node_xy, power_arrays, NODE_IDS, flac_start, step_s
+    )
+    print(f"  Training on {len(rssi_db)} GPS-labelled samples …")
+    classifier = fit_supervised_classifier(rssi_db, distances, NODE_IDS)
+
+    print(f"  Predicting {T} steps …")
+    positions = predict_supervised_sequence(power_arrays, NODE_IDS, classifier, step_s)
+
+    counts = np.bincount(positions, minlength=N_CELLS)
+    print(f"  Cell occupancy [0-5]: {counts.tolist()}")
+    print(f"  Dominant cell: {int(counts.argmax())}  "
+          f"({counts.max()/T*100:.1f}% of time)")
     return positions
 
 
@@ -419,14 +548,15 @@ Tuning parameters
     )
     parser.add_argument(
         "--file",
-        default=DEFAULT_FILE,
-        help="Path to a single respeaker_power_*.npy file "
-             "(default: respeaker_power_20260416_152832.npy)"
+        default=None,
+        help="Path to a single respeaker_power_*.npy file (raw argmax mode). "
+             "If omitted, FLAC-Bayesian mode is used instead."
     )
     parser.add_argument(
         "--out-dir",
         default=None,
-        help="Output directory (default: same directory as --file)"
+        help="Output directory (default: iobt_data/ for FLAC mode, "
+             "same dir as --file for .npy mode)"
     )
     parser.add_argument(
         "--min-dwell", type=int, default=2,
@@ -442,28 +572,103 @@ Tuning parameters
         "--no-plot", action="store_true",
         help="Skip matplotlib visualisation"
     )
+    # ── FLAC mode flags (supervised + Bayesian) ───────────────────────────
+    parser.add_argument(
+        "--flac-dir", type=str, default=None,
+        help="Folder with FLAC files (default: iobt_data/)"
+    )
+    parser.add_argument(
+        "--session", type=str, default=DEFAULT_SESSION,
+        help=f"Session prefix to filter FLAC files (default: {DEFAULT_SESSION})"
+    )
+    parser.add_argument(
+        "--nodes-txt", type=str, default=DEFAULT_NODES_TXT,
+        help="Tab-delimited node_positions.txt, row order = nodes 11–16 "
+             "(default: iobt_data/node_positions.txt)"
+    )
+    parser.add_argument(
+        "--gps-csv", type=str,
+        default=os.path.join(_IOBT_DATA, "20260416_154037_gps2_gps.csv"),
+        help="GPS CSV for supervised training "
+             "(default: iobt_data/20260416_154037_gps2_gps.csv)"
+    )
+    parser.add_argument(
+        "--bayesian", action="store_true",
+        help="Use Bayesian path-loss inference instead of supervised classifier"
+    )
+    parser.add_argument(
+        "--path-loss-json", type=str, default=DEFAULT_PATH_LOSS,
+        help="[--bayesian] Trained path-loss params JSON "
+             "(default: iobt_data/path_loss_params_20260416.json)"
+    )
+    parser.add_argument(
+        "--step", type=float, default=DEFAULT_STEP_S,
+        help="FLAC window size in seconds (default: 0.5)"
+    )
+    parser.add_argument(
+        "--rssi-window", type=int, default=DEFAULT_RSSI_WINDOW,
+        help="[--bayesian] Rolling-average dB window (default: 1 = no rolling)"
+    )
     args = parser.parse_args()
 
-    filepath = os.path.abspath(args.file)
-    out_dir  = args.out_dir or os.path.dirname(filepath)
+    # ── Choose mode ───────────────────────────────────────────────────────
+    if args.file is not None:
+        mode = "npy"
+    elif args.bayesian:
+        mode = "bayesian"
+    elif os.path.isfile(args.gps_csv):
+        mode = "supervised"
+    else:
+        mode = "bayesian"   # no GPS CSV → fall back to Bayesian
 
-    # Extract timestamp suffix from filename, e.g. respeaker_power_20260416_153953.npy → 20260416_153953
-    stem   = Path(filepath).stem   # respeaker_power_20260416_153953
-    prefix = "respeaker_power_"
-    suffix = stem[len(prefix):] if stem.startswith(prefix) else stem
+    flac_dir = args.flac_dir or DEFAULT_FLAC_DIR
+
+    if mode == "npy":
+        filepath = os.path.abspath(args.file)
+        if not os.path.isfile(filepath):
+            print(f"[ERROR] File not found: {filepath}")
+            sys.exit(1)
+        mode_label = f"raw argmax  ({os.path.basename(filepath)})"
+        out_dir    = args.out_dir or os.path.dirname(filepath)
+        stem       = Path(filepath).stem
+        prefix     = "respeaker_power_"
+        suffix     = stem[len(prefix):] if stem.startswith(prefix) else stem
+    else:
+        filepath   = None
+        suffix     = args.session
+        out_dir    = args.out_dir or DEFAULT_FLAC_DIR
+        if mode == "supervised":
+            mode_label = f"supervised  (session={args.session})"
+        else:
+            mode_label = f"Bayesian  (session={args.session})"
 
     print("=" * 60)
     print("  RESPEAKER → TRANSITION MATRIX")
     print("=" * 60)
-    print(f"  Input file : {filepath}")
+    print(f"  Mode       : {mode_label}")
+    if mode == "npy":
+        print(f"  Input file : {filepath}")
     print(f"  Out dir    : {out_dir}")
     print(f"  Min dwell  : {args.min_dwell}")
     print(f"  Min prob   : {args.min_prob}")
     print()
 
-    # ── Load & filter ─────────────────────────────────────────────────────
-    print("[1/4] Loading positions …")
-    positions = load_positions(filepath)
+    # ── Load positions ────────────────────────────────────────────────────
+    if mode == "supervised":
+        print("[1/4] Training supervised classifier from GPS + FLAC …")
+        positions = load_positions_supervised(
+            flac_dir, args.session, args.nodes_txt, args.gps_csv,
+            step_s=args.step,
+        )
+    elif mode == "bayesian":
+        print("[1/4] Running Bayesian RSSI inference from FLAC …")
+        positions = load_positions_from_flac(
+            flac_dir, args.session, args.nodes_txt, args.path_loss_json,
+            step_s=args.step, rssi_window=args.rssi_window,
+        )
+    else:
+        print("[1/4] Loading positions …")
+        positions = load_positions(filepath)
 
     print("\n[2/4] Filtering noise …")
     positions = apply_min_dwell(positions, args.min_dwell)

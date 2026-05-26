@@ -338,11 +338,13 @@ class grid_env_rect:
     """
 
     def __init__(self, nrows, ncols, num_trans, state_trans_cum_prob,
-                 max_sensors, max_sensors_null, missing_state, time_limit):
+                 max_sensors, max_sensors_null, missing_state, time_limit,
+                 no_moore_constraint=False):
         self.nrows = nrows
         self.ncols = ncols
         self.N     = ncols          # gym_wrapper reads self.N for obs-space size
         self.n_cells = nrows * ncols
+        self.no_moore_constraint = no_moore_constraint
 
         self.num_trans      = num_trans
         self.prob_list_cum  = np.array(state_trans_cum_prob)
@@ -523,6 +525,10 @@ class grid_env_rect:
 
     def realign_obj(self, object_pos, current_state, time_delay):
         """Return (relative_position_in_window, in_window_flag)."""
+        if self.no_moore_constraint:
+            # Full-grid mode: object is always reachable; use absolute cell index.
+            return object_pos, 1
+
         state_cell = current_state // (self.time_limit + 1)
         grid_rad   = (2 * time_delay + 3) // 2
 
@@ -550,17 +556,22 @@ class grid_env_rect:
         no_of_time_sensors = (2 * time_delay + 3) ** 2
 
         if current_state != self.missing_state:
-            action_clip    = current_action[-no_of_time_sensors:]
-            action_sensors = np.multiply(
-                action_clip,
-                self.valid_q_indices_dict[time_delay][current_state]
-            )
-            obj_rel_pos, obj_in_grid = self.realign_obj(
-                self.object_pos, current_state, time_delay
-            )
+            if self.no_moore_constraint:
+                action_sensors = np.asarray(current_action[:self.n_cells])
+                obj_rel_pos, obj_in_grid = self.object_pos, 1
+            else:
+                action_clip    = current_action[-no_of_time_sensors:]
+                action_sensors = np.multiply(
+                    action_clip,
+                    self.valid_q_indices_dict[time_delay][current_state]
+                )
+                obj_rel_pos, obj_in_grid = self.realign_obj(
+                    self.object_pos, current_state, time_delay
+                )
         else:
             obj_rel_pos, obj_in_grid = 0, 1
-            action_sensors = [1] * no_of_time_sensors
+            action_sensors = [1] * (self.n_cells if self.no_moore_constraint
+                                    else no_of_time_sensors)
 
         if obj_in_grid == 1 and action_sensors[int(obj_rel_pos)] == 1:
             obj_found        = 1
@@ -603,7 +614,8 @@ class learning_grid_sarsa_0:
     """
 
     def __init__(self, run_number, nrows, ncols, num_trans, state_trans_cum_prob,
-                 max_sensors, max_sensors_null, time_limit, time_limit_max):
+                 max_sensors, max_sensors_null, time_limit, time_limit_max,
+                 no_moore_constraint=False):
         self.run_number     = run_number
         self.nrows          = nrows
         self.ncols          = ncols
@@ -617,7 +629,8 @@ class learning_grid_sarsa_0:
 
         self.grid_env = grid_env_rect(
             nrows, ncols, num_trans, state_trans_cum_prob,
-            max_sensors, max_sensors_null, self.missing_state, time_limit
+            max_sensors, max_sensors_null, self.missing_state, time_limit,
+            no_moore_constraint=no_moore_constraint,
         )
 
         self.exploration_epsilon = 0.15

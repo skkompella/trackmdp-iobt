@@ -31,13 +31,22 @@ class grid_environment_rect(gym.Env):
         self.time_limit_max     = env_config["time_limit_max"]
         self.missing_state      = self.qobj.missing_state
         self.n_cells            = self.qobj.n_cells    # NROWS * NCOLS
+        self._max_ep_steps      = env_config.get("max_ep_steps", 100)
+        self._ep_step           = 0
+        self.no_moore_constraint = env_config.get("no_moore_constraint", False)
 
-        # Action space: (2*time_limit_max + 3)² binary decisions
-        action_space_sz = (2 * self.time_limit_max + 3) ** 2
+        # Action space: full grid when no_moore_constraint, else (2t+3)² window
+        if self.no_moore_constraint:
+            action_space_sz = self.n_cells
+        else:
+            action_space_sz = (2 * self.time_limit_max + 3) ** 2
         self.action_space = gym.spaces.MultiDiscrete([2] * action_space_sz)
 
-        # Augment vector (same as original — depends only on time_limit_max)
-        self.augment_vec_1 = [(2 * i + 3) ** 2 for i in range(self.time_limit_max + 1)]
+        # Augment vector
+        if self.no_moore_constraint:
+            self.augment_vec_1 = [self.n_cells] * (self.time_limit_max + 1)
+        else:
+            self.augment_vec_1 = [(2 * i + 3) ** 2 for i in range(self.time_limit_max + 1)]
         augment_vec = [0]
         for v in self.augment_vec_1:
             augment_vec.append(augment_vec[-1] + v)
@@ -66,6 +75,7 @@ class grid_environment_rect(gym.Env):
         self.info       = {}
         self.reward     = 0
         self.done       = False
+        self._ep_step   = 0
 
         self.seed(SEED)
         self.reset()
@@ -97,12 +107,14 @@ class grid_environment_rect(gym.Env):
         self.actions_list        = []
         self.reward              = 0
         self.done                = False
+        self._ep_step            = 0
         self.info                = {}
         return self.tuple_augment_state, {}
 
     def step(self, action):
         if self.current_state == self.missing_state:
-            action_bool = [1] * ((2 * self.time_limit_max + 3) ** 2)
+            action_bool = [1] * (self.n_cells if self.no_moore_constraint
+                                 else (2 * self.time_limit_max + 3) ** 2)
         else:
             action_bool = action
 
@@ -123,9 +135,11 @@ class grid_environment_rect(gym.Env):
         if next_state != self.missing_state:
             self.state = self.current_state
 
+        self._ep_step           += 1
+        truncated                = (self._ep_step >= self._max_ep_steps)
         self.reward              = reward
         self.tuple_augment_state = self.to_tuple_augment_state(self.state, self.actions_list)
-        return [self.tuple_augment_state, self.reward, self.done, False, self.info]
+        return [self.tuple_augment_state, self.reward, self.done, truncated, self.info]
 
     def render(self, mode="human"):
         print(f"position: {self.state:2d}  reward: {self.reward:+.3f}  info: {self.info}")
