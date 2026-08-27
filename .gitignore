@@ -214,3 +214,16 @@ secrets.py
 
 
 agent_run194_a2c/
+
+# gnhf objective-push-track-876cb3 worktree: symlinks to large/read-only dirs
+# in the main checkout — never track these, they aren't part of this worktree.
+/iobt_data
+/iobt_data_10
+/results
+/experiments_ref
+/runs
+/track_mdp_env
+
+# ...but do track this worktree's own experiment run logs (notes.json), even
+# though *.json is ignored above.
+!/experiments/**/notes.json
