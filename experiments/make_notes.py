@@ -28,6 +28,15 @@ HYPOTHESES = {
     600: "Reproduce run 236 baseline (soft-scale=0.8, camera fusion, from 227) in this worktree to confirm setup is correct before trying anything new.",
     601: "RESUME.md next-step #1: sweep --soft-scale below 0.8 (from run 227 base, camera fusion) since the "
          "1.2->0.8 trend was reported monotonically positive and not bottomed out. Tried soft-scale=0.5 first.",
+    602: "RESUME.md next-step #2: multi-session training. Combine session 20250812_165739 (130 GPS-covered "
+         "steps) with 20250812_091600 (1736 GPS-covered steps, camera P_cam available despite 3 missing "
+         "audio FLACs and 3 malformed YOLO json files) into one concatenated training set (1866 steps total), "
+         "same soft-scale=0.8/threshold=0.4 camera-fusion recipe as run 600/236 from the run 227 base. "
+         "Required a code change to examples/finetune_deterministic.py (--iobt-extra-sessions flag) to build "
+         "and concatenate P_fused/gt_seq across sessions for TRAINING while keeping EVAL on session "
+         "20250812_165739 alone (via a separate eval-only RealIoBTEnv), so the reported accuracy number stays "
+         "comparable to single-session runs 600/236 rather than being diluted across a much larger second "
+         "session.",
 }
 
 FINDINGS = {
@@ -50,6 +59,19 @@ FINDINGS = {
          "is now considered explored and unpromising — the drop from 0.8->0.5 is steep enough that 0.6/0.7 are "
          "very unlikely to beat 0.8. Moving to next-steps #2+ in RESUME.md's ranked list rather than spending "
          "more runs narrowing this direction.",
+    602: "Best accuracy 90.05% at iter 110 (4.93 nodes/step), baseline 88.65% — essentially FLAT vs run 600's "
+         "single-session 89.95% (and still below run 236's documented 91.00%), well within run-to-run noise "
+         "given the eval set is only 130 GPS-covered steps on session 20250812_165739. Adding ~14x more "
+         "training data from a second session did NOT raise the accuracy ceiling on the primary session. "
+         "Same oscillate-after-early-peak shape as every other camera-fusion run (best at iter 110, then "
+         "decays/oscillates in the 85-90% band for the remaining 90 iterations) — the failure mode looks "
+         "identical to the single-session case, so more training data from one additional, very different "
+         "session isn't fixing whatever is capping accuracy around 90%. RESUME.md next-step #2 (multi-session "
+         "training) is now considered explored and NOT promising enough to pursue further with more session "
+         "combinations — the bottleneck is more likely in the reward/PPO dynamics (oscillate-then-decay after "
+         "an early peak, same as every single-session run) than in training-set diversity or overfitting to "
+         "one trajectory. Moving to next-steps #3+ (--advanced-hparams, node-clf gating, run-241 base sweep, "
+         "cam-fallback-thresh, --gt oracle).",
 }
 
 

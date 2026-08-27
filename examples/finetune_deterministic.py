@@ -1683,6 +1683,7 @@ def finetune(cfg, source_checkpoint, new_run, circle_path=None,
              realdata=False, train_sequence=None, eval_sequence=None,
              no_moore=False, binary_detections=None, gps_eval=False,
              iobt_gt_sequence=None, iobt_p_audio=None,
+             iobt_gt_sequence_eval=None, iobt_p_audio_eval=None,
              soft_threshold=0.5, soft_scale=1.0,
              iobt_prior="circular"):
     env_mode      = cfg["env"]
@@ -1702,6 +1703,7 @@ def finetune(cfg, source_checkpoint, new_run, circle_path=None,
     use_realdata      = realdata and train_sequence is not None
     use_transition    = transition_matrix is not None and not use_realdata
     use_soft_iobt     = iobt_gt_sequence is not None
+    iobt_eval_env     = None
 
     # ── Build env + wrapper depending on mode and movement model ─────────────
     cfg["binary_detections"] = binary_detections
@@ -1735,6 +1737,23 @@ def finetune(cfg, source_checkpoint, new_run, circle_path=None,
         cfg["missing_state"]      = IOBT_N * IOBT_N * (time_limit_max + 1) + 1
         cfg["no_moore_constraint"] = True
         env_wrapper_cls           = grid_environment
+
+        # If a distinct eval-only sequence was supplied (multi-session training,
+        # where training data is a concatenation of sessions but eval must stay
+        # on a single held-out-comparable session), build a separate eval env so
+        # the reported accuracy is measured only on that primary session.
+        iobt_eval_env = None
+        if (iobt_gt_sequence_eval is not None
+                and (len(iobt_gt_sequence_eval) != len(iobt_gt_sequence)
+                     or not np.array_equal(iobt_gt_sequence_eval, iobt_gt_sequence))):
+            iobt_eval_env = RealIoBTEnv(
+                cfg["max_sensors"], cfg["max_sensors_null"], cfg["missing_state"],
+                time_limit,
+                iobt_gt_sequence_eval,
+                p_audio        = iobt_p_audio_eval,
+                soft_threshold = soft_threshold,
+                soft_scale     = soft_scale,
+            )
     elif env_mode == "iobt":
         if use_transition:
             qobj = TransitionMatrixIoBTLearner(
@@ -1808,7 +1827,8 @@ def finetune(cfg, source_checkpoint, new_run, circle_path=None,
     def _eval(algo_, eval_cfg_):
         if use_realdata:
             return evaluate_realdata_policy(algo_, eval_cfg_, eval_sequence)
-        return evaluate_policy(algo_, qobj.grid_env, eval_cfg_)
+        eval_env_ = iobt_eval_env if iobt_eval_env is not None else qobj.grid_env
+        return evaluate_policy(algo_, eval_env_, eval_cfg_)
 
     if eval_only:
         print(f"Loading checkpoint: {source_checkpoint}")
@@ -2091,7 +2111,16 @@ Examples
     parser.add_argument("--iobt-gt-session",  type=str, default=None,
                         metavar="YYYYMMDD_HHMMSS",
                         help="[--soft-reward] Session subdir under --iobt-data-dir "
-                             "(e.g. 20250812_165739). Drives the IoBT object from GPS.")
+                             "(e.g. 20250812_165739). Drives the IoBT object from GPS. "
+                             "This session is always used for the final eval, even if "
+                             "--iobt-extra-sessions adds more sessions to training.")
+    parser.add_argument("--iobt-extra-sessions", type=str, default=None,
+                        metavar="SESSION1,SESSION2,...",
+                        help="[--soft-reward] Comma-separated extra session IDs whose "
+                             "GT sequence + P_fused are concatenated onto --iobt-gt-session "
+                             "for TRAINING only (multi-session training set). Eval always "
+                             "stays on --iobt-gt-session alone so accuracy numbers remain "
+                             "comparable across runs.")
     parser.add_argument("--iobt-data-dir",    type=str, default=_D10,
                         help=f"[--soft-reward] Root data directory for 10-node IoBT sessions "
                              f"(default: {_D10})")
@@ -2302,8 +2331,10 @@ Examples
             )
 
     # ── IoBT 10-node soft-reward mode ─────────────────────────────────────
-    iobt_gt_sequence = None
-    iobt_p_audio     = None
+    iobt_gt_sequence      = None
+    iobt_p_audio          = None
+    iobt_gt_sequence_eval = None
+    iobt_p_audio_eval     = None
 
     if getattr(args, 'soft_reward', False):
         if not args.iobt_gt_session:
@@ -2311,11 +2342,6 @@ Examples
             sys.exit(1)
         if not args.pooled_clf:
             print("[ERROR] --soft-reward requires --pooled-clf")
-            sys.exit(1)
-
-        session_dir = os.path.join(args.iobt_data_dir, args.iobt_gt_session)
-        if not os.path.isdir(session_dir):
-            print(f"[ERROR] IoBT session directory not found: {session_dir}")
             sys.exit(1)
         if not os.path.exists(args.pooled_clf):
             print(f"[ERROR] --pooled-clf file not found: {args.pooled_clf}")
@@ -2327,69 +2353,100 @@ Examples
         args.no_moore            = True
         cfg["no_moore_constraint"] = True
 
-        print("[soft-reward] Building IoBT GPS ground-truth sequence …")
-        iobt_gt_sequence, gps_mask = build_iobt_gt_sequence(session_dir, step_s=0.5)
-
-        print("[soft-reward] Building pooled audio probability matrix …")
+        fusion_mode = getattr(args, 'fusion_mode', 'audio')
         import joblib as _jl
         from pathlib import Path as _Path
         calibrators = _jl.load(args.calibrators) if args.calibrators else None
-        P_audio_full = build_p_audio_iobt_10(
-            args.pooled_clf, session_dir,
-            list(range(1, 11)), calibrators=calibrators, step_s=0.5,
-        )  # (T_full, 10)
 
-        fusion_mode = getattr(args, 'fusion_mode', 'audio')
+        def _build_session_fused(session_id):
+            """Return (gt_seq, P_fused_gps) for one session, GPS-covered steps only."""
+            session_dir = os.path.join(args.iobt_data_dir, session_id)
+            if not os.path.isdir(session_dir):
+                print(f"[ERROR] IoBT session directory not found: {session_dir}")
+                sys.exit(1)
 
-        if fusion_mode != 'audio':
-            from collection.train_node_classifiers_10 import (
-                build_p_cam_10 as _build_p_cam_10,
-                _parse_session_start_10,
-            )
-            session_start_unix = _parse_session_start_10(args.iobt_gt_session).timestamp()
-            T_full = P_audio_full.shape[0]
-            print(f"[soft-reward] Building camera probability matrix (fusion={fusion_mode}) …")
-            P_cam_full = _build_p_cam_10(
-                _Path(session_dir), list(range(1, 11)),
-                session_start_unix, T_full, bin_size_s=0.5,
+            print(f"[soft-reward] [{session_id}] Building IoBT GPS ground-truth sequence …")
+            gt_seq, gps_mask = build_iobt_gt_sequence(session_dir, step_s=0.5)
+
+            print(f"[soft-reward] [{session_id}] Building pooled audio probability matrix …")
+            P_audio_full = build_p_audio_iobt_10(
+                args.pooled_clf, session_dir,
+                list(range(1, 11)), calibrators=calibrators, step_s=0.5,
             )  # (T_full, 10)
-            print(f"  [camera] P_cam: mean={P_cam_full.mean():.3f}  "
-                  f"max={P_cam_full.max():.3f}  "
-                  f"positive_rate={(P_cam_full > 0).mean():.3f}")
 
-            if fusion_mode == 'camera':
-                P_fused_full = P_cam_full.astype(np.float32)
-            elif fusion_mode == 'or_max':
-                P_fused_full = np.maximum(P_audio_full, P_cam_full).astype(np.float32)
-            elif fusion_mode == 'weighted':
-                aw = getattr(args, 'audio_weight', 0.5)
-                cw = getattr(args, 'cam_weight',   0.5)
-                P_fused_full = np.clip(
-                    aw * P_audio_full + cw * P_cam_full, 0.0, 1.0
-                ).astype(np.float32)
-            elif fusion_mode == 'cam_fallback':
-                # Use camera above threshold, audio elsewhere
-                cam_thresh = getattr(args, 'cam_fallback_thresh', 0.0)
-                P_fused_full = np.where(
-                    P_cam_full > cam_thresh, P_cam_full, P_audio_full
-                ).astype(np.float32)
+            if fusion_mode != 'audio':
+                from collection.train_node_classifiers_10 import (
+                    build_p_cam_10 as _build_p_cam_10,
+                    _parse_session_start_10,
+                )
+                session_start_unix = _parse_session_start_10(session_id).timestamp()
+                T_full = P_audio_full.shape[0]
+                print(f"[soft-reward] [{session_id}] Building camera probability matrix "
+                      f"(fusion={fusion_mode}) …")
+                P_cam_full = _build_p_cam_10(
+                    _Path(session_dir), list(range(1, 11)),
+                    session_start_unix, T_full, bin_size_s=0.5,
+                )  # (T_full, 10)
+                print(f"  [camera] P_cam: mean={P_cam_full.mean():.3f}  "
+                      f"max={P_cam_full.max():.3f}  "
+                      f"positive_rate={(P_cam_full > 0).mean():.3f}")
+
+                if fusion_mode == 'camera':
+                    P_fused_full = P_cam_full.astype(np.float32)
+                elif fusion_mode == 'or_max':
+                    P_fused_full = np.maximum(P_audio_full, P_cam_full).astype(np.float32)
+                elif fusion_mode == 'weighted':
+                    aw = getattr(args, 'audio_weight', 0.5)
+                    cw = getattr(args, 'cam_weight',   0.5)
+                    P_fused_full = np.clip(
+                        aw * P_audio_full + cw * P_cam_full, 0.0, 1.0
+                    ).astype(np.float32)
+                elif fusion_mode == 'cam_fallback':
+                    # Use camera above threshold, audio elsewhere
+                    cam_thresh = getattr(args, 'cam_fallback_thresh', 0.0)
+                    P_fused_full = np.where(
+                        P_cam_full > cam_thresh, P_cam_full, P_audio_full
+                    ).astype(np.float32)
+                else:
+                    P_fused_full = P_audio_full
+
+                print(f"  [fused]  P_fused: mean={P_fused_full.mean():.3f}  "
+                      f"max={P_fused_full.max():.3f}")
+                if fusion_mode == 'cam_fallback':
+                    cam_covered = (P_cam_full > 0).mean()
+                    audio_fill  = ((P_cam_full == 0) & (P_audio_full > 0)).mean()
+                    print(f"  [cam_fallback] cam coverage: {cam_covered:.3f}  "
+                          f"audio fill-in: {audio_fill:.3f}")
             else:
                 P_fused_full = P_audio_full
 
-            print(f"  [fused]  P_fused: mean={P_fused_full.mean():.3f}  "
-                  f"max={P_fused_full.max():.3f}")
-            if fusion_mode == 'cam_fallback':
-                cam_covered = (P_cam_full > 0).mean()
-                audio_fill  = ((P_cam_full == 0) & (P_audio_full > 0)).mean()
-                print(f"  [cam_fallback] cam coverage: {cam_covered:.3f}  "
-                      f"audio fill-in: {audio_fill:.3f}")
-        else:
-            P_fused_full = P_audio_full
+            # Align to GPS-covered timesteps (same for all modalities)
+            p_fused_gps = P_fused_full[gps_mask]  # (T_gps, 10)
+            print(f"[soft-reward] [{session_id}] Aligned P_fused: {p_fused_gps.shape}  "
+                  f"gt_seq: {len(gt_seq)}")
+            return gt_seq, p_fused_gps
 
-        # Align to GPS-covered timesteps (same for all modalities)
-        iobt_p_audio = P_fused_full[gps_mask]  # (T_gps, 10)
-        print(f"[soft-reward] Aligned P_fused: {iobt_p_audio.shape}  "
-              f"gt_seq: {len(iobt_gt_sequence)}")
+        primary_gt, primary_p = _build_session_fused(args.iobt_gt_session)
+        iobt_gt_sequence_eval, iobt_p_audio_eval = primary_gt, primary_p
+
+        extra_sessions = [s.strip() for s in (args.iobt_extra_sessions or "").split(",")
+                           if s.strip()]
+        if extra_sessions:
+            gt_parts = [primary_gt]
+            p_parts  = [primary_p]
+            for sess in extra_sessions:
+                sess_gt, sess_p = _build_session_fused(sess)
+                gt_parts.append(sess_gt)
+                p_parts.append(sess_p)
+            iobt_gt_sequence = np.concatenate(gt_parts).astype(np.int32)
+            iobt_p_audio     = np.concatenate(p_parts, axis=0).astype(np.float32)
+            print(f"[soft-reward] Multi-session training set: {[args.iobt_gt_session] + extra_sessions} "
+                  f"-> combined gt_seq={len(iobt_gt_sequence)}  P_fused={iobt_p_audio.shape}  "
+                  f"(eval stays on {args.iobt_gt_session} alone: "
+                  f"gt_seq={len(iobt_gt_sequence_eval)})")
+        else:
+            iobt_gt_sequence = primary_gt
+            iobt_p_audio     = primary_p
 
     # ── Locate source checkpoint ──────────────────────────────────────────
     if args.scratch:
@@ -2493,6 +2550,8 @@ Examples
                  gps_eval=args.gps_eval,
                  iobt_gt_sequence=iobt_gt_sequence,
                  iobt_p_audio=iobt_p_audio,
+                 iobt_gt_sequence_eval=iobt_gt_sequence_eval,
+                 iobt_p_audio_eval=iobt_p_audio_eval,
                  soft_threshold=getattr(args, 'soft_threshold', 0.5),
                  soft_scale=getattr(args, 'soft_scale', 1.0),
                  iobt_prior=getattr(args, 'iobt_prior', 'circular'))
