@@ -26,6 +26,8 @@ PROJECT_ROOT = Path(__file__).parent.parent
 # ---------------------------------------------------------------------------
 HYPOTHESES = {
     600: "Reproduce run 236 baseline (soft-scale=0.8, camera fusion, from 227) in this worktree to confirm setup is correct before trying anything new.",
+    601: "RESUME.md next-step #1: sweep --soft-scale below 0.8 (from run 227 base, camera fusion) since the "
+         "1.2->0.8 trend was reported monotonically positive and not bottomed out. Tried soft-scale=0.5 first.",
 }
 
 FINDINGS = {
@@ -38,6 +40,16 @@ FINDINGS = {
          "string '127.0.0.1' (and 'localhost'/'::1') and silently rewrites it back to the auto-detected "
          "external IP, which this sandbox blocks for self-connections, so GCS startup timed out every time. "
          "Fixed by pinning to '127.0.0.2' instead (still loopback on Linux, not special-cased by Ray).",
+    601: "REJECTS the monotonic-trend hypothesis: soft-scale=0.5 best accuracy is only 83.35% (vs 89.95% for "
+         "scale=0.8 in run 600, and 91.00% documented for run 236) — clearly worse, not better. Accuracy "
+         "oscillates in the 79-83% band across all 200 iterations with no upward trend, unlike scale=0.8's "
+         "peak-then-decay shape reaching ~90%. The 1.2->0.8 trend does NOT continue below 0.8 — 0.8 sits near "
+         "a local optimum, not partway down a monotonic slope. Likely cause: at scale=0.5 the reward signal "
+         "becomes too weak/flat for PPO's advantage estimation to distinguish good from bad actions, undoing "
+         "the benefit that softening provided going from 1.2->0.8. Next-step #1 (soft-scale sweep below 0.8) "
+         "is now considered explored and unpromising — the drop from 0.8->0.5 is steep enough that 0.6/0.7 are "
+         "very unlikely to beat 0.8. Moving to next-steps #2+ in RESUME.md's ranked list rather than spending "
+         "more runs narrowing this direction.",
 }
 
 
