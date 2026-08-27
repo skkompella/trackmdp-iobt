@@ -28,7 +28,17 @@ HYPOTHESES = {
     600: "Reproduce run 236 baseline (soft-scale=0.8, camera fusion, from 227) in this worktree to confirm setup is correct before trying anything new.",
 }
 
-FINDINGS = {}
+FINDINGS = {
+    600: "Reproduced within ~1pt of run 236: best 89.95% at iter 34 (vs run 236's 91.00% at iter 54/58) — "
+         "run-to-run variance since neither run pins a training RNG seed. Confirms this worktree's setup, "
+         "checkpoints, and pooled classifier are all correct. Accuracy peaks early (iter 30-40) then degrades "
+         "over the remaining ~160 iterations, same oscillate-then-decay shape documented for run 236. "
+         "Also fixed a real infra bug hit during this run: ray.init(_node_ip_address='127.0.0.1') from the "
+         "previous iteration was a no-op — Ray's services.resolve_ip_for_localhost() special-cases the exact "
+         "string '127.0.0.1' (and 'localhost'/'::1') and silently rewrites it back to the auto-detected "
+         "external IP, which this sandbox blocks for self-connections, so GCS startup timed out every time. "
+         "Fixed by pinning to '127.0.0.2' instead (still loopback on Linux, not special-cased by Ray).",
+}
 
 
 # ---------------------------------------------------------------------------

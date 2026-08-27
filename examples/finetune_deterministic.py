@@ -1796,9 +1796,13 @@ def finetune(cfg, source_checkpoint, new_run, circle_path=None,
             ignore_reinit_error=True,
             runtime_env={"env_vars": {"PYTHONPATH": project_root}},
             # This sandbox blocks self-connections to the machine's external-facing
-            # IP (Ray's auto-detected node IP), which hangs GCS startup. Pin to
-            # loopback so the local single-node cluster can actually bind/connect.
-            _node_ip_address="127.0.0.1",
+            # IP (Ray's auto-detected node IP), which hangs GCS startup. "127.0.0.1"
+            # doesn't work here: Ray's services.resolve_ip_for_localhost() special-cases
+            # the literal string "127.0.0.1"/"localhost"/"::1" and silently rewrites it
+            # back to the auto-detected external IP. Use another loopback address
+            # (127.0.0.0/8 is all loopback on Linux) that isn't special-cased, so it
+            # survives resolution and the GCS server actually binds/connects locally.
+            _node_ip_address="127.0.0.2",
         )
 
     def _eval(algo_, eval_cfg_):
