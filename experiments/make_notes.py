@@ -37,6 +37,12 @@ HYPOTHESES = {
          "20250812_165739 alone (via a separate eval-only RealIoBTEnv), so the reported accuracy number stays "
          "comparable to single-session runs 600/236 rather than being diluted across a much larger second "
          "session.",
+    603: "RESUME.md next-step #3: --advanced-hparams slow-convergence PPO (lr=1e-4, train_batch_size=4000, "
+         "num_sgd_iter=10, sgd_minibatch_size=128, clip_param=0.2, entropy_coeff=0.01, grad_clip=30, "
+         "num_workers=4, rollout_fragment_length=1000) on the same run-227-base camera-fusion recipe as "
+         "runs 600/236 (soft-scale=0.8, soft-threshold=0.4, session 20250812_165739, 200 iterations), to test "
+         "whether a slower, more conservative PPO update schedule avoids the early-peak-then-decay pattern "
+         "seen in every fast-convergence run so far and lets accuracy keep climbing past ~90%.",
 }
 
 FINDINGS = {
@@ -72,6 +78,20 @@ FINDINGS = {
          "an early peak, same as every single-session run) than in training-set diversity or overfitting to "
          "one trajectory. Moving to next-steps #3+ (--advanced-hparams, node-clf gating, run-241 base sweep, "
          "cam-fallback-thresh, --gt oracle).",
+    603: "Best accuracy 89.90% at iter 14 (5.20 nodes/step), baseline 89.20% — essentially FLAT vs run 600's "
+         "89.95% and still below run 236's documented 91.00%. The slow-convergence hyperparameters do NOT "
+         "avoid the early-peak-then-decay pattern; if anything the decay is worse and monotonic: after peaking "
+         "at iter 14, accuracy drifts down through the 87-89% band (iters 15-100), then keeps sliding to the "
+         "83-86% band (iters 100-160), and finishes in the 81-87% band (iters 160-200, final iter 200 = "
+         "87.30%) while sensors/step steadily collapses from 5.2 down to ~3.2-3.7 — the lower entropy_coeff "
+         "schedule interacting with kl_coeff appears to be driving the policy toward using fewer and fewer "
+         "sensors over training, which look like a slow, steady collapse toward a degenerate low-sensor-usage "
+         "policy rather than continued improvement. This run took ~90 min wall-clock (vs run 600's ~38 min) "
+         "for the same 200 iterations due to the 8x larger train_batch_size (4000 vs default 512) — expensive "
+         "for no benefit. RESUME.md next-step #3 (--advanced-hparams) is now considered explored and NOT "
+         "promising: neither the fast-convergence defaults nor the slow-convergence advanced hparams beat the "
+         "~90% ceiling from the run-227 base recipe. Moving to next-steps #4+ (node-clf binary gating combined "
+         "with soft-reward camera fusion, run-241 base sweep, finer cam-fallback-thresh sweep, --gt oracle).",
 }
 
 
