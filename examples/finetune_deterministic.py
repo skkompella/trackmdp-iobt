@@ -1605,6 +1605,67 @@ def build_p_audio_iobt_10(
     return P_cal.astype(np.float32)
 
 
+def build_binary_detection_matrix_10(
+    node_clfs_dir: str,
+    session_dir:   str,
+    node_ids:      list[int],
+    step_s:        float = 0.5,
+) -> np.ndarray:
+    """
+    Build (T_full, N) bool binary detection matrix for the 10-node IoBT
+    per-node v3 classifiers (results/v3_10node/node_clf_N{nid}_multisession_v3_*.pkl),
+    using the same 20-feature amplitude+spectral pipeline they were trained with.
+
+    Returns full (T_full, N) array aligned to FLAC bins, same convention as
+    build_p_audio_iobt_10 / build_p_cam_10 — slice with gps_mask before use.
+    """
+    import glob
+    import joblib
+    import pandas as _pd
+    from pathlib import Path as _Path
+    from collection.train_node_classifiers_10 import (
+        build_node_features, aggregate_rolling, FEATURE_NAMES, WINDOW_STEPS,
+        _discover_session_flac_10,
+    )
+
+    session_dir = _Path(session_dir)
+    file_map    = _discover_session_flac_10(session_dir)
+    missing     = [nid for nid in node_ids if nid not in file_map]
+    if missing:
+        raise FileNotFoundError(
+            f"No FLAC file for node(s) {missing} in {session_dir}"
+        )
+
+    raw_and_T = {nid: build_node_features(file_map[nid], step_s) for nid in node_ids}
+    T_full    = min(t for _, t in raw_and_T.values())
+
+    B = np.zeros((T_full, len(node_ids)), dtype=bool)
+    for col_idx, nid in enumerate(node_ids):
+        clf_matches = sorted(glob.glob(
+            os.path.join(node_clfs_dir, f"node_clf_N{nid}_*.pkl")
+        ))
+        scaler_matches = sorted(glob.glob(
+            os.path.join(node_clfs_dir, f"node_scaler_N{nid}_*.pkl")
+        ))
+        if not clf_matches:
+            raise FileNotFoundError(f"No node classifier found for node {nid}: {node_clfs_dir}")
+        if not scaler_matches:
+            raise FileNotFoundError(f"No scaler pkl for node {nid}: {node_clfs_dir}")
+        clf    = joblib.load(clf_matches[-1])
+        scaler = joblib.load(scaler_matches[-1])
+
+        raw, _ = raw_and_T[nid]
+        X = aggregate_rolling(scaler.transform(raw[:T_full]), WINDOW_STEPS)
+        B[:, col_idx] = clf.predict(_pd.DataFrame(X, columns=FEATURE_NAMES)).astype(bool)
+
+        print(f"[node-clfs-10] Node {nid}: {os.path.basename(clf_matches[-1])}, "
+              f"positive rate = {B[:, col_idx].mean():.3f}")
+
+    print(f"[node-clfs-10] Binary detection matrix: shape={B.shape}, "
+          f"overall positive rate = {B.mean():.3f}")
+    return B
+
+
 def evaluate_realdata_policy(algo, cfg, rssi_sequence) -> dict:
     """
     Evaluate algo on real RSSI-posterior object positions.
@@ -2128,6 +2189,12 @@ Examples
                         help="[--soft-reward] Path to pooled_clf_{{ts}}.pkl from "
                              "train_node_classifiers_pooled.py. "
                              "Paired pooled_scaler_{{ts}}.pkl must be alongside it.")
+    parser.add_argument("--node-clfs-dir-10", type=str, default=None,
+                        help="[--soft-reward] Directory of 10-node per-node binary "
+                             "classifiers (node_clf_N{1..10}_multisession_v3_*.pkl + "
+                             "paired node_scaler_N*.pkl, from train_node_classifiers_10.py). "
+                             "When set, P_fused is gated: zeroed at (t, node) where the "
+                             "binary classifier does not confirm a hit.")
     parser.add_argument("--calibrators",      type=str, default=None,
                         help="[--soft-reward] Path to pooled_calibrators_{{ts}}.pkl "
                              "(isotonic per-node calibration, optional).")
@@ -2419,6 +2486,22 @@ Examples
                           f"audio fill-in: {audio_fill:.3f}")
             else:
                 P_fused_full = P_audio_full
+
+            if args.node_clfs_dir_10:
+                print(f"[soft-reward] [{session_id}] Building 10-node binary "
+                      f"detection gate …")
+                B_full = build_binary_detection_matrix_10(
+                    args.node_clfs_dir_10, session_dir, list(range(1, 11)),
+                    step_s=0.5,
+                )  # (T_full, 10) bool
+                T_gate = min(P_fused_full.shape[0], B_full.shape[0])
+                pre_mean = P_fused_full[:T_gate].mean()
+                P_fused_full = P_fused_full[:T_gate] * B_full[:T_gate].astype(np.float32)
+                gps_mask = gps_mask[:T_gate]
+                gt_seq   = gt_seq[:gps_mask.sum()] if len(gt_seq) > gps_mask.sum() else gt_seq
+                print(f"  [node-clfs-10 gate] P_fused mean {pre_mean:.4f} -> "
+                      f"{P_fused_full.mean():.4f} "
+                      f"(zeroed {1.0 - B_full[:T_gate].mean():.3f} of cells)")
 
             # Align to GPS-covered timesteps (same for all modalities)
             p_fused_gps = P_fused_full[gps_mask]  # (T_gps, 10)

@@ -43,6 +43,18 @@ HYPOTHESES = {
          "runs 600/236 (soft-scale=0.8, soft-threshold=0.4, session 20250812_165739, 200 iterations), to test "
          "whether a slower, more conservative PPO update schedule avoids the early-peak-then-decay pattern "
          "seen in every fast-convergence run so far and lets accuracy keep climbing past ~90%.",
+    604: "RESUME.md next-step #4: combine --node-clfs-dir binary gating with --soft-reward camera fusion. "
+         "Required a code change to examples/finetune_deterministic.py: a new build_binary_detection_matrix_10() "
+         "function (using the same 20-feature amplitude+spectral pipeline as train_node_classifiers_10.py) plus "
+         "a new --node-clfs-dir-10 flag, since the existing --node-clfs-dir/build_binary_detection_matrix() was "
+         "hardcoded to the 6-node ReSpeaker CLAUDE.md pipeline (nodes 11-16, different feature set) and cannot "
+         "be reused for the 10-node soft-reward system. Used the existing pre-trained 10-node per-node binary "
+         "classifiers at results/v3_10node/node_clf_N{1..10}_multisession_v3_20260520_173424.pkl (trained "
+         "in-session on 20250812_165739 — no other 10-node session has full binary-classifier training data). "
+         "Gate is applied as P_fused[t,k] *= B[t,k] before GPS-mask alignment: zeroes soft-reward at (t,node) "
+         "cells the binary classifier does not confirm, testing RESUME.md's hypothesis that this cuts false "
+         "positives capping accuracy below 95%. Otherwise identical to run 600/236: source=227, camera fusion, "
+         "soft-scale=0.8, soft-threshold=0.4, session 20250812_165739, 200 iterations, --gps-eval.",
 }
 
 FINDINGS = {
@@ -92,6 +104,26 @@ FINDINGS = {
          "promising: neither the fast-convergence defaults nor the slow-convergence advanced hparams beat the "
          "~90% ceiling from the run-227 base recipe. Moving to next-steps #4+ (node-clf binary gating combined "
          "with soft-reward camera fusion, run-241 base sweep, finer cam-fallback-thresh sweep, --gt oracle).",
+    604: "Best accuracy 90.05% at iter 111 (5.59 nodes/step), baseline 89.20% — essentially FLAT vs run 600's "
+         "89.95%/run 236's documented 91.00%, and NOT an improvement over the ~90% ceiling despite the gate "
+         "zeroing 90.0% of all P_fused cells (binary classifier overall positive rate only 10.0% across the "
+         "10 nodes x 132 steps, in-session on 20250812_165739). Same oscillate-after-early-peak-then-decay "
+         "shape as every other camera-fusion run: after the iter-111 peak, accuracy drifts down into the "
+         "82-86% band by iter 190-200 (final iter 200 = 84.85%), sensors/step drifting up from 5.3 to ~5.8 "
+         "(more sensors activated for less reward, unlike run 603's collapse toward fewer sensors — opposite "
+         "failure mode, same net effect of accuracy decay after the peak). The binary gate being this aggressive "
+         "(90% of cells zeroed) yet leaving best-accuracy essentially unchanged suggests the RL policy is "
+         "already learning to activate sensors close to the true GT node (where P_cam is naturally highest AND "
+         "the in-session-overfit binary classifier is naturally most likely to fire), so gating out low-P_fused "
+         "cells elsewhere doesn't meaningfully change which action the policy prefers — it mostly removes reward "
+         "noise the policy was already learning to ignore. RESUME.md next-step #4 (node-clf binary gating) is "
+         "now considered explored and NOT promising: it neither breaks through the ~90% ceiling nor materially "
+         "changes the training dynamics (same peak-iter-~100-150 then decay pattern seen in runs 600/601/602). "
+         "Caveat: only one gating classifier set exists (in-session on 165739, LOSO recall near-0 on other nodes "
+         "per results/v3_10node/node_clf_v3_report.txt), so this is a best-case (overfit) gate, not a realistic "
+         "cross-session one; a stricter/looser gate on more sessions was not tested given time budget. "
+         "Moving to next-steps #5+ (run-241 base full soft-scale sweep, finer cam-fallback-thresh sweep, --gt "
+         "oracle upper bound).",
 }
 
 
