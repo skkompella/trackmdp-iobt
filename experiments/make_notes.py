@@ -43,6 +43,11 @@ HYPOTHESES = {
          "runs 600/236 (soft-scale=0.8, soft-threshold=0.4, session 20250812_165739, 200 iterations), to test "
          "whether a slower, more conservative PPO update schedule avoids the early-peak-then-decay pattern "
          "seen in every fast-convergence run so far and lets accuracy keep climbing past ~90%.",
+    605: "RESUME.md next-step #5: use the run 241 base (500-iter topo prior, 99% raw eval accuracy) as the "
+         "source for a full soft-scale sweep instead of just the single scale=1.2 pass done in run 242. This "
+         "run tests scale=0.8 (the best scale found from the run 227 base in runs 600-604) from the stronger "
+         "run 241 base, to see whether the better-pretrained base checkpoint raises the ceiling once combined "
+         "with the best-known soft-reward config.",
     604: "RESUME.md next-step #4: combine --node-clfs-dir binary gating with --soft-reward camera fusion. "
          "Required a code change to examples/finetune_deterministic.py: a new build_binary_detection_matrix_10() "
          "function (using the same 20-feature amplitude+spectral pipeline as train_node_classifiers_10.py) plus "
@@ -124,6 +129,23 @@ FINDINGS = {
          "cross-session one; a stricter/looser gate on more sessions was not tested given time budget. "
          "Moving to next-steps #5+ (run-241 base full soft-scale sweep, finer cam-fallback-thresh sweep, --gt "
          "oracle upper bound).",
+    605: "Best accuracy 90.20% at iter 146 (4.32 nodes/step), baseline 89.10% — marginally above the ~90% "
+         "ceiling seen in runs 600/602/604 (89.95-90.05%) but still below run 236's documented 91.00% and far "
+         "below the 95% target, and within normal run-to-run noise given the 130-step eval set (~0.77pp "
+         "granularity per step). Despite run 241's much stronger raw base accuracy (99% per RESUME.md), fine-"
+         "tuning it with the same scale=0.8 camera-fusion recipe produces the same oscillate-after-early-peak "
+         "training shape as every prior run from the weaker run 227 base: peaks at iter 146, i.e. even later "
+         "than run 600's iter 30 peak, but still decays afterward (iter 198 dropped back to 88.65%). This "
+         "confirms next-step #5's premise (241 base helps slightly) but the gain is marginal (+0.15-0.25pp over "
+         "the 227-base ceiling), nowhere near closing the 4-5pp gap to 95%. Sensors/step at best (4.32) is "
+         "notably lower than every 227-base run's best (4.9-5.6), suggesting the stronger base's better raw "
+         "movement-prediction lets the policy use fewer, more targeted sensor activations for similar or "
+         "slightly better accuracy — but this doesn't translate into materially higher accuracy. RESUME.md "
+         "next-step #5 is now considered explored and NOT sufficient on its own to reach 95%: the bottleneck "
+         "is not primarily base-checkpoint quality, reinforcing the pattern from runs 600-604 that something "
+         "structural in the soft-reward PPO training dynamics (or the underlying camera/audio classifier noise "
+         "floor) caps this recipe family around 90%. Next: RESUME.md next-step #6 (finer cam-fallback-thresh "
+         "sweep) and #7 (--gt oracle upper bound) remain untried.",
 }
 
 
