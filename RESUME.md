@@ -131,3 +131,67 @@ track_mdp_env/bin/python examples/finetune_deterministic.py \
 - Log every run in `experiments/run{N}/notes.json` and re-run `experiments/make_notes.py`
   so `experiments/index.md` stays the single source of truth — don't let ad-hoc runs go
   unlogged.
+- Any run whose fusion touches P_audio (`audio`/`or_max`/`weighted`/`cam_fallback`) MUST
+  pass `--calibrators results/pooled/pooled_calibrators_20260521_164149.pkl`. Omitting it
+  feeds the raw uncalibrated pooled classifier (mean≈0.80 at every node — not
+  node-discriminative) into the reward and produces spurious 95%+ numbers (caught and
+  discarded during phase-1 run 606). Pure `camera` mode is the only fusion that's safe
+  without it.
+- Ray in a sandbox that blocks self-connections to the external IP: `ray.init()` hangs on
+  GCS startup, and pinning `_node_ip_address='127.0.0.1'` is a silent no-op (Ray rewrites
+  that exact string back to the auto-detected IP). Pin `'127.0.0.2'` instead.
+
+---
+
+## PHASE 2 — post-mortem of the 90% ceiling (2026-08-28 diagnosis)
+
+All 7 next-steps above were executed in the `objective-push-track-876cb3` worktree
+(runs 600-606, logged in its own `experiments/`). Every one landed at 89.9-90.2% with the
+same peak-then-decay shape. Root-cause analysis (verified analytically against the actual
+130-step eval sequence for `20250812_165739`, script preserved as `diag_ceiling.py` in the
+main checkout root — run it from the main checkout with any working track_mdp_env python):
+
+**The ceiling is structural — three binding constraints no phase-1 run ever varied:**
+
+1. **GT-node signal coverage = 73.85%.** Camera sees the GT node on only 96/130 eval steps.
+   The 34 dead steps cluster into long gaps: 14, 8, 5, 2, and five 1-step holes. Camera
+   scores are bimodal (exactly 0 or ≥0.50, median 0.92), which is why soft-scale 0.8 vs
+   1.2 vs 1.5 all behaved identically (lock bar P≥0.5 vs P≥0.33 selects the same steps)
+   and scale 0.5 collapsed (bar P≥0.8 kills the 0.50-0.80 quartile).
+2. **Audio can never hold the tracker's lock.** Calibrated audio max = 0.449, so
+   audio × scale 0.8 = 0.36 < threshold 0.4 — in every or_max/cam_fallback run in project
+   history the audio channel only shaped rewards; it never once confirmed a detection.
+   That's why every cam_fallback threshold behaved exactly like camera-only.
+3. **`time_limit = 1` and `max_sensors = 6` (of 10)** in `IOBT_DEFAULTS`
+   (examples/finetune_deterministic.py). After just 2 consecutive failed confirmations the
+   tracker enters missing state — an automatic scored miss. The camera gaps above force
+   ~7 such auto-misses (~5.5%) even for a perfect policy, and a lost policy can only cover
+   6 of 10 nodes.
+
+Key mechanical fact (verified in `RealIoBTEnv.get_reward_next_state`): the state machine
+only ever consults P_fused at the TRUE object node — false positives at other nodes cannot
+mislead it. So lowering `--soft-threshold` costs nothing in tracking honesty; it only
+lowers the bar for the true node to hold the lock. The eval metric itself is
+activation-based (GT node in the activated set while tracked), also unaffected.
+
+### Phase-2 ranked experiments (attack the binding constraints)
+
+1. **Raise `time_limit`/`time_limit_max` to 3-5.** Converts missing-state churn into
+   informed stale tracking; removes most of the ~7 forced misses. The obs/action space
+   depends on `time_limit_max`, so old checkpoints are incompatible — retrain the topo
+   base from `--scratch` first (500 iters, per run 241's recipe), then fine-tune.
+2. **Lower `--soft-threshold` to ~0.2 (keep scale 0.8) with `or_max` fusion +
+   calibrators.** Audio ≥0.25 on 13 of the 34 camera-dead steps → lock coverage
+   73.85% → 83.85%. Provably safe per the mechanical fact above.
+3. **Temporally smooth P_cam** (carry-forward or max-pool over ±1-2 bins, i.e. ±0.5-1s)
+   before fusing — the object cannot teleport; this bridges the six short gaps (~7 steps)
+   legitimately. New code in the P_cam builder path.
+4. **Recalibrate/retrain the audio classifier** — isotonic calibration currently squashes
+   audio to max 0.449. The unused PCEN pipeline (`collection/train_node_classifiers_pcen.py`)
+   is the starting point. Success metric: audio ≥0.5 at the GT node on camera-dead steps.
+5. **`max_sensors` 6 → 8** (flag as an energy trade-off in the run notes) — improves
+   stale-phase coverage; combine with the winners of 1-3 rather than testing alone.
+
+Expected combined effect of 1+2+3: lock coverage ~85-90%, forced misses ~7 → ~2,
+projected accuracy ~93-96%. Compare against the phase-1 `--gt` oracle number (run 607±)
+to know how much headroom the policy side still has.

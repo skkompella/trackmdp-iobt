@@ -1,0 +1,15 @@
+[iobt-gt] T_full=132  GPS-covered=130  0-based nodes visited: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[p-audio] P_audio shape=(132, 10)  mean=0.1985  max=0.4490  calibrated=True
+eval steps=130  scale=0.8
+
+(a) or_max lock coverage vs soft-threshold (no smoothing):
+  threshold=0.40  bar=0.5000  coverage=0.7385 (96/130)
+  threshold=0.30  bar=0.3750  coverage=0.7462 (97/130)
+  threshold=0.25  bar=0.3125  coverage=0.7538 (98/130)
+  threshold=0.20  bar=0.2500  coverage=0.8385 (109/130)
+
+(b) P_cam max-pool smoothing (bar shown = threshold/scale):
+  +/-0 bins: cam-only thr0.4 cov=0.7385 (96/130)  or_max thr0.4 cov=0.7385  or_max thr0.2 cov=0.8385 (109/130)  remaining cam gaps: [14, 8, 5, 2, 1, 1, 1, 1, 1]
+  +/-1 bins: cam-only thr0.4 cov=0.8077 (105/130)  or_max thr0.4 cov=0.8077  or_max thr0.2 cov=0.8846 (115/130)  remaining cam gaps: [12, 8, 4, 1]
+  +/-2 bins: cam-only thr0.4 cov=0.8385 (109/130)  or_max thr0.4 cov=0.8385  or_max thr0.2 cov=0.9000 (117/130)  remaining cam gaps: [10, 8, 3]
+  +/-3 bins: cam-only thr0.4 cov=0.8692 (113/130)  or_max thr0.4 cov=0.8692  or_max thr0.2 cov=0.9231 (120/130)  remaining cam gaps: [8, 4, 3, 2]

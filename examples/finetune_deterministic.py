@@ -2225,6 +2225,11 @@ Examples
                              "camera is used instead of audio. 0.0=any detection fires camera "
                              "(default, equiv to or_max for this dataset). 0.65=only "
                              "high-confidence YOLO detections suppress audio.")
+    parser.add_argument("--cam-smooth-bins", type=int, default=0,
+                        help="Temporally max-pool P_cam over +/-N bins (N*0.5s) per node "
+                             "before fusion, carrying camera detections forward/backward "
+                             "to bridge short detection gaps (the object cannot teleport "
+                             "at 0.5s resolution). 0 = no smoothing (default).")
 
     # ── Real-data replay mode ─────────────────────────────────────────────
     _D = os.path.join(project_root, "iobt_data")
@@ -2475,6 +2480,18 @@ Examples
                 print(f"  [camera] P_cam: mean={P_cam_full.mean():.3f}  "
                       f"max={P_cam_full.max():.3f}  "
                       f"positive_rate={(P_cam_full > 0).mean():.3f}")
+
+                smooth_w = getattr(args, 'cam_smooth_bins', 0) or 0
+                if smooth_w > 0:
+                    # Max-pool each node's P_cam over a +/-smooth_w bin window
+                    smoothed = P_cam_full.copy()
+                    for s in range(1, smooth_w + 1):
+                        smoothed[s:]  = np.maximum(smoothed[s:],  P_cam_full[:-s])
+                        smoothed[:-s] = np.maximum(smoothed[:-s], P_cam_full[s:])
+                    P_cam_full = smoothed
+                    print(f"  [cam-smooth] max-pooled P_cam over +/-{smooth_w} bins "
+                          f"({smooth_w * 0.5:.1f}s): mean={P_cam_full.mean():.3f}  "
+                          f"positive_rate={(P_cam_full > 0).mean():.3f}")
 
                 if fusion_mode == 'camera':
                     P_fused_full = P_cam_full.astype(np.float32)
