@@ -108,6 +108,36 @@ HYPOTHESES = {
          "curve: +/-1 (80.77%) is strictly dominated by +/-2, and +/-3 (1.5s) exceeds the 0.5-1s "
          "non-teleportation legitimacy window, so only +/-2 gets a training run. Exact command saved at "
          "experiments/run609/cmd.sh.",
+    610: "PHASE-2 experiment #4 (RESUME.md phase-2 ranked list): COMBINE the family-#2 and family-#3 winners "
+         "in one run — or_max fusion + soft-threshold 0.2 (lock bar 0.25, calibrated audio can rescue camera "
+         "gaps) + --cam-smooth-bins 2 (+/-1.0s max-pool of P_cam before fusion), soft-scale 0.8, from the "
+         "run 227 base, 200 iterations, --gps-eval, session 20250812_165739, --calibrators (MANDATORY for "
+         "or_max, see run 606 trap). TRACKER CONFIG: time_limit=1, max_sensors=6 (defaults, unchanged); lock "
+         "bar 0.25; P_cam temporally smoothed +/-2 bins before fusion. Analytic pre-checks: GT-node lock "
+         "coverage 90.00% (117/130, residual gaps [10, 8, 3]) — diag_phase2_coverage.txt +/-2-bin or_max@0.2 "
+         "cell; oracle-policy accuracy upper bound 96.92% (diag_phase2_coverage.py section (c)), so reaching "
+         "95.00% requires a near-oracle policy (runs 608/609 fell 1.7pp/? short of their oracle caps — this "
+         "is the run most likely to reach 95% per the phase-2 plan, but it is tight). Exact command saved at "
+         "experiments/run610/cmd.sh.",
+    611: "PHASE-2 experiment #1 stage 1 (RESUME.md phase-2 ranked list): retrain the topo base from --scratch "
+         "with time_limit=time_limit_max=3, via the new --time-limit flag (implemented iteration 5, "
+         "smoke-tested at 10 iters as throwaway run 998 before launch). Recipe otherwise reproduces the "
+         "run-241 base (topo prior, soft-reward audio fusion, 500 iters, session 20250812_165739). Needed "
+         "because the obs/action space depends on time_limit_max — the run-227/241 bases (tlm=1) are "
+         "incompatible with any tl=3 fine-tune. NOTE: this base's own accuracy numbers are NOT reportable "
+         "results (the historical base recipe uses uncalibrated audio, like runs 227/241); only the "
+         "subsequent calibrated fine-tune (run 612) counts as a phase-2 result. Exact command saved at "
+         "experiments/run611/cmd.sh.",
+    612: "PHASE-2 experiment #1+#4 (RESUME.md phase-2 ranked list): the FULL combination — time_limit=3 + "
+         "or_max fusion + soft-threshold 0.2 + --cam-smooth-bins 2, soft-scale 0.8, fine-tuned from the tl=3 "
+         "topo base (run 611), 200 iterations, --gps-eval, --calibrators (MANDATORY for or_max), session "
+         "20250812_165739. TRACKER CONFIG: time_limit=time_limit_max=3, max_sensors=6, lock bar 0.25, P_cam "
+         "smoothed +/-2 bins. Analytic pre-checks: same 90.00% lock coverage as run 610, but tl=3 lets the "
+         "tracker survive the residual [10, 8, 3] gaps' first 3 steps each — oracle-policy accuracy upper "
+         "bound 98.46% vs run 610's 96.92% (diag_phase2_coverage.py section (c)), giving 3.5pp of headroom "
+         "above the 95% target instead of 1.9pp. Eval metric unchanged (GT node activated while tracked) — "
+         "comparable to all prior runs; the tracker-internal time_limit change is design, not metric. Exact "
+         "command saved at experiments/run612/cmd.sh.",
 }
 
 FINDINGS = {

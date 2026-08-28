@@ -2100,6 +2100,13 @@ Examples
                              "restoring any checkpoint. --run and --checkpoint are "
                              "ignored when this flag is set.")
     parser.add_argument("--save-dir",    type=str,   default=None)
+    parser.add_argument("--time-limit",  type=int,   default=None,
+                        help="Override time_limit AND time_limit_max (default 1). "
+                             "The tracker tolerates this many consecutive failed "
+                             "confirmations before dropping to missing state. "
+                             "NOTE: obs/action space depends on time_limit_max, so "
+                             "checkpoints trained with a different value are "
+                             "INCOMPATIBLE — use --scratch to train a new base.")
     parser.add_argument("--circle",      type=str,   default=None,
                         help="Comma-separated circle path, e.g. '0,4,3,6,2,1'")
     parser.add_argument("--transition",  type=str,   default=None,
@@ -2275,6 +2282,11 @@ Examples
     if args.iterations is not None: cfg["training_iterations"] = args.iterations
     if args.eval_episodes is not None: cfg["eval_episodes"]    = args.eval_episodes
     if args.max_ep_steps  is not None: cfg["max_ep_steps"]     = args.max_ep_steps
+    if args.time_limit is not None:
+        cfg["time_limit"]     = args.time_limit
+        cfg["time_limit_max"] = args.time_limit
+        print(f"[time-limit] time_limit = time_limit_max = {args.time_limit} "
+              f"(obs/action space differs from time_limit_max=1 checkpoints)")
     cfg["no_moore_constraint"] = args.no_moore
 
     if args.advanced_hparams:
