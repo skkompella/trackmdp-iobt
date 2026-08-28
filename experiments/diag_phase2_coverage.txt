@@ -1,5 +1,16 @@
 [iobt-gt] T_full=132  GPS-covered=130  0-based nodes visited: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 [p-audio] P_audio shape=(132, 10)  mean=0.1985  max=0.4490  calibrated=True
+  [camera] node1: removing 2 static object(s)
+  [camera] node1: 22/132 active bins (16.7% positive rate)
+  [camera] node2: 11/132 active bins (8.3% positive rate)
+  [camera] node3: 18/132 active bins (13.6% positive rate)
+  [camera] node4: 8/132 active bins (6.1% positive rate)
+  [camera] node5: 42/132 active bins (31.8% positive rate)
+  [camera] node6: 72/132 active bins (54.5% positive rate)
+  [camera] node7: 8/132 active bins (6.1% positive rate)
+  [camera] node8: 8/132 active bins (6.1% positive rate)
+  [camera] node9: 127/132 active bins (96.2% positive rate)
+  [camera] node10: 31/132 active bins (23.5% positive rate)
 eval steps=130  scale=0.8
 
 (a) or_max lock coverage vs soft-threshold (no smoothing):
@@ -13,3 +24,10 @@ eval steps=130  scale=0.8
   +/-1 bins: cam-only thr0.4 cov=0.8077 (105/130)  or_max thr0.4 cov=0.8077  or_max thr0.2 cov=0.8846 (115/130)  remaining cam gaps: [12, 8, 4, 1]
   +/-2 bins: cam-only thr0.4 cov=0.8385 (109/130)  or_max thr0.4 cov=0.8385  or_max thr0.2 cov=0.9000 (117/130)  remaining cam gaps: [10, 8, 3]
   +/-3 bins: cam-only thr0.4 cov=0.8692 (113/130)  or_max thr0.4 cov=0.8692  or_max thr0.2 cov=0.9231 (120/130)  remaining cam gaps: [8, 4, 3, 2]
+
+(c) Oracle-policy accuracy upper bound vs time_limit (exact eval-loop state machine, looped sequence):
+  no-smooth  cam-only thr0.4  cov=0.7385  ->  tl=1: 0.9154  tl=3: 0.9615  tl=5: 0.9769
+  no-smooth  or_max   thr0.2  cov=0.8385  ->  tl=1: 0.9538  tl=3: 0.9846  tl=5: 0.9923
+  smooth+/-2 cam-only thr0.4  cov=0.8385  ->  tl=1: 0.9461  tl=3: 0.9769  tl=5: 0.9846
+  smooth+/-2 or_max   thr0.2  cov=0.9000  ->  tl=1: 0.9692  tl=3: 0.9846  tl=5: 0.9923
+  smooth+/-3 or_max   thr0.2  cov=0.9231  ->  tl=1: 0.9769  tl=3: 0.9923  tl=5: 1.0000

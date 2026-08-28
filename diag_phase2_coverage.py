@@ -76,3 +76,51 @@ for w in (0, 1, 2, 3):
           f"or_max thr0.2 cov={(or_s_gt >= 0.25).mean():.4f} "
           f"({(or_s_gt >= 0.25).sum()}/{len(gt_seq)})  "
           f"remaining cam gaps: {sorted(gaps, reverse=True)}")
+
+
+# ── (c) Oracle-policy accuracy upper bound ──────────────────────────────────
+# Exact simulation of the eval-loop state machine (evaluate_policy +
+# RealIoBTEnv.get_reward_next_state semantics, verified in source):
+#   - tracked step: counts as a HIT iff the policy activated the GT node
+#     (regardless of soft confirm); confirm success (covered[t]) resets
+#     time_delay, failure increments it; time_delay > time_limit -> missing.
+#   - missing step: always a MISS; full rescan always succeeds -> tracked next
+#     step with time_delay 0.
+#   - the 130-step sequence loops (object_move uses modulo), eval is 2000 steps.
+# An oracle policy always activates the GT node, so its accuracy is
+# 1 - steady-state missing-step rate — an upper bound no trained policy can
+# exceed for a given coverage pattern and time_limit.
+
+def oracle_accuracy(covered, time_limit, n_steps=130000):
+    misses, tracked, td, t = 0, False, 0, 0
+    T = len(covered)
+    for _ in range(n_steps):
+        if not tracked:
+            misses += 1
+            tracked, td = True, 0
+        elif covered[t]:
+            td = 0
+        else:
+            td += 1
+            if td > time_limit:
+                tracked = False
+        t = (t + 1) % T
+    return 1.0 - misses / n_steps
+
+
+print("\n(c) Oracle-policy accuracy upper bound vs time_limit "
+      "(exact eval-loop state machine, looped sequence):")
+configs = [
+    ("no-smooth  cam-only thr0.4", 0, False, 0.5),
+    ("no-smooth  or_max   thr0.2", 0, True,  0.25),
+    ("smooth+/-2 cam-only thr0.4", 2, False, 0.5),
+    ("smooth+/-2 or_max   thr0.2", 2, True,  0.25),
+    ("smooth+/-3 or_max   thr0.2", 3, True,  0.25),
+]
+for label, w, use_or, bar in configs:
+    pc_s = maxpool_time(P_cam, w)[gps_mask]
+    p = np.maximum(pc_s, pa) if use_or else pc_s
+    cov = p[t, gt_seq] >= bar
+    accs = "  ".join(f"tl={tl}: {oracle_accuracy(cov, tl):.4f}"
+                     for tl in (1, 3, 5))
+    print(f"  {label}  cov={cov.mean():.4f}  ->  {accs}")

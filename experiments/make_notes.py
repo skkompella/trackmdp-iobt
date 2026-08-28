@@ -93,6 +93,21 @@ HYPOTHESES = {
          "machine only consults P_fused at the TRUE node (verified in RealIoBTEnv.get_reward_next_state), so "
          "lowering the threshold cannot let false positives mislead the tracker, and the eval metric "
          "(GT node activated while tracked) is unchanged and comparable to all prior runs.",
+    609: "PHASE-2 experiment #3 (RESUME.md phase-2 ranked list): temporal smoothing of P_cam before fusion, "
+         "isolated from the family-#2 threshold change to measure its standalone effect. New --cam-smooth-bins "
+         "flag (implemented during iteration 2): max-pool each node's P_cam over a +/-N bin window before "
+         "fusion, bridging short camera gaps legitimately (the object cannot teleport at 0.5s bin resolution). "
+         "This run uses +/-2 bins (+/-1.0s) on the standard run-236 camera recipe: camera fusion, soft-scale "
+         "0.8, soft-threshold 0.4, run 227 base, 200 iterations, --gps-eval, session 20250812_165739 "
+         "(camera-only fusion, so --calibrators correctly not required). TRACKER CONFIG: time_limit=1, "
+         "max_sensors=6 (defaults, unchanged); lock bar stays 0.5 — only P_cam's temporal support widens. "
+         "Analytic pre-check (diag_phase2_coverage.txt): +/-2-bin smoothing raises cam-only GT-node lock "
+         "coverage from 73.85% (96/130) to 83.85% (109/130), residual gaps [10, 8, 3] — coincidentally "
+         "identical coverage to run 608's or_max@0.2, so the baselines should land near each other (~93%) if "
+         "smoothing engages correctly in the eval path. Width choice justified from the logged coverage "
+         "curve: +/-1 (80.77%) is strictly dominated by +/-2, and +/-3 (1.5s) exceeds the 0.5-1s "
+         "non-teleportation legitimacy window, so only +/-2 gets a training run. Exact command saved at "
+         "experiments/run609/cmd.sh.",
 }
 
 FINDINGS = {
