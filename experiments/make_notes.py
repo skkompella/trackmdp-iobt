@@ -60,6 +60,18 @@ HYPOTHESES = {
          "cells the binary classifier does not confirm, testing RESUME.md's hypothesis that this cuts false "
          "positives capping accuracy below 95%. Otherwise identical to run 600/236: source=227, camera fusion, "
          "soft-scale=0.8, soft-threshold=0.4, session 20250812_165739, 200 iterations, --gps-eval.",
+    606: "RESUME.md next-step #6: re-run the cam-fallback-thresh sweep with an intermediate threshold (0.3) "
+         "not tried in the original runs 232 (thresh=0.0) / 238 (thresh=0.65). Fusion mode cam_fallback: use "
+         "camera P_cam when it exceeds cam-fallback-thresh, else fall back to audio P_audio. Otherwise same "
+         "recipe as run 600/236: source=227, soft-scale=0.8, soft-threshold=0.4, session 20250812_165739, "
+         "200 iterations, --gps-eval. IMPORTANT: this run required --calibrators results/pooled/"
+         "pooled_calibrators_20260521_164149.pkl to be passed explicitly alongside --pooled-clf — a first "
+         "launch attempt omitted it (RESUME.md's own example commands never show --calibrators, easy to miss) "
+         "and produced a spurious baseline of 95.15% purely because the raw uncalibrated pooled audio "
+         "classifier outputs mean=0.80/min=0.365 across all 10 nodes (i.e. it's not node-discriminative at "
+         "all, everything scores 'high'), vs the properly calibrated mean=0.1985/max=0.449 that matches run "
+         "232/238's historical P_fused stats. That first attempt was killed before completion and its "
+         "checkpoint/log discarded — it was never a real result and is not being reported.",
 }
 
 FINDINGS = {
@@ -146,6 +158,30 @@ FINDINGS = {
          "structural in the soft-reward PPO training dynamics (or the underlying camera/audio classifier noise "
          "floor) caps this recipe family around 90%. Next: RESUME.md next-step #6 (finer cam-fallback-thresh "
          "sweep) and #7 (--gt oracle upper bound) remain untried.",
+    606: "Best accuracy 90.00% at iter 43 (5.26 nodes/step), baseline 89.20% — matches run 232's historical "
+         "cam_fallback-thresh=0.0 result almost exactly (P_fused mean=0.349 vs 232's 0.349, baseline=89.20% "
+         "vs 232's 89.20%, best 90.00% vs 232's 89.95%), confirming thresh=0.3 behaves essentially "
+         "identically to thresh=0.0 for this session: P_cam is either exactly 0 or a high-confidence YOLO "
+         "score (typically ≫0.3) with almost no probability mass in (0, 0.3], so raising the threshold from "
+         "0.0 to 0.3 barely changes which cells fall back to audio (cam_coverage=0.263 in both cases). Same "
+         "oscillate-after-early-peak-then-decay training shape as every other camera/cam_fallback run: peaks "
+         "at iter 43, then decays (iter 135 dropped to 86.00%). RESUME.md next-step #6 (finer cam-fallback-"
+         "thresh sweep) does NOT beat the ~90% ceiling and does not meaningfully differ from the already-"
+         "tried thresh=0.0 case — the P_cam distribution's bimodal (zero-or-high) shape means intermediate "
+         "thresholds between 0 and ~0.5 are unlikely to ever behave differently from thresh=0, so this "
+         "direction is now considered fully explored. Also surfaced and fixed a real methodology bug: a "
+         "first launch of this run omitted --calibrators (RESUME.md's example commands don't show this flag "
+         "for the soft-reward path, easy to miss), which lets the pooled audio classifier's raw uncalibrated "
+         "output (mean=0.80, min=0.365 across all 10 nodes at every timestep — i.e. NOT node-discriminative) "
+         "leak into the reward's audio-fallback channel, producing a spurious 95.15% baseline / apparent "
+         "95%+ accuracy purely from an artifact (the tracker's internal 'tracked' state persists far more "
+         "often when almost every activated node scores >0.4 threshold regardless of correctness), not from "
+         "any real detection improvement. That run was killed before completion, its checkpoint deleted, and "
+         "its number (606) reused for the corrected, properly-calibrated run reported here. Any future run "
+         "touching P_audio (fusion modes audio/or_max/weighted/cam_fallback) MUST pass --calibrators "
+         "results/pooled/pooled_calibrators_20260521_164149.pkl — only pure camera-fusion mode is safe to "
+         "run without it (P_cam doesn't go through the pooled audio classifier at all). Moving to RESUME.md "
+         "next-step #7 (--gt oracle upper bound), the last untried ranked next-step.",
 }
 
 
