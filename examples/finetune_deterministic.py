@@ -2205,14 +2205,17 @@ Examples
                         help="[--soft-reward] Probability threshold for binary "
                              "state-transition trigger (default: 0.5)")
     parser.add_argument("--fusion-mode",      type=str,   default="audio",
-                        choices=["audio", "camera", "or_max", "weighted", "cam_fallback"],
+                        choices=["audio", "camera", "or_max", "weighted", "cam_fallback", "gt"],
                         help="[--soft-reward] Sensor fusion strategy for P_fused. "
                              "'audio': audio-only (default, backward compatible). "
                              "'camera': YOLO camera-only. "
                              "'or_max': elementwise max of audio and camera. "
                              "'weighted': audio_weight*P_audio + cam_weight*P_cam. "
                              "'cam_fallback': camera when P_cam>0, else audio "
-                             "(camera-priority with audio gap-fill).")
+                             "(camera-priority with audio gap-fill). "
+                             "'gt': oracle upper bound — P_fused is a perfect one-hot "
+                             "built directly from GPS ground truth, bypassing the audio/camera "
+                             "classifiers entirely (RESUME.md next-step #7).")
     parser.add_argument("--audio-weight",     type=float, default=0.5,
                         help="[--fusion-mode weighted] Weight for audio channel (default: 0.5)")
     parser.add_argument("--cam-weight",       type=float, default=0.5,
@@ -2434,6 +2437,21 @@ Examples
 
             print(f"[soft-reward] [{session_id}] Building IoBT GPS ground-truth sequence …")
             gt_seq, gps_mask = build_iobt_gt_sequence(session_dir, step_s=0.5)
+
+            if fusion_mode == 'gt':
+                # Oracle upper bound: P_fused is a perfect one-hot from GPS ground
+                # truth, bypassing the audio/camera classifiers entirely.
+                print(f"[soft-reward] [{session_id}] Building ORACLE P_fused "
+                      f"(one-hot from GPS ground truth, no classifiers) …")
+                T_full = len(gps_mask)
+                P_fused_full = np.zeros((T_full, 10), dtype=np.float32)
+                P_fused_full[gps_mask, gt_seq] = 1.0
+                print(f"  [oracle] P_fused: mean={P_fused_full.mean():.3f}  "
+                      f"max={P_fused_full.max():.3f}  gps_coverage={gps_mask.mean():.3f}")
+                p_fused_gps = P_fused_full[gps_mask]  # (T_gps, 10)
+                print(f"[soft-reward] [{session_id}] Aligned P_fused: {p_fused_gps.shape}  "
+                      f"gt_seq: {len(gt_seq)}")
+                return gt_seq, p_fused_gps
 
             print(f"[soft-reward] [{session_id}] Building pooled audio probability matrix …")
             P_audio_full = build_p_audio_iobt_10(

@@ -72,6 +72,14 @@ HYPOTHESES = {
          "all, everything scores 'high'), vs the properly calibrated mean=0.1985/max=0.449 that matches run "
          "232/238's historical P_fused stats. That first attempt was killed before completion and its "
          "checkpoint/log discarded — it was never a real result and is not being reported.",
+    607: "RESUME.md next-step #7 (final ranked item): establish a --gt oracle upper bound that drives P_fused "
+         "directly from GPS ground truth, bypassing the audio/camera classifiers entirely, to check whether "
+         "95% is even achievable given the current sensor/classifier noise floor. Required a code change to "
+         "examples/finetune_deterministic.py: a new fusion_mode='gt' branch in _build_session_fused() that "
+         "builds P_fused as a perfect one-hot (P_fused[t, gt_seq[t]] = 1.0, zero elsewhere) directly from the "
+         "GPS-derived ground-truth node sequence, skipping the pooled audio classifier and YOLO camera "
+         "detector builds entirely. Otherwise identical recipe to run 600/236: source=227, soft-scale=0.8, "
+         "soft-threshold=0.4, session 20250812_165739, 200 iterations, --gps-eval.",
 }
 
 FINDINGS = {
@@ -182,6 +190,34 @@ FINDINGS = {
          "results/pooled/pooled_calibrators_20260521_164149.pkl — only pure camera-fusion mode is safe to "
          "run without it (P_cam doesn't go through the pooled audio classifier at all). Moving to RESUME.md "
          "next-step #7 (--gt oracle upper bound), the last untried ranked next-step.",
+    607: "Best accuracy 99.00% at iter 191 (3.85 nodes/step), baseline 96.60% (before any fine-tuning at all, "
+         "purely from the run-227 base checkpoint evaluated against a perfect one-hot reward) — DECISIVELY "
+         "answers RESUME.md next-step #7's question: 95% IS achievable given the current environment/PPO/"
+         "policy architecture, with a wide margin to spare (99.00%, 4pp above target), when the reward signal "
+         "is clean. This is the highest accuracy of any run in this worktree's log by a large margin (vs the "
+         "~90-91% ceiling for every one of runs 600-606, all of which used real audio/camera classifier "
+         "signal). Critically, the TRAINING SHAPE is qualitatively different from every real-classifier run: "
+         "instead of the oscillate-after-early-peak-then-decay pattern seen in 100% of runs 600-606, this run "
+         "climbs steadily and near-monotonically for all 200 iterations (96.6% -> 97.0-97.5% by iter ~20-130 "
+         "-> 98.3-98.4% by iter ~180-190 -> 99.0% at iter 191, then holds flat at 98.2-99.0% through iter 200 "
+         "with NO decay), while sensors/step falls smoothly from 5.18 to ~3.85-3.92 (a cleaner, more efficient "
+         "policy, not a collapsing one). This strongly confirms the hypothesis that has been building across "
+         "runs 600-606: the ~90% ceiling on the real system is NOT caused by PPO training dynamics, RL "
+         "hyperparameters, base-checkpoint quality, training-data volume, or reward-shaping choices (soft-"
+         "scale/threshold/fusion-mode) — every one of those was independently ruled out by next-steps #1-6. "
+         "It is caused by noise in the audio/camera classifier signal itself: real P_fused values are noisy, "
+         "sometimes wrong, and sometimes near-uniform across nodes (as seen with the uncalibrated-audio bug in "
+         "run 606), which both caps the achievable policy quality AND destabilizes PPO's advantage estimation "
+         "enough to produce the oscillate-then-decay pattern absent here. CONCLUSION for the ranked next-steps "
+         "list: all 7 items are now tried. None of the 6 concrete, classifier-driven directions (soft-scale "
+         "sweep, multi-session training, advanced-hparams, node-clf gating, run-241 base, cam-fallback-thresh) "
+         "broke the ~90-91% ceiling — best real-classifier result remains run 236's documented 91.00%. The "
+         "--gt oracle (this run) measured 99.00%, confirming 95% is achievable in principle and the bottleneck "
+         "is the audio/camera classifier noise floor on this session's sensor data, not the RL pipeline. "
+         "Reaching 95% on the REAL system would require improving the underlying audio/camera classifiers "
+         "themselves (e.g. better YOLO detections, less noisy audio features, more/better-labeled training "
+         "sessions for the pooled+camera classifiers) rather than further RL/PPO tuning — a different "
+         "workstream outside this task's ranked next-steps list.",
 }
 
 
