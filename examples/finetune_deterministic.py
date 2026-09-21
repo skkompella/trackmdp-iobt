@@ -1987,6 +1987,7 @@ def finetune(cfg, source_checkpoint, new_run, circle_path=None,
     best_accuracy = baseline["tracking_accuracy"]
     best_sensors  = baseline["mean_sensors_used"]
     best_ckpt     = source_checkpoint
+    saved_best    = False
 
     # ── Training loop ─────────────────────────────────────────────────────
     print(f"Fine-tuning for {cfg['training_iterations']} iterations "
@@ -2013,11 +2014,23 @@ def finetune(cfg, source_checkpoint, new_run, circle_path=None,
                 best_accuracy = metrics["tracking_accuracy"]
                 best_sensors  = metrics["mean_sensors_used"]
                 best_ckpt     = algo.save(save_dir)
+                saved_best    = True
                 print(f"         ★ New best {best_accuracy:.4f} — saved")
         else:
             print(f"  {i:5d}  {reward_mean:+10.3f}")
 
-    final_ckpt = algo.save(save_dir)
+    # Accuracy peaks early and then decays on every run in this project, so the
+    # final iteration is usually NOT the policy worth keeping.  save_dir holds
+    # the best-accuracy checkpoint — it is the path `--run N` resolves to — so
+    # the final policy must go somewhere else instead of overwriting it.
+    # If no iteration ever beat the baseline, nothing was written to save_dir,
+    # so the final policy goes there to keep producing a loadable checkpoint.
+    if saved_best:
+        final_dir = save_dir.rstrip("/") + "_final"
+        os.makedirs(final_dir, exist_ok=True)
+        final_ckpt = algo.save(final_dir)
+    else:
+        final_ckpt = algo.save(save_dir)
 
     print(f"\n{'='*65}")
     print("  FINE-TUNE COMPLETE")
