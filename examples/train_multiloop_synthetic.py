@@ -41,7 +41,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
 import ray                                                    # noqa: E402
-from ray.rllib.algorithms.ppo import PPOConfig                # noqa: E402
+from ray.rllib.algorithms.ppo import PPO, PPOConfig           # noqa: E402
 
 from src.core.gym_wrapper import grid_environment             # noqa: E402
 from src.core.iobt_loops import (                             # noqa: E402
@@ -187,6 +187,14 @@ def main():
                    help="Episodes per loop for the final report, run once on "
                         "the best checkpoint")
     p.add_argument("--eval-seed",   type=int, default=12345)
+    p.add_argument("--eval-only",   action="store_true",
+                   help="Skip training: load a checkpoint and evaluate it on "
+                        "the loop set. --time-limit MUST match the checkpoint's "
+                        "observation space or the restore will mismatch.")
+    p.add_argument("--eval-run",    type=int, default=None,
+                   help="Evaluate runs/agent_run{N}_ppo (with --eval-only)")
+    p.add_argument("--eval-checkpoint", type=str, default=None,
+                   help="Explicit checkpoint path (overrides --eval-run)")
     p.add_argument("--train-seed",  type=int, default=7)
     p.add_argument("--out-dir",     type=str, default=None)
     args = p.parse_args()
@@ -231,6 +239,49 @@ def main():
             "max_loop_len": args.max_loop_len,
             "loops":       loops,
         }, fh, indent=2)
+
+    # ── Eval-only: score an existing checkpoint on the loop set ────────────
+    if args.eval_only:
+        ckpt = args.eval_checkpoint or os.path.join(
+            project_root, "runs", f"agent_run{args.eval_run}_ppo"
+        )
+        if not os.path.isdir(ckpt):
+            raise SystemExit(f"[ERROR] no checkpoint at {ckpt}")
+
+        if not ray.is_initialized():
+            ray.init(ignore_reinit_error=True,
+                     runtime_env={"env_vars": {"PYTHONPATH": project_root}},
+                     _node_ip_address="127.0.0.2")
+
+        print(f"\n  Loading checkpoint : {ckpt}")
+        print(f"  time_limit         : {time_limit} "
+              f"(obs state_time is Discrete({time_limit + 1}))")
+        algo = PPO.from_checkpoint(ckpt)
+
+        eval_env = make_eval_env(loops, cfg, args.eval_seed, args.sensor_rew)
+        per_loop, agg = evaluate_per_loop(
+            algo, eval_env, cfg, args.final_eval_episodes_per_loop)
+
+        label = args.eval_checkpoint or f"run{args.eval_run}"
+        print("\n" + "=" * 70)
+        print(f"  PER-LOOP EVALUATION — {label} (no training)")
+        print("=" * 70)
+        print(format_per_loop_table(per_loop, agg))
+
+        tag = os.path.basename(ckpt.rstrip("/"))
+        with open(os.path.join(out_dir, f"eval_{tag}.md"), "w") as fh:
+            fh.write(f"# {label} evaluated on the run-{args.new_run} loop set\n\n")
+            fh.write(f"- Checkpoint: `{ckpt}` (no training)\n")
+            fh.write(f"- Loops: {args.num_loops} sampled with seed {args.loop_seed}\n")
+            fh.write(f"- time_limit {time_limit}, max_sensors {cfg['max_sensors']} "
+                     f"of {IOBT_NUM_NODES}, sensor_rew {args.sensor_rew}\n")
+            fh.write(f"- Eval: {args.final_eval_episodes_per_loop} episodes per "
+                     f"loop, fixed seed {args.eval_seed}, dedicated env\n\n")
+            fh.write(format_per_loop_table(per_loop, agg))
+            fh.write("\n")
+        print(f"\n  Wrote {out_dir}/eval_{tag}.md")
+        algo.stop()
+        return
 
     # ── Env + PPO ──────────────────────────────────────────────────────────
     qobj = MultiLoopIoBTLearner(
