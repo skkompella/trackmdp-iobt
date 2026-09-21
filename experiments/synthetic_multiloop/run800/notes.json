@@ -1,0 +1,278 @@
+{
+  "run": 800,
+  "date": "2026-09-21",
+  "source_run": null,
+  "checkpoint_path": "runs/agent_run800_ppo",
+  "session": "SYNTHETIC (no session - 10 generated loops)",
+  "env": "MultiLoopIoBTEnv, ideal binary detection",
+  "loop_seed": 20260921,
+  "loops": [
+    [
+      0,
+      4,
+      5,
+      3,
+      6,
+      2,
+      1
+    ],
+    [
+      0,
+      1,
+      6,
+      8,
+      9,
+      7
+    ],
+    [
+      0,
+      4,
+      5,
+      3,
+      2,
+      6,
+      1
+    ],
+    [
+      0,
+      7,
+      9,
+      8,
+      6,
+      1,
+      2,
+      3,
+      5,
+      4
+    ],
+    [
+      0,
+      1,
+      2,
+      6,
+      8,
+      9,
+      7
+    ],
+    [
+      0,
+      7,
+      1,
+      2,
+      3,
+      5,
+      4
+    ],
+    [
+      0,
+      4,
+      3,
+      2,
+      6,
+      1
+    ],
+    [
+      0,
+      4,
+      2,
+      3,
+      6,
+      8,
+      9,
+      7,
+      1
+    ],
+    [
+      2,
+      3,
+      6
+    ],
+    [
+      0,
+      4,
+      2,
+      3,
+      6,
+      1,
+      7
+    ]
+  ],
+  "time_limit": 3,
+  "max_sensors": 6,
+  "sensor_rew": -0.25,
+  "iterations_run": 170,
+  "converged": true,
+  "best_iteration": 20,
+  "baseline_acc": 0.3212,
+  "baseline_sensors": 5.99,
+  "best_acc": 0.6349,
+  "sensors_at_best": 5.50695,
+  "min_loop_acc": 0.283,
+  "max_loop_acc": 0.89,
+  "std_loop_acc": 0.18624940268360596,
+  "worst_loop": 0,
+  "per_loop": [
+    {
+      "loop": 0,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        6,
+        2,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.283,
+      "sensors": 5.711,
+      "reward": -147.8
+    },
+    {
+      "loop": 1,
+      "nodes": [
+        0,
+        1,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 6,
+      "accuracy": 0.8235,
+      "sensors": 5.1739999999999995,
+      "reward": -16.15
+    },
+    {
+      "loop": 2,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.423,
+      "sensors": 5.712,
+      "reward": -109.7
+    },
+    {
+      "loop": 3,
+      "nodes": [
+        0,
+        7,
+        9,
+        8,
+        6,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 10,
+      "accuracy": 0.89,
+      "sensors": 5.402500000000002,
+      "reward": -8.5625
+    },
+    {
+      "loop": 4,
+      "nodes": [
+        0,
+        1,
+        2,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.565,
+      "sensors": 5.710000000000001,
+      "reward": -81.25
+    },
+    {
+      "loop": 5,
+      "nodes": [
+        0,
+        7,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 7,
+      "accuracy": 0.849,
+      "sensors": 5.575,
+      "reward": -21.075
+    },
+    {
+      "loop": 6,
+      "nodes": [
+        0,
+        4,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 6,
+      "accuracy": 0.4915,
+      "sensors": 5.673,
+      "reward": -95.25
+    },
+    {
+      "loop": 7,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        8,
+        9,
+        7,
+        1
+      ],
+      "length": 9,
+      "accuracy": 0.658,
+      "sensors": 5.340000000000001,
+      "reward": -53.4
+    },
+    {
+      "loop": 8,
+      "nodes": [
+        2,
+        3,
+        6
+      ],
+      "length": 3,
+      "accuracy": 0.66,
+      "sensors": 5.3375,
+      "reward": -52.9375
+    },
+    {
+      "loop": 9,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        1,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.706,
+      "sensors": 5.434500000000001,
+      "reward": -46.1625
+    }
+  ],
+  "eval_protocol": "20 episodes/loop x 100 steps, dedicated env re-seeded per loop (seed 12345), best checkpoint restored before measuring",
+  "hypothesis": "Can ONE policy track 10 different loops over the Camp Buckner topology when it never observes which loop is active? Synthetic ideal-binary detection, loop sampled uniformly per episode, tl=3, max_sensors=6 of 10, sensor_rew=-0.25, PPO from scratch, plateau early-stop (patience 30 evals, min_delta 0.5pp, cap 600).",
+  "findings": "Partial success with a WIDE per-loop spread. Best at iteration 20 of 170: mean 63.49%% @ 5.51 sensors/step vs untrained baseline 32.12%% @ 5.99 - so the policy roughly doubles baseline accuracy while using slightly fewer sensors. But per-loop accuracy ranges 28.30%% (loop 0) to 89.00%% (loop 3), sd 18.62pp: the single agent does NOT cover the family evenly. Loop length is not the driver (corr +0.20; the 10-node Hamiltonian loop 3 is the EASIEST); successor ambiguity correlates negatively but only moderately (corr -0.41). Loops 0 and 2 differ by one transposition yet score 28.30%% vs 42.30%%, so the policy resolves the family inconsistently. Training then DECAYED monotonically after iter 20: by iter 170 accuracy 35.22%% at 3.22 sensors - both axes worse together, which is a too-strong penalty rather than an energy trade. Reward arithmetic explains it: at sensor_rew=-0.25 with the 6-sensor cap, detecting with all 6 on nets exactly 0.00 (cost 1.5 cancels reward 1.5) while a 1-sensor hit nets +1.25, so PPO chases a precision it cannot achieve under ambiguity. Cheap training eval (5 eps/loop) gave 63.50%% at iter 20 vs 63.49%% on the thorough 20 eps/loop re-measure - the cheap-eval design is sound. NEXT: sweep --sensor-rew (0.0, -0.05, -0.10) from scratch to find the real ceiling and a usable operating point. See diagnostics.md."
+}
