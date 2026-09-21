@@ -795,7 +795,8 @@ class RealIoBTEnv(iobt_env):
                  object_sequence: np.ndarray,
                  p_audio=None,
                  soft_threshold: float = 0.5,
-                 soft_scale: float = 1.0):
+                 soft_scale: float = 1.0,
+                 sensor_rew=None):
         self._object_sequence = np.asarray(object_sequence, dtype=np.int32)
         self._seq_t           = 0
         self._p_audio         = (np.asarray(p_audio, dtype=np.float32)
@@ -808,7 +809,8 @@ class RealIoBTEnv(iobt_env):
         self.tracking_miss_rew         = -0.5
         self.tracking_rew_missing      = 0.5
         self.tracking_miss_rew_missing = -1.0
-        self.sensor_rew                = -0.25
+        self.sensor_rew                = (-0.25 if sensor_rew is None
+                                          else float(sensor_rew))
 
     def reset_object_state(self):
         self._seq_t     = int(np.random.randint(len(self._object_sequence)))
@@ -887,7 +889,8 @@ class RealIoBTLearner:
                  object_sequence: np.ndarray,
                  p_audio=None,
                  soft_threshold: float = 0.5,
-                 soft_scale: float = 1.0):
+                 soft_scale: float = 1.0,
+                 sensor_rew=None):
         self.run_number     = run_number
         self.N              = IOBT_N
         self.n_cells        = IOBT_NUM_NODES
@@ -902,6 +905,7 @@ class RealIoBTLearner:
             p_audio        = p_audio,
             soft_threshold = soft_threshold,
             soft_scale     = soft_scale,
+            sensor_rew     = sensor_rew,
         )
 
         self.exploration_epsilon = 0.15
@@ -1746,7 +1750,7 @@ def finetune(cfg, source_checkpoint, new_run, circle_path=None,
              iobt_gt_sequence=None, iobt_p_audio=None,
              iobt_gt_sequence_eval=None, iobt_p_audio_eval=None,
              soft_threshold=0.5, soft_scale=1.0,
-             iobt_prior="circular"):
+             iobt_prior="circular", sensor_rew=None):
     env_mode      = cfg["env"]
     time_limit    = cfg["time_limit"]
     time_limit_max = cfg["time_limit_max"]
@@ -1793,6 +1797,7 @@ def finetune(cfg, source_checkpoint, new_run, circle_path=None,
             p_audio        = iobt_p_audio,
             soft_threshold = soft_threshold,
             soft_scale     = soft_scale,
+            sensor_rew     = sensor_rew,
         )
         cfg["n_cells"]            = IOBT_N * IOBT_N
         cfg["missing_state"]      = IOBT_N * IOBT_N * (time_limit_max + 1) + 1
@@ -1814,6 +1819,7 @@ def finetune(cfg, source_checkpoint, new_run, circle_path=None,
                 p_audio        = iobt_p_audio_eval,
                 soft_threshold = soft_threshold,
                 soft_scale     = soft_scale,
+                sensor_rew     = sensor_rew,
             )
     elif env_mode == "iobt":
         if use_transition:
@@ -2232,11 +2238,30 @@ Examples
                              "camera is used instead of audio. 0.0=any detection fires camera "
                              "(default, equiv to or_max for this dataset). 0.65=only "
                              "high-confidence YOLO detections suppress audio.")
+    parser.add_argument("--cam-classes", type=str, default="car",
+                        help="Comma-separated YOLO classes accepted as the tracked "
+                             "object (default: car). Session 20250812_091600's object "
+                             "is detected as 'truck' — the hardcoded 'car' filter "
+                             "discarded 84%% of its GT-bin detections (diag_camera_audit).")
+    parser.add_argument("--cam-min-conf", type=float, default=0.5,
+                        help="Min YOLO confidence for camera detections (default 0.5).")
     parser.add_argument("--cam-smooth-bins", type=int, default=0,
                         help="Temporally max-pool P_cam over +/-N bins (N*0.5s) per node "
                              "before fusion, carrying camera detections forward/backward "
                              "to bridge short detection gaps (the object cannot teleport "
                              "at 0.5s resolution). 0 = no smoothing (default).")
+    parser.add_argument("--sensor-rew", type=float, default=None,
+                        help="[--soft-reward] Per-active-sensor energy penalty in the "
+                             "reward (default: keep RealIoBTEnv's -0.25). Weaker "
+                             "penalties (e.g. -0.05..-0.10) trade energy for accuracy — "
+                             "the run-612 diagnosis: tl=3 slack went to frugality "
+                             "because -0.25 dominated. Does not affect the obs/action "
+                             "space, so checkpoints remain compatible across values.")
+    parser.add_argument("--max-sensors", type=int, default=None,
+                        help="Max sensors the policy may activate per step outside the "
+                             "missing state (default: keep IOBT_DEFAULTS' 6 of 10). "
+                             "Energy trade-off lever; does not affect the obs/action "
+                             "space, so checkpoints remain compatible across values.")
 
     # ── Real-data replay mode ─────────────────────────────────────────────
     _D = os.path.join(project_root, "iobt_data")
@@ -2287,6 +2312,13 @@ Examples
         cfg["time_limit_max"] = args.time_limit
         print(f"[time-limit] time_limit = time_limit_max = {args.time_limit} "
               f"(obs/action space differs from time_limit_max=1 checkpoints)")
+    if args.sensor_rew is not None:
+        print(f"[sensor-rew] per-sensor energy penalty = {args.sensor_rew} "
+              f"(default -0.25; checkpoint-compatible)")
+    if args.max_sensors is not None:
+        cfg["max_sensors"] = args.max_sensors
+        print(f"[max-sensors] max_sensors = {args.max_sensors} "
+              f"(default 6 of 10; checkpoint-compatible)")
     cfg["no_moore_constraint"] = args.no_moore
 
     if args.advanced_hparams:
@@ -2488,6 +2520,9 @@ Examples
                 P_cam_full = _build_p_cam_10(
                     _Path(session_dir), list(range(1, 11)),
                     session_start_unix, T_full, bin_size_s=0.5,
+                    target_class=set(
+                        getattr(args, 'cam_classes', 'car').split(',')),
+                    min_conf=getattr(args, 'cam_min_conf', 0.5),
                 )  # (T_full, 10)
                 print(f"  [camera] P_cam: mean={P_cam_full.mean():.3f}  "
                       f"max={P_cam_full.max():.3f}  "
@@ -2616,6 +2651,9 @@ Examples
         print(f"  Calibrators       : {args.calibrators or 'none'}")
         print(f"  Soft scale        : {args.soft_scale}")
         print(f"  Soft threshold    : {args.soft_threshold}")
+        print(f"  Sensor penalty    : "
+              f"{args.sensor_rew if args.sensor_rew is not None else -0.25}")
+        print(f"  Max sensors       : {cfg['max_sensors']}")
         print(f"  Fusion mode       : {getattr(args, 'fusion_mode', 'audio')}")
         print(f"  GT seq length     : {len(iobt_gt_sequence)}")
         print(f"  P_audio shape     : {iobt_p_audio.shape}")
@@ -2684,7 +2722,8 @@ Examples
                  iobt_p_audio_eval=iobt_p_audio_eval,
                  soft_threshold=getattr(args, 'soft_threshold', 0.5),
                  soft_scale=getattr(args, 'soft_scale', 1.0),
-                 iobt_prior=getattr(args, 'iobt_prior', 'circular'))
+                 iobt_prior=getattr(args, 'iobt_prior', 'circular'),
+                 sensor_rew=getattr(args, 'sensor_rew', None))
     finally:
         if ray.is_initialized():
             ray.shutdown()

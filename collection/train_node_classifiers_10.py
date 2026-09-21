@@ -758,6 +758,8 @@ def load_yolo_json(
         _warnings.warn(f"load_yolo_json: skipping malformed JSON {json_path}: {e}")
         return _pd.DataFrame(columns=["t_unix", "x", "y", "z", "conf", "depth"])
 
+    # target_class may be a single class name or a set/list of accepted classes
+    accepted = {target_class} if isinstance(target_class, str) else set(target_class)
     records = []
     for frame in frames:
         if not isinstance(frame, list):
@@ -765,7 +767,7 @@ def load_yolo_json(
         for det in frame:
             if not isinstance(det, dict):
                 continue
-            if det.get("class") != target_class:
+            if det.get("class") not in accepted:
                 continue
             conf = float(det.get("conf", 0.0))
             if conf < min_conf:

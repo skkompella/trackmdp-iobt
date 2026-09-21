@@ -1,0 +1,14 @@
+Run 997 smoke test — PASSED (2026-09-01 00:23-00:24 CDT), exit 0.
+Throwaway, NOT a reportable result (5 iterations only). Named RESULT.txt (not
+notes.json) so make_notes.py never picks it up into index.md.
+
+Verified:
+  [sensor-rew] banner printed: "per-sensor energy penalty = -0.1"
+  Config block shows "Sensor penalty : -0.1", "Max sensors : 6"
+  Restore from runs/agent_run611_ppo (tl=3) worked with the flag present.
+  Baseline eval 91.30% @ 1.49 sensors/step == run 612's baseline exactly
+  (same checkpoint, same eval path — deterministic reproduction confirms the
+  flag changed nothing outside the reward).
+  5 iterations trained + evaluated; best 91.60% (meaningless at 5 iters).
+Checkpoint runs/agent_run997_ppo is disposable.
+Log: /tmp/track_mdp_logs/run997_smoke.log

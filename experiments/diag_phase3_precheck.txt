@@ -1,0 +1,106 @@
+/home/hari/Documents/Projects/trackmdp-iobt-gnhf-worktrees/objective-push-track-876cb3/track_mdp_env/lib/python3.10/site-packages/sklearn/utils/validation.py:2749: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+/home/hari/Documents/Projects/trackmdp-iobt-gnhf-worktrees/objective-push-track-876cb3/track_mdp_env/lib/python3.10/site-packages/sklearn/utils/validation.py:2749: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+  warnings.warn(
+[iobt-gt] T_full=132  GPS-covered=130  0-based nodes visited: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[p-audio] P_audio shape=(132, 10)  mean=0.1985  max=0.4490  calibrated=True
+  [camera] node1: removing 2 static object(s)
+  [camera] node1: 22/132 active bins (16.7% positive rate)
+  [camera] node2: 11/132 active bins (8.3% positive rate)
+  [camera] node3: 18/132 active bins (13.6% positive rate)
+  [camera] node4: 8/132 active bins (6.1% positive rate)
+  [camera] node5: 42/132 active bins (31.8% positive rate)
+  [camera] node6: 72/132 active bins (54.5% positive rate)
+  [camera] node7: 8/132 active bins (6.1% positive rate)
+  [camera] node8: 8/132 active bins (6.1% positive rate)
+  [camera] node9: 127/132 active bins (96.2% positive rate)
+  [camera] node10: 31/132 active bins (23.5% positive rate)
+BASELINE (or_max@0.2 + smooth +/-2):
+  champion stack                             cov=0.9000 (117/130)  oracle tl=3=0.9846  gaps=[10, 2, 1]
+  uncovered step indices: [40, 41, 45, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120]
+
+(C) camera smoothing variants (all with or_max@0.2, calibrated audio):
+  symmetric +/-3 bins (1.5s)                 cov=0.9231 (120/130)  oracle tl=3=0.9923  gaps=[4, 3, 2, 1]
+  symmetric +/-4 bins (2.0s)                 cov=0.9462 (123/130)  oracle tl=3=1.0000  gaps=[2, 2, 2, 1]
+  symmetric +/-5 bins (2.5s)                 cov=0.9692 (126/130)  oracle tl=3=1.0000  gaps=[2, 1, 1]
+  forward-only hold 2 bins (1.0s)            cov=0.8769 (114/130)  oracle tl=3=0.9846  gaps=[10, 2, 1, 1, 1, 1]
+  forward-only hold 4 bins (2.0s)            cov=0.9077 (118/130)  oracle tl=3=0.9923  gaps=[4, 2, 2, 1, 1, 1, 1]
+  forward-only hold 6 bins (3.0s)            cov=0.9385 (122/130)  oracle tl=3=1.0000  gaps=[2, 2, 1, 1, 1, 1]
+  forward-only hold 8 bins (4.0s)            cov=0.9538 (124/130)  oracle tl=3=1.0000  gaps=[2, 1, 1, 1, 1]
+  +/-2 sym + forward hold 4 bins             cov=0.9308 (121/130)  oracle tl=3=0.9923  gaps=[4, 2, 2, 1]
+  +/-2 sym + forward hold 6 bins             cov=0.9615 (125/130)  oracle tl=3=1.0000  gaps=[2, 2, 1]
+  +/-2 sym + forward hold 8 bins             cov=0.9769 (127/130)  oracle tl=3=1.0000  gaps=[2, 1]
+
+(D-thr) lock-bar depth on the champion stack (bar = thr/0.8):
+  threshold 0.20 (bar 0.2500)                cov=0.9000 (117/130)  oracle tl=3=0.9846  gaps=[10, 2, 1]
+  threshold 0.15 (bar 0.1875)                cov=0.9615 (125/130)  oracle tl=3=0.9923  gaps=[4, 1]
+  threshold 0.10 (bar 0.1250)                cov=0.9615 (125/130)  oracle tl=3=0.9923  gaps=[4, 1]
+  threshold 0.05 (bar 0.0625)                cov=1.0000 (130/130)  oracle tl=3=1.0000  gaps=[]
+  calibrated audio at GT node on the 13 uncovered steps: min=0.069 median=0.191 max=0.218
+  counts >= bar: 0.25:0  0.1875:8  0.125:8  0.0625:13
+  audio FP rate at NON-GT nodes (deployment honesty, not in eval metric): >=0.25: 0.257  >=0.1875: 0.650  >=0.125: 0.690  >=0.0625: 0.891
+  GT dwell times (bins): median=10 mean=10.8 min=3 max=29  share >=4: 0.83  >=8: 0.58
+
+(D1) recalibration potential — RAW pooled score discrimination:
+  node  gt_steps  AUC(raw score, GT vs non-GT steps)
+     1         5    0.395
+     2         5    0.798
+     3         8    0.661
+     4        15    0.389
+     5        11    0.367
+     6        44    0.317
+     7        13    0.653
+     8         9    0.341
+     9        17    0.434
+    10         3    0.924
+  uncovered steps whose GT-node RAW score exceeds that node's median: 3/13
+  (monotone recalibration can only rescue steps that rank high vs the node's own distribution)
+
+(D2) multiclass audio prior as extra or_max channel:
+  label alignment check: 130/130 labeled, agreement with gt_seq = 1.000
+  [LOSO] P_mc at GT node: median=0.031 max=0.999  top-1 acc=0.231
+  [LOSO] champion + P_mc or_max @0.2         cov=0.9077 (118/130)  oracle tl=3=0.9846  gaps=[9, 2, 1]
+    rescues 1/13 baseline-uncovered steps at bar 0.25
+  [in-domain] P_mc at GT node: median=1.000 max=1.000  top-1 acc=1.000
+  [in-domain] champion + P_mc or_max @0.2    cov=1.0000 (130/130)  oracle tl=3=1.0000  gaps=[]
+    rescues 13/13 baseline-uncovered steps at bar 0.25
+
+================================================================================
+DECISIONS (2026-08-31, phase-3 accuracy push) — bar: >= 2pp coverage gain
+================================================================================
+Baseline champion stack (or_max@0.2 + smooth +/-2): 117/130 = 90.00%,
+residual uncovered steps [40,41,45] + [111..120], oracle tl=3 = 98.46%.
+
+TRACK C (smoothing re-tune): PASS -> training run earned.
+  Best candidate: symmetric +/-4 bins (2.0s): 123/130 (+4.6pp), oracle tl=3
+  = 100%. Legitimacy: GT dwell median 10 bins, 83% of dwells >= 4 bins, so a
+  2s carry rarely crosses a node transition. (+/-3: +2.3pp borderline;
+  forward-only holds inferior at equal window; +/-2sym+fwd8 reaches 127/130
+  but 4s staleness is harder to defend.)
+  -> queued as run 617 (A-winner config + --cam-smooth-bins 4).
+
+TRACK D-thr (lower lock bar): CONDITIONAL PASS — documented caveat.
+  threshold 0.15 (bar 0.1875): 125/130 (+6.2pp), oracle tl=3 = 99.23%.
+  CAVEAT: audio FP rate at non-GT nodes rises 25.7% -> 65.0%; in deployment
+  any activated node with audio >= bar claims a detection, so the honesty of
+  the soft-confirm approximation degrades (eval metric cannot see this — the
+  state machine only consults the GT node). thresholds 0.10/0.05 REJECTED
+  (FP 69%/89% ~= the run-606 uncalibrated regime in disguise).
+  -> optional run 618 only if 613-617 fall short of 97%; must carry the FP
+  caveat in its notes.
+
+TRACK D1 (audio recalibration): CLOSED, no training run.
+  RAW pooled-score AUC at GT node is at/below chance for 7 of 10 nodes
+  (node 6, the most-visited: 0.317); only 3/13 uncovered steps rank above
+  their node's median raw score. Monotone recalibration preserves ranking =>
+  cannot honestly rescue the uncovered steps. Consistent with diag_audio_auc
+  (near-chance binary AUC) — the pooled feature set, not the calibration, is
+  the limit.
+
+TRACK D2 (multiclass audio prior): CLOSED for this in-domain push.
+  LOSO-trained LGBM rescues 1/13 uncovered steps (+0.8pp — fails bar).
+  In-domain-trained rescues 13/13 but with top-1 = 1.000 on its own training
+  session = pure memorization (same best-case-gate caveat as run 604); a
+  number produced this way would not be a real tracking result.
+  Remains a candidate for the GENERALIZATION workstream (LOSO top-1 0.231 vs
+  0.1 chance), per RESUME.md.
