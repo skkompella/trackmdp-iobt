@@ -1,0 +1,186 @@
+{
+  "run": 801,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": "runs/agent_run801_ppo",
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv, ideal binary detection",
+  "lever": "control",
+  "time_limit": 1,
+  "max_sensors": 6,
+  "reward_preset": "grid",
+  "sensor_rew": -0.16,
+  "converged": true,
+  "best_iteration": 20,
+  "iterations_run": 170,
+  "best_acc": 0.57015,
+  "sensors_at_best": 5.6850000000000005,
+  "min_loop_acc": 0.29,
+  "max_loop_acc": 0.99,
+  "std_loop_acc": 0.2061535895879575,
+  "worst_loop": 0,
+  "per_loop": [
+    {
+      "loop": 0,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        6,
+        2,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.29,
+      "sensors": 5.8585,
+      "reward": -87.85599999999991
+    },
+    {
+      "loop": 1,
+      "nodes": [
+        0,
+        1,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 6,
+      "accuracy": 0.3265,
+      "sensors": 5.5235,
+      "reward": -83.88599999999995
+    },
+    {
+      "loop": 2,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.7065,
+      "sensors": 5.717499999999999,
+      "reward": -22.510000000000055
+    },
+    {
+      "loop": 3,
+      "nodes": [
+        0,
+        7,
+        9,
+        8,
+        6,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 10,
+      "accuracy": 0.696,
+      "sensors": 5.6004999999999985,
+      "reward": -36.968000000000046
+    },
+    {
+      "loop": 4,
+      "nodes": [
+        0,
+        1,
+        2,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.424,
+      "sensors": 5.570499999999998,
+      "reward": -70.56799999999996
+    },
+    {
+      "loop": 5,
+      "nodes": [
+        0,
+        7,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 7,
+      "accuracy": 0.99,
+      "sensors": 5.717499999999999,
+      "reward": 5.920000000000004
+    },
+    {
+      "loop": 6,
+      "nodes": [
+        0,
+        4,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 6,
+      "accuracy": 0.6595,
+      "sensors": 5.668,
+      "reward": -26.33800000000006
+    },
+    {
+      "loop": 7,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        8,
+        9,
+        7,
+        1
+      ],
+      "length": 9,
+      "accuracy": 0.4405,
+      "sensors": 5.668000000000001,
+      "reward": -65.75800000000004
+    },
+    {
+      "loop": 8,
+      "nodes": [
+        2,
+        3,
+        6
+      ],
+      "length": 3,
+      "accuracy": 0.462,
+      "sensors": 5.67,
+      "reward": -61.96000000000005
+    },
+    {
+      "loop": 9,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        1,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.7065,
+      "sensors": 5.856,
+      "reward": -24.64600000000006
+    }
+  ],
+  "ceiling": 0.99,
+  "hypothesis": "LEVER CONTROL. Matched baseline for both arms: tl=1 + grid reward preset (run 241's regime), 10 loops seed 20260921, max_sensors 6, sensor_rew -0.16. Run 241 shares this config but trained on the topo random walk rather than these loops, so it is a ceiling reference, not a control.",
+  "findings": "CONTROL = 57.02% @ 5.69 sensors, sd 20.62pp, best iter 20. The decisive comparison of this session: run 241 scores 99.00% (the ceiling) on these exact loops under the SAME tl=1 + grid config, differing only in that it trained on the topo random walk instead of the 10 loops. Holding tl and rewards fixed isolates the cause of run 800's weakness to the TRAINING TARGET, not time_limit and not the reward preset."
+}

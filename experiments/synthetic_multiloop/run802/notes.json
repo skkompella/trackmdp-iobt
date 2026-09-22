@@ -1,0 +1,186 @@
+{
+  "run": 802,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": "runs/agent_run802_ppo",
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv, ideal binary detection",
+  "lever": "max_sensors",
+  "time_limit": 1,
+  "max_sensors": 3,
+  "reward_preset": "grid",
+  "sensor_rew": -0.16,
+  "converged": true,
+  "best_iteration": 25,
+  "iterations_run": 175,
+  "best_acc": 0.47465,
+  "sensors_at_best": 3.0,
+  "min_loop_acc": 0.014,
+  "max_loop_acc": 0.99,
+  "std_loop_acc": 0.2855930715196011,
+  "worst_loop": 1,
+  "per_loop": [
+    {
+      "loop": 0,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        6,
+        2,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.425,
+      "sensors": 3.0,
+      "reward": -36.388
+    },
+    {
+      "loop": 1,
+      "nodes": [
+        0,
+        1,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 6,
+      "accuracy": 0.014,
+      "sensors": 3.0,
+      "reward": -115.55200000000013
+    },
+    {
+      "loop": 2,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.2815,
+      "sensors": 3.0,
+      "reward": -51.56999999999992
+    },
+    {
+      "loop": 3,
+      "nodes": [
+        0,
+        7,
+        9,
+        8,
+        6,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 10,
+      "accuracy": 0.593,
+      "sensors": 3.0,
+      "reward": -11.372000000000032
+    },
+    {
+      "loop": 4,
+      "nodes": [
+        0,
+        1,
+        2,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.1485,
+      "sensors": 3.0,
+      "reward": -92.95000000000006
+    },
+    {
+      "loop": 5,
+      "nodes": [
+        0,
+        7,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 7,
+      "accuracy": 0.8495,
+      "sensors": 3.0,
+      "reward": 34.86999999999998
+    },
+    {
+      "loop": 6,
+      "nodes": [
+        0,
+        4,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 6,
+      "accuracy": 0.325,
+      "sensors": 3.0,
+      "reward": -52.00399999999993
+    },
+    {
+      "loop": 7,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        8,
+        9,
+        7,
+        1
+      ],
+      "length": 9,
+      "accuracy": 0.5495,
+      "sensors": 3.0,
+      "reward": -17.80200000000003
+    },
+    {
+      "loop": 8,
+      "nodes": [
+        2,
+        3,
+        6
+      ],
+      "length": 3,
+      "accuracy": 0.99,
+      "sensors": 3.0,
+      "reward": 48.92000000000008
+    },
+    {
+      "loop": 9,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        1,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.5705,
+      "sensors": 3.0,
+      "reward": -21.94200000000003
+    }
+  ],
+  "ceiling": 0.99,
+  "hypothesis": "LEVER A (max_sensors 6 -> 3). Still >= the ambiguity of 3 at most nodes, so hedging should largely survive; first point on the constraint curve.",
+  "findings": "47.47% @ 3.00 sensors (cap binds exactly), sd 28.56pp. -9.55pp accuracy for -2.69 sensors vs control."
+}

@@ -1,0 +1,186 @@
+{
+  "run": 803,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": "runs/agent_run803_ppo",
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv, ideal binary detection",
+  "lever": "max_sensors",
+  "time_limit": 1,
+  "max_sensors": 2,
+  "reward_preset": "grid",
+  "sensor_rew": -0.16,
+  "converged": true,
+  "best_iteration": 80,
+  "iterations_run": 230,
+  "best_acc": 0.31525000000000003,
+  "sensors_at_best": 1.7484000000000002,
+  "min_loop_acc": 0.005,
+  "max_loop_acc": 0.99,
+  "std_loop_acc": 0.30097418909268614,
+  "worst_loop": 6,
+  "per_loop": [
+    {
+      "loop": 0,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        6,
+        2,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.2695,
+      "sensors": 1.7205,
+      "reward": -35.970000000000006
+    },
+    {
+      "loop": 1,
+      "nodes": [
+        0,
+        1,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 6,
+      "accuracy": 0.0125,
+      "sensors": 1.8405,
+      "reward": -101.5579999999999
+    },
+    {
+      "loop": 2,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.0715,
+      "sensors": 1.7850000000000001,
+      "reward": -86.48199999999989
+    },
+    {
+      "loop": 3,
+      "nodes": [
+        0,
+        7,
+        9,
+        8,
+        6,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 10,
+      "accuracy": 0.692,
+      "sensors": 1.6025000000000003,
+      "reward": 19.367999999999988
+    },
+    {
+      "loop": 4,
+      "nodes": [
+        0,
+        1,
+        2,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.282,
+      "sensors": 1.862,
+      "reward": -35.41600000000001
+    },
+    {
+      "loop": 5,
+      "nodes": [
+        0,
+        7,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 7,
+      "accuracy": 0.99,
+      "sensors": 1.4330000000000003,
+      "reward": 73.83200000000011
+    },
+    {
+      "loop": 6,
+      "nodes": [
+        0,
+        4,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 6,
+      "accuracy": 0.005,
+      "sensors": 1.8345000000000002,
+      "reward": -103.89199999999987
+    },
+    {
+      "loop": 7,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        8,
+        9,
+        7,
+        1
+      ],
+      "length": 9,
+      "accuracy": 0.2165,
+      "sensors": 1.7845000000000002,
+      "reward": -58.646
+    },
+    {
+      "loop": 8,
+      "nodes": [
+        2,
+        3,
+        6
+      ],
+      "length": 3,
+      "accuracy": 0.462,
+      "sensors": 1.7690000000000001,
+      "reward": -6.519999999999968
+    },
+    {
+      "loop": 9,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        1,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.1515,
+      "sensors": 1.8525000000000003,
+      "reward": -77.88199999999995
+    }
+  ],
+  "ceiling": 0.99,
+  "hypothesis": "LEVER A (max_sensors 6 -> 2). Below the family's maximum successor ambiguity of 4, so the policy can no longer cover every candidate successor at the worst nodes.",
+  "findings": "31.53% @ 1.75 sensors, sd 30.10pp, worst loop 0.50%. Below the ambiguity threshold of 4: hedging is now impossible at the worst nodes and per-loop variance explodes."
+}

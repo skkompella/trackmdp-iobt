@@ -1,0 +1,186 @@
+{
+  "run": 805,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": "runs/agent_run805_ppo",
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv, ideal binary detection",
+  "lever": "sensor_rew",
+  "time_limit": 1,
+  "max_sensors": 6,
+  "reward_preset": "grid",
+  "sensor_rew": -0.5,
+  "converged": true,
+  "best_iteration": 60,
+  "iterations_run": 175,
+  "best_acc": 0.5821499999999998,
+  "sensors_at_best": 4.9791,
+  "min_loop_acc": 0.3345,
+  "max_loop_acc": 0.99,
+  "std_loop_acc": 0.17851877352256262,
+  "worst_loop": 1,
+  "per_loop": [
+    {
+      "loop": 0,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        6,
+        2,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.5565,
+      "sensors": 4.8715,
+      "reward": -195.175
+    },
+    {
+      "loop": 1,
+      "nodes": [
+        0,
+        1,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 6,
+      "accuracy": 0.3345,
+      "sensors": 5.1625,
+      "reward": -310.675
+    },
+    {
+      "loop": 2,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.707,
+      "sensors": 4.7265,
+      "reward": -170.625
+    },
+    {
+      "loop": 3,
+      "nodes": [
+        0,
+        7,
+        9,
+        8,
+        6,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 10,
+      "accuracy": 0.597,
+      "sensors": 5.103499999999999,
+      "reward": -248.975
+    },
+    {
+      "loop": 4,
+      "nodes": [
+        0,
+        1,
+        2,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.429,
+      "sensors": 5.009,
+      "reward": -281.55
+    },
+    {
+      "loop": 5,
+      "nodes": [
+        0,
+        7,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 7,
+      "accuracy": 0.99,
+      "sensors": 4.868499999999999,
+      "reward": -149.425
+    },
+    {
+      "loop": 6,
+      "nodes": [
+        0,
+        4,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 6,
+      "accuracy": 0.66,
+      "sensors": 4.85,
+      "reward": -181.5
+    },
+    {
+      "loop": 7,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        8,
+        9,
+        7,
+        1
+      ],
+      "length": 9,
+      "accuracy": 0.66,
+      "sensors": 4.895000000000001,
+      "reward": -183.75
+    },
+    {
+      "loop": 8,
+      "nodes": [
+        2,
+        3,
+        6
+      ],
+      "length": 3,
+      "accuracy": 0.462,
+      "sensors": 5.439000000000001,
+      "reward": -280.25
+    },
+    {
+      "loop": 9,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        1,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.4255,
+      "sensors": 4.865499999999999,
+      "reward": -275.225
+    }
+  ],
+  "ceiling": 0.99,
+  "hypothesis": "LEVER B (sensor_rew -0.16 -> -0.50). First point on the penalty curve.",
+  "findings": "58.21% @ 4.98 sensors -- slightly ABOVE the control on accuracy and only -0.71 sensors. The penalty barely moves activation."
+}

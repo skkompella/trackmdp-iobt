@@ -1,0 +1,186 @@
+{
+  "run": 804,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": "runs/agent_run804_ppo",
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv, ideal binary detection",
+  "lever": "max_sensors",
+  "time_limit": 1,
+  "max_sensors": 1,
+  "reward_preset": "grid",
+  "sensor_rew": -0.16,
+  "converged": true,
+  "best_iteration": 275,
+  "iterations_run": 415,
+  "best_acc": 0.24105000000000004,
+  "sensors_at_best": 1.0,
+  "min_loop_acc": 0.0025,
+  "max_loop_acc": 0.99,
+  "std_loop_acc": 0.3147482684622745,
+  "worst_loop": 8,
+  "per_loop": [
+    {
+      "loop": 0,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        6,
+        2,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.0695,
+      "sensors": 1.0,
+      "reward": -78.7699999999999
+    },
+    {
+      "loop": 1,
+      "nodes": [
+        0,
+        1,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 6,
+      "accuracy": 0.0055,
+      "sensors": 1.0,
+      "reward": -95.72999999999988
+    },
+    {
+      "loop": 2,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.1375,
+      "sensors": 1.0,
+      "reward": -71.84999999999988
+    },
+    {
+      "loop": 3,
+      "nodes": [
+        0,
+        7,
+        9,
+        8,
+        6,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 10,
+      "accuracy": 0.692,
+      "sensors": 1.0,
+      "reward": 27.28
+    },
+    {
+      "loop": 4,
+      "nodes": [
+        0,
+        1,
+        2,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.1445,
+      "sensors": 1.0,
+      "reward": -70.54999999999988
+    },
+    {
+      "loop": 5,
+      "nodes": [
+        0,
+        7,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 7,
+      "accuracy": 0.99,
+      "sensors": 1.0,
+      "reward": 80.60000000000018
+    },
+    {
+      "loop": 6,
+      "nodes": [
+        0,
+        4,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 6,
+      "accuracy": 0.0075,
+      "sensors": 1.0,
+      "reward": -95.04999999999988
+    },
+    {
+      "loop": 7,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        8,
+        9,
+        7,
+        1
+      ],
+      "length": 9,
+      "accuracy": 0.2175,
+      "sensors": 1.0,
+      "reward": -49.44999999999992
+    },
+    {
+      "loop": 8,
+      "nodes": [
+        2,
+        3,
+        6
+      ],
+      "length": 3,
+      "accuracy": 0.0025,
+      "sensors": 1.0,
+      "reward": -96.7499999999999
+    },
+    {
+      "loop": 9,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        1,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.144,
+      "sensors": 1.0,
+      "reward": -70.5999999999999
+    }
+  ],
+  "ceiling": 0.99,
+  "hypothesis": "LEVER A (max_sensors 6 -> 1). Full commitment: one node per step, so the policy MUST identify the active loop.",
+  "findings": "24.11% @ 1.00 sensors (cap binds exactly), sd 31.47pp, worst loop 0.25%, best iter 275 -- much later than the others, i.e. it needed far more training. Full commitment regime."
+}

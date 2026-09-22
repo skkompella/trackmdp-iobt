@@ -1,0 +1,186 @@
+{
+  "run": 807,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": "runs/agent_run807_ppo",
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv, ideal binary detection",
+  "lever": "sensor_rew",
+  "time_limit": 1,
+  "max_sensors": 6,
+  "reward_preset": "grid",
+  "sensor_rew": -2.0,
+  "converged": true,
+  "best_iteration": 20,
+  "iterations_run": 170,
+  "best_acc": 0.5357999999999999,
+  "sensors_at_best": 5.4387,
+  "min_loop_acc": 0.003,
+  "max_loop_acc": 0.8465,
+  "std_loop_acc": 0.265551520424945,
+  "worst_loop": 8,
+  "per_loop": [
+    {
+      "loop": 0,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        6,
+        2,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.2865,
+      "sensors": 5.446,
+      "reward": -1360.55
+    },
+    {
+      "loop": 1,
+      "nodes": [
+        0,
+        1,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 6,
+      "accuracy": 0.3355,
+      "sensors": 5.671000000000001,
+      "reward": -1440.65
+    },
+    {
+      "loop": 2,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.7075,
+      "sensors": 5.436,
+      "reward": -1036.45
+    },
+    {
+      "loop": 3,
+      "nodes": [
+        0,
+        7,
+        9,
+        8,
+        6,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 10,
+      "accuracy": 0.791,
+      "sensors": 5.600999999999999,
+      "reward": -1061.1
+    },
+    {
+      "loop": 4,
+      "nodes": [
+        0,
+        1,
+        2,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.7065,
+      "sensors": 5.294999999999999,
+      "reward": -1008.35
+    },
+    {
+      "loop": 5,
+      "nodes": [
+        0,
+        7,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 7,
+      "accuracy": 0.8465,
+      "sensors": 5.434,
+      "reward": -1022.15
+    },
+    {
+      "loop": 6,
+      "nodes": [
+        0,
+        4,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 6,
+      "accuracy": 0.8145,
+      "sensors": 5.345999999999999,
+      "reward": -1016.75
+    },
+    {
+      "loop": 7,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        8,
+        9,
+        7,
+        1
+      ],
+      "length": 9,
+      "accuracy": 0.442,
+      "sensors": 5.450000000000001,
+      "reward": -1281.8
+    },
+    {
+      "loop": 8,
+      "nodes": [
+        2,
+        3,
+        6
+      ],
+      "length": 3,
+      "accuracy": 0.003,
+      "sensors": 5.273999999999999,
+      "reward": -1728.5
+    },
+    {
+      "loop": 9,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        1,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.425,
+      "sensors": 5.434,
+      "reward": -1340.3
+    }
+  ],
+  "ceiling": 0.99,
+  "hypothesis": "LEVER B (sensor_rew -0.16 -> -2.00). Every activation strictly negative-value; included to bracket the arm.",
+  "findings": "53.58% @ 5.44 sensors, sd 26.56pp, worst loop 0.30%. A 12.5x steepening from -0.16 buys only -0.25 sensors/step. PREDICTION REFUTED: I expected collapse toward inactivity. It does not happen because the missing-state step is charged n_grid*sensor_rew (16*sensor_rew) regardless of the action taken, so steepening the penalty scales the cost of BEING LOST in lockstep with the cost of activating. The trade is nearly scale-invariant, which is exactly why sensor_rew is a poor knob."
+}

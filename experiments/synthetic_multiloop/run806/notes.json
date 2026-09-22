@@ -1,0 +1,186 @@
+{
+  "run": 806,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": "runs/agent_run806_ppo",
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv, ideal binary detection",
+  "lever": "sensor_rew",
+  "time_limit": 1,
+  "max_sensors": 6,
+  "reward_preset": "grid",
+  "sensor_rew": -1.0,
+  "converged": true,
+  "best_iteration": 135,
+  "iterations_run": 285,
+  "best_acc": 0.60455,
+  "sensors_at_best": 5.38555,
+  "min_loop_acc": 0.2925,
+  "max_loop_acc": 0.99,
+  "std_loop_acc": 0.17331956756234998,
+  "worst_loop": 0,
+  "per_loop": [
+    {
+      "loop": 0,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        6,
+        2,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.2925,
+      "sensors": 5.696,
+      "reward": -686.85
+    },
+    {
+      "loop": 1,
+      "nodes": [
+        0,
+        1,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 6,
+      "accuracy": 0.653,
+      "sensors": 4.5200000000000005,
+      "reward": -398.7
+    },
+    {
+      "loop": 2,
+      "nodes": [
+        0,
+        4,
+        5,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 7,
+      "accuracy": 0.559,
+      "sensors": 5.707,
+      "reward": -528.8
+    },
+    {
+      "loop": 3,
+      "nodes": [
+        0,
+        7,
+        9,
+        8,
+        6,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 10,
+      "accuracy": 0.693,
+      "sensors": 5.2090000000000005,
+      "reward": -558.6
+    },
+    {
+      "loop": 4,
+      "nodes": [
+        0,
+        1,
+        2,
+        6,
+        8,
+        9,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.5665,
+      "sensors": 5.141499999999999,
+      "reward": -467.5
+    },
+    {
+      "loop": 5,
+      "nodes": [
+        0,
+        7,
+        1,
+        2,
+        3,
+        5,
+        4
+      ],
+      "length": 7,
+      "accuracy": 0.99,
+      "sensors": 5.156,
+      "reward": -426.6
+    },
+    {
+      "loop": 6,
+      "nodes": [
+        0,
+        4,
+        3,
+        2,
+        6,
+        1
+      ],
+      "length": 6,
+      "accuracy": 0.656,
+      "sensors": 5.669499999999999,
+      "reward": -511.85
+    },
+    {
+      "loop": 7,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        8,
+        9,
+        7,
+        1
+      ],
+      "length": 9,
+      "accuracy": 0.55,
+      "sensors": 5.335000000000001,
+      "reward": -597.0
+    },
+    {
+      "loop": 8,
+      "nodes": [
+        2,
+        3,
+        6
+      ],
+      "length": 3,
+      "accuracy": 0.66,
+      "sensors": 5.991,
+      "reward": -543.1
+    },
+    {
+      "loop": 9,
+      "nodes": [
+        0,
+        4,
+        2,
+        3,
+        6,
+        1,
+        7
+      ],
+      "length": 7,
+      "accuracy": 0.4255,
+      "sensors": 5.4305,
+      "reward": -648.0
+    }
+  ],
+  "ceiling": 0.99,
+  "hypothesis": "LEVER B (sensor_rew -0.16 -> -1.00). A 1-sensor hit nets 0.0; predicted collapse toward inactivity.",
+  "findings": "60.46% @ 5.39 sensors -- higher accuracy AND higher activation than at -0.50. Non-monotonic; the arm is not a curve."
+}
