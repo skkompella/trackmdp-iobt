@@ -1,0 +1,40 @@
+{
+  "run": 821,
+  "date": "2026-09-22",
+  "learner": "tabular",
+  "env": "SwitchingTransitionGridEnv 5x5, matrices A(NE) and B(SW)",
+  "grid": [
+    5,
+    5
+  ],
+  "matrices": [
+    "A",
+    "B"
+  ],
+  "time_limit": 1,
+  "max_sensors": 6,
+  "sensor_rew": -0.16,
+  "detector_enabled": true,
+  "oracle_restart": false,
+  "restart_strategy": "cold",
+  "n_restarts": 71,
+  "episodes_per_segment": 1024,
+  "passes": 3,
+  "env_steps": 614400,
+  "mean_accuracy": 0.18837239583333334,
+  "final_accuracy": 0.18368333333333334,
+  "mean_sensors": 5.715703125,
+  "mean_latency_episodes": 0.0,
+  "detector": {
+    "n_detections": 71,
+    "n_switches": 5,
+    "true_positive": 5,
+    "false_alarms": 66,
+    "precision": 0.07042253521126761,
+    "recall": 1.0,
+    "tolerance_episodes": 204
+  },
+  "ceiling": 0.99,
+  "hypothesis": "TABULAR + GLR detection, COLD restart. In the multi-loop experiment this was the worst arm; the question is whether genuinely conflicting regimes change that.",
+  "findings": "WORST ARM at 18.84%, and flat across passes (18.9/19.0/18.6) - 71 restarts over 6144 episodes, 66 of them false, so it never accumulates anything. Matches the multi-loop cold result."
+}

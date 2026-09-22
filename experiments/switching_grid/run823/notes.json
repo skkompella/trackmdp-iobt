@@ -1,0 +1,40 @@
+{
+  "run": 823,
+  "date": "2026-09-22",
+  "learner": "tabular",
+  "env": "SwitchingTransitionGridEnv 5x5, matrices A(NE) and B(SW)",
+  "grid": [
+    5,
+    5
+  ],
+  "matrices": [
+    "A",
+    "B"
+  ],
+  "time_limit": 1,
+  "max_sensors": 6,
+  "sensor_rew": -0.16,
+  "detector_enabled": false,
+  "oracle_restart": true,
+  "restart_strategy": "cold",
+  "n_restarts": 5,
+  "episodes_per_segment": 1024,
+  "passes": 3,
+  "env_steps": 614400,
+  "mean_accuracy": 0.47557779947916673,
+  "final_accuracy": 0.65355,
+  "mean_sensors": 5.384016927083334,
+  "mean_latency_episodes": 333.0,
+  "detector": {
+    "n_detections": 5,
+    "n_switches": 5,
+    "true_positive": 5,
+    "false_alarms": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tolerance_episodes": 204
+  },
+  "ceiling": 0.99,
+  "hypothesis": "ORACLE CONTROL for 821: restart at the 5 known switches, no detector, so detector error is removed.",
+  "findings": "47.56% with perfect detection (5/5, zero false alarms). Still 18.62pp BELOW the no-detector baseline, so cold restarting remains harmful even when perfectly timed - consistent with the multi-loop oracle. The gap from 821's 18.84% to 47.56% is what detector false alarms cost."
+}

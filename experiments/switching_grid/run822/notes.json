@@ -1,0 +1,40 @@
+{
+  "run": 822,
+  "date": "2026-09-22",
+  "learner": "tabular",
+  "env": "SwitchingTransitionGridEnv 5x5, matrices A(NE) and B(SW)",
+  "grid": [
+    5,
+    5
+  ],
+  "matrices": [
+    "A",
+    "B"
+  ],
+  "time_limit": 1,
+  "max_sensors": 6,
+  "sensor_rew": -0.16,
+  "detector_enabled": true,
+  "oracle_restart": false,
+  "restart_strategy": "warm",
+  "n_restarts": 55,
+  "episodes_per_segment": 1024,
+  "passes": 3,
+  "env_steps": 614400,
+  "mean_accuracy": 0.8213167317708332,
+  "final_accuracy": 0.8338999999999999,
+  "mean_sensors": 5.589539388020834,
+  "mean_latency_episodes": 18.333333333333332,
+  "detector": {
+    "n_detections": 55,
+    "n_switches": 5,
+    "true_positive": 4,
+    "false_alarms": 51,
+    "precision": 0.07272727272727272,
+    "recall": 0.8,
+    "tolerance_episodes": 204
+  },
+  "ceiling": 0.99,
+  "hypothesis": "TABULAR + GLR detection, WARM restart to the equal-weight matrix-C prior (99% standalone on all three regimes).",
+  "findings": "BEST ARM at 82.13%, beating the no-detector baseline by 15.95pp. THIS REVERSES THE MULTI-LOOP FINDING, where no-detector won. Note it wins DESPITE a poor detector (4/5 caught but 51 false alarms): restoring a strong generalist is nearly harmless when spurious, whereas a spurious cold wipe is catastrophic. Warm buys the accuracy with energy - 5.59 sensors against the baseline's 4.64."
+}
