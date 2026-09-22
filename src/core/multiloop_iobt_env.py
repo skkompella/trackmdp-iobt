@@ -27,13 +27,37 @@ from .iobt_new_env import iobt_env
 # Backing grid is 4x4 for the 10-node map (see iobt_new_env.py).
 IOBT_N = 4
 
-# IoBT-tuned rewards, matching RealIoBTEnv in examples/finetune_deterministic.py
-# so synthetic numbers stay comparable with the live-data runs.
-DEFAULT_TRACKING_REW              = 1.5
-DEFAULT_TRACKING_MISS_REW         = -0.5
-DEFAULT_TRACKING_REW_MISSING      = 0.5
-DEFAULT_TRACKING_MISS_REW_MISSING = -1.0
-DEFAULT_SENSOR_REW                = -0.25
+# Two reward regimes, selectable by name.
+#
+#   "iobt" — the live-tuned constants RealIoBTEnv uses
+#            (examples/finetune_deterministic.py), so synthetic numbers stay
+#            comparable with the live-data runs.  Run 800 trained under these.
+#   "grid" — the grid_env defaults (src/core/environment.py:75-79), which
+#            TopoIoBTEnv inherits unchanged.  This is the regime run 241 was
+#            trained under, the one that reaches the tracking ceiling.
+#
+# The difference is not cosmetic: under "iobt" with a 6-sensor cap, detecting
+# with every sensor on nets exactly 0.0 (cost 1.5 cancels reward 1.5), which
+# pushes a policy toward narrow activation it may not be able to afford.
+REWARD_PRESETS = {
+    "iobt": dict(tracking_rew              = 1.5,
+                 tracking_miss_rew         = -0.5,
+                 tracking_rew_missing      = 0.5,
+                 tracking_miss_rew_missing = -1.0,
+                 sensor_rew                = -0.25),
+    "grid": dict(tracking_rew              = 1.0,
+                 tracking_miss_rew         = 0.0,
+                 tracking_rew_missing      = 0.0,
+                 tracking_miss_rew_missing = 0.0,
+                 sensor_rew                = -0.16),
+}
+
+DEFAULT_REWARD_PRESET             = "iobt"
+DEFAULT_TRACKING_REW              = REWARD_PRESETS["iobt"]["tracking_rew"]
+DEFAULT_TRACKING_MISS_REW         = REWARD_PRESETS["iobt"]["tracking_miss_rew"]
+DEFAULT_TRACKING_REW_MISSING      = REWARD_PRESETS["iobt"]["tracking_rew_missing"]
+DEFAULT_TRACKING_MISS_REW_MISSING = REWARD_PRESETS["iobt"]["tracking_miss_rew_missing"]
+DEFAULT_SENSOR_REW                = REWARD_PRESETS["iobt"]["sensor_rew"]
 
 
 class MultiLoopIoBTEnv(iobt_env):
@@ -46,7 +70,14 @@ class MultiLoopIoBTEnv(iobt_env):
 
     def __init__(self, max_sensors, max_sensors_null, missing_state, time_limit,
                  loops, seed=None, no_moore_constraint=True,
-                 sensor_rew=DEFAULT_SENSOR_REW):
+                 reward_preset=DEFAULT_REWARD_PRESET, sensor_rew=None,
+                 tracking_rew=None, tracking_miss_rew=None,
+                 tracking_rew_missing=None, tracking_miss_rew_missing=None):
+        if reward_preset not in REWARD_PRESETS:
+            raise ValueError(
+                f"unknown reward_preset {reward_preset!r}; "
+                f"choose one of {sorted(REWARD_PRESETS)}"
+            )
         if not loops:
             raise ValueError("loops must be a non-empty list of node cycles")
         for i, loop in enumerate(loops):
@@ -63,11 +94,20 @@ class MultiLoopIoBTEnv(iobt_env):
 
         super().__init__(max_sensors, max_sensors_null, missing_state, time_limit)
 
-        self.tracking_rew              = DEFAULT_TRACKING_REW
-        self.tracking_miss_rew         = DEFAULT_TRACKING_MISS_REW
-        self.tracking_rew_missing      = DEFAULT_TRACKING_REW_MISSING
-        self.tracking_miss_rew_missing = DEFAULT_TRACKING_MISS_REW_MISSING
-        self.sensor_rew                = float(sensor_rew)
+        # Preset supplies the defaults; any explicit argument overrides it.
+        preset = REWARD_PRESETS[reward_preset]
+
+        def _pick(override, key):
+            return float(preset[key] if override is None else override)
+
+        self.reward_preset             = reward_preset
+        self.tracking_rew              = _pick(tracking_rew, "tracking_rew")
+        self.tracking_miss_rew         = _pick(tracking_miss_rew, "tracking_miss_rew")
+        self.tracking_rew_missing      = _pick(tracking_rew_missing,
+                                               "tracking_rew_missing")
+        self.tracking_miss_rew_missing = _pick(tracking_miss_rew_missing,
+                                               "tracking_miss_rew_missing")
+        self.sensor_rew                = _pick(sensor_rew, "sensor_rew")
 
     # ── loop access ────────────────────────────────────────────────────────
 
@@ -175,7 +215,8 @@ class MultiLoopIoBTLearner:
 
     def __init__(self, run_number, num_trans, max_sensors, max_sensors_null,
                  time_limit, time_limit_max, loops, seed=None,
-                 no_moore_constraint=True, sensor_rew=DEFAULT_SENSOR_REW):
+                 no_moore_constraint=True,
+                 reward_preset=DEFAULT_REWARD_PRESET, sensor_rew=None):
         self.run_number     = run_number
         # N must be the backing grid size so the gym wrapper's obs space is right.
         self.N              = IOBT_N
@@ -188,7 +229,7 @@ class MultiLoopIoBTLearner:
         self.grid_env = MultiLoopIoBTEnv(
             max_sensors, max_sensors_null, self.missing_state, time_limit,
             loops, seed=seed, no_moore_constraint=no_moore_constraint,
-            sensor_rew=sensor_rew,
+            reward_preset=reward_preset, sensor_rew=sensor_rew,
         )
 
         self.exploration_epsilon = 0.15
@@ -213,4 +254,4 @@ class MultiLoopIoBTLearner:
         self.grid_env.valid_q_indices_dict = self.grid_env.get_valid_q_indices_dict()
 
 
-__all__ = ["MultiLoopIoBTEnv", "MultiLoopIoBTLearner"]
+__all__ = ["MultiLoopIoBTEnv", "MultiLoopIoBTLearner", "REWARD_PRESETS"]

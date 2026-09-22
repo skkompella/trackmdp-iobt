@@ -48,7 +48,7 @@ from src.core.iobt_loops import (                             # noqa: E402
     IOBT_NUM_NODES, describe_loops, sample_loops,
 )
 from src.core.multiloop_iobt_env import (                     # noqa: E402
-    IOBT_N, MultiLoopIoBTEnv, MultiLoopIoBTLearner,
+    IOBT_N, REWARD_PRESETS, MultiLoopIoBTEnv, MultiLoopIoBTLearner,
 )
 
 # Reuse the evaluator from the live pipeline so observation construction stays
@@ -80,12 +80,13 @@ DEFAULTS = {
 # Evaluation
 # ---------------------------------------------------------------------------
 
-def make_eval_env(loops, cfg, seed, sensor_rew):
+def make_eval_env(loops, cfg, seed, sensor_rew, reward_preset="iobt"):
     """A fresh env for evaluation only — never the one training mutates."""
     return MultiLoopIoBTEnv(
         cfg["max_sensors"], cfg["max_sensors_null"],
         cfg["missing_state"], cfg["time_limit"],
-        loops, seed=seed, no_moore_constraint=True, sensor_rew=sensor_rew,
+        loops, seed=seed, no_moore_constraint=True,
+        reward_preset=reward_preset, sensor_rew=sensor_rew,
     )
 
 
@@ -169,8 +170,13 @@ def main():
     p.add_argument("--time-limit",  type=int, default=3,
                    help="Failed confirmations tolerated before the object is lost")
     p.add_argument("--max-sensors", type=int, default=6)
-    p.add_argument("--sensor-rew",  type=float, default=-0.25,
-                   help="Per-sensor energy penalty")
+    p.add_argument("--reward-preset", type=str, default="iobt",
+                   choices=sorted(REWARD_PRESETS),
+                   help="'iobt' = live-tuned constants (run 800 regime); "
+                        "'grid' = grid_env defaults, the regime run 241 reached "
+                        "the tracking ceiling under")
+    p.add_argument("--sensor-rew",  type=float, default=None,
+                   help="Per-sensor energy penalty; overrides the preset's value")
     p.add_argument("--new-run",     type=int, default=800)
     p.add_argument("--max-iterations", type=int, default=600,
                    help="Hard cap; training stops earlier on plateau")
@@ -258,7 +264,8 @@ def main():
               f"(obs state_time is Discrete({time_limit + 1}))")
         algo = PPO.from_checkpoint(ckpt)
 
-        eval_env = make_eval_env(loops, cfg, args.eval_seed, args.sensor_rew)
+        eval_env = make_eval_env(loops, cfg, args.eval_seed, args.sensor_rew,
+                                   args.reward_preset)
         per_loop, agg = evaluate_per_loop(
             algo, eval_env, cfg, args.final_eval_episodes_per_loop)
 
@@ -274,7 +281,8 @@ def main():
             fh.write(f"- Checkpoint: `{ckpt}` (no training)\n")
             fh.write(f"- Loops: {args.num_loops} sampled with seed {args.loop_seed}\n")
             fh.write(f"- time_limit {time_limit}, max_sensors {cfg['max_sensors']} "
-                     f"of {IOBT_NUM_NODES}, sensor_rew {args.sensor_rew}\n")
+                     f"of {IOBT_NUM_NODES}, reward_preset {args.reward_preset}, "
+                     f"sensor_rew {eval_env.sensor_rew}\n")
             fh.write(f"- Eval: {args.final_eval_episodes_per_loop} episodes per "
                      f"loop, fixed seed {args.eval_seed}, dedicated env\n\n")
             fh.write(format_per_loop_table(per_loop, agg))
@@ -287,7 +295,8 @@ def main():
     qobj = MultiLoopIoBTLearner(
         args.new_run, cfg["num_trans"], cfg["max_sensors"], cfg["max_sensors_null"],
         time_limit, time_limit_max, loops, seed=args.train_seed,
-        no_moore_constraint=True, sensor_rew=args.sensor_rew,
+        no_moore_constraint=True,
+        reward_preset=args.reward_preset, sensor_rew=args.sensor_rew,
     )
 
     env_config = {
@@ -336,12 +345,16 @@ def main():
     ppo_cfg.normalize_actions = False
     algo = ppo_cfg.build()
 
-    eval_env = make_eval_env(loops, cfg, args.eval_seed, args.sensor_rew)
+    eval_env = make_eval_env(loops, cfg, args.eval_seed, args.sensor_rew,
+                                   args.reward_preset)
 
     print(f"\n  Loops             : {args.num_loops} (seed {args.loop_seed})")
     print(f"  time_limit        : {time_limit}")
     print(f"  max_sensors       : {cfg['max_sensors']} of {IOBT_NUM_NODES}")
-    print(f"  sensor_rew        : {args.sensor_rew}")
+    print(f"  reward preset     : {args.reward_preset} "
+          f"(track={qobj.grid_env.tracking_rew}, "
+          f"miss={qobj.grid_env.tracking_miss_rew}, "
+          f"sensor={qobj.grid_env.sensor_rew})")
     print(f"  Eval              : every {args.eval_interval} iters, "
           f"{args.eval_episodes_per_loop} eps/loop "
           f"(final: {args.final_eval_episodes_per_loop} eps/loop)")
@@ -440,7 +453,8 @@ def main():
             "loop_seed":         args.loop_seed,
             "time_limit":        time_limit,
             "max_sensors":       cfg["max_sensors"],
-            "sensor_rew":        args.sensor_rew,
+            "reward_preset":     args.reward_preset,
+            "sensor_rew":        eval_env.sensor_rew,
             "converged":         converged,
             "best_iteration":    best_iter,
             "iterations_run":    history[-1]["iteration"],
@@ -455,7 +469,8 @@ def main():
         fh.write(f"# Synthetic multi-loop run {args.new_run}\n\n")
         fh.write(f"- Loops: {args.num_loops} sampled with seed {args.loop_seed}\n")
         fh.write(f"- time_limit {time_limit}, max_sensors {cfg['max_sensors']} "
-                 f"of {IOBT_NUM_NODES}, sensor_rew {args.sensor_rew}\n")
+                 f"of {IOBT_NUM_NODES}, reward_preset {args.reward_preset}, "
+                     f"sensor_rew {eval_env.sensor_rew}\n")
         fh.write(f"- Converged: {converged} (best iteration {best_iter} of "
                  f"{history[-1]['iteration']})\n")
         fh.write(f"- Eval: {args.final_eval_episodes_per_loop} episodes per loop, "
