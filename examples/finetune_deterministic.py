@@ -1160,9 +1160,15 @@ def find_latest_checkpoint(run_number, save_dir=None):
 # Evaluation
 # ===========================================================================
 
-def evaluate_policy(algo, env, cfg):
+def evaluate_policy(algo, env, cfg, return_detections=False):
     """
     Greedy rollout on the circular env.  Works for both rect and IoBT modes.
+
+    ``return_detections`` additionally returns the per-step 0/1 hit sequence
+    under the key "detections".  The switching-grid experiment feeds that
+    stream to a change detector; PPO has no per-step hook of its own, because
+    its rollouts live in worker processes.  Default False, so every existing
+    caller sees exactly the same dict as before.
 
     cfg must contain:
         n_cells       — number used as state_pos in the missing-state obs
@@ -1176,6 +1182,16 @@ def evaluate_policy(algo, env, cfg):
     time_limit_max = cfg["time_limit_max"]
     max_sensors    = cfg["max_sensors"]
     no_moore       = cfg.get("no_moore_constraint", False)
+    # How to enforce max_sensors when a policy activates more than the budget.
+    # "index" (default) keeps the lowest-indexed active sensors, preserving the
+    # behaviour every earlier result was measured under.  That rule is BIASED
+    # toward low-index cells: on the 5x5 switching grid, matrix B concentrates
+    # 92% of its stationary mass on cells 0-5 and matrix A only 0.04%, so
+    # index-clipping handed B near-free tracking and A almost none, purely as an
+    # artifact.  "random" takes an unbiased subsample instead, and is what any
+    # comparison across differently-positioned regimes must use.
+    clip_mode      = cfg.get("clip_mode", "index")
+    clip_rng       = np.random.default_rng(cfg.get("clip_seed", 0))
 
     if no_moore:
         av1, av           = _build_augment_vecs_no_moore(time_limit_max, n_cells)
@@ -1187,6 +1203,7 @@ def evaluate_policy(algo, env, cfg):
         max_action_sz      = (2 * time_limit_max + 3) ** 2
 
     total_rewards, ep_lengths, sensors_ep = [], [], []
+    detections: list[int] = []
     total_steps = total_found = 0
 
     for _ in range(cfg["eval_episodes"]):
@@ -1231,12 +1248,18 @@ def evaluate_policy(algo, env, cfg):
                 obj_rel_pos, obj_in_window = 0, 1
 
             if action_sensors.sum() > max_sensors:
-                active = np.where(action_sensors == 1)[0][:max_sensors]
+                active = np.where(action_sensors == 1)[0]
+                if clip_mode == "random":
+                    active = clip_rng.choice(active, size=max_sensors,
+                                             replace=False)
+                else:
+                    active = active[:max_sensors]
                 action_sensors = np.zeros(num_sensors, dtype=int)
                 action_sensors[active] = 1
 
             obj_detected = int(obj_in_window == 1 and
                                action_sensors[int(obj_rel_pos)] == 1)
+            detections.append(int(not was_missing and obj_detected))
             if not was_missing and obj_detected:
                 total_found += 1
 
@@ -1264,13 +1287,16 @@ def evaluate_policy(algo, env, cfg):
         ep_lengths.append(ep_steps)
         sensors_ep.append(ep_sensors / max(ep_steps, 1))
 
-    return {
+    out = {
         "tracking_accuracy": total_found / max(total_steps, 1),
         "mean_reward":       float(np.mean(total_rewards)),
         "std_reward":        float(np.std(total_rewards)),
         "mean_length":       float(np.mean(ep_lengths)),
         "mean_sensors_used": float(np.mean(sensors_ep)),
     }
+    if return_detections:
+        out["detections"] = detections
+    return out
 
 
 # ===========================================================================
