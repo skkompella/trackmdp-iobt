@@ -1,0 +1,32 @@
+{
+  "run": 812,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": null,
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv + TabularTDAgent (SARSA-lambda)",
+  "algorithm": "tabular SARSA(lambda)",
+  "time_limit": 1,
+  "max_sensors": 2,
+  "reward_preset": "grid",
+  "sensor_rew": -0.16,
+  "detector_enabled": true,
+  "oracle_restart": false,
+  "restart_strategy": "warm",
+  "n_restarts": 40,
+  "best_acc": 0.679408,
+  "sensors_at_best": 1.9314000000000002,
+  "mean_latency_episodes": 5.14,
+  "detector": {
+    "n_detections": 40,
+    "n_switches": 49,
+    "true_positive": 22,
+    "false_alarms": 18,
+    "precision": 0.55,
+    "recall": 0.4489795918367347,
+    "tolerance_episodes": 10
+  },
+  "ceiling": 0.99,
+  "hypothesis": "WARM restart: on detection, reset to prior_k2.npy, a Q-table trained across all 10 loops uniformly (70.35% stationary).",
+  "findings": "67.94% @ 1.93. Best latency (5.1 episodes) but latency is measured against each segment's own plateau, so it flatters arms that settle quickly into worse plateaus - read accuracy. Detector caught only 22/49."
+}

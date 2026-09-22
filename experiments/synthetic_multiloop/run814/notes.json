@@ -1,0 +1,32 @@
+{
+  "run": 814,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": null,
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv + TabularTDAgent (SARSA-lambda)",
+  "algorithm": "tabular SARSA(lambda)",
+  "time_limit": 1,
+  "max_sensors": 2,
+  "reward_preset": "grid",
+  "sensor_rew": -0.16,
+  "detector_enabled": false,
+  "oracle_restart": true,
+  "restart_strategy": "cold",
+  "n_restarts": 49,
+  "best_acc": 0.596,
+  "sensors_at_best": 1.8443479999999999,
+  "mean_latency_episodes": 9.2,
+  "detector": {
+    "n_detections": 49,
+    "n_switches": 49,
+    "true_positive": 49,
+    "false_alarms": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tolerance_episodes": 10
+  },
+  "ceiling": 0.99,
+  "hypothesis": "ORACLE CONTROL for 810: restart at the 49 KNOWN switch points, no detector. Separates 'restarting destroys shared knowledge' from 'the GLR detector over-fires'.",
+  "findings": "DECISIVE CONTROL. With perfect detection (49/49, zero false alarms) cold restart reaches 59.60% - still 12.02pp BELOW the no-detector baseline's 71.62%. The GLR arm's extra shortfall to 47.51% is a further 12.09pp. So the cold-restart deficit splits almost exactly in half: half is the detector over-firing (recoverable by tuning), half is the cost of restarting AT ALL (not recoverable by any detector). Restart-on-change is the wrong architecture for this problem because the 10 loops share a transition structure - every loop is a path through IOBT_MAP - so knowledge of one loop transfers to the others, and a restart discards exactly that."
+}

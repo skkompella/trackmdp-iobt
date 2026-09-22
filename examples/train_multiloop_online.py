@@ -205,6 +205,11 @@ def main():
     # detector
     p.add_argument("--no-detector", action="store_true",
                    help="Baseline: pure continual learning, never restart")
+    p.add_argument("--oracle-restart", action="store_true",
+                   help="Control: restart at the KNOWN switch points instead of "
+                        "using the detector. Separates 'restarting is harmful' "
+                        "from 'the detector misfires' - with a perfect detector "
+                        "this is the best any restart policy could do")
     p.add_argument("--delta", type=float, default=0.01)
     p.add_argument("--min-samples", type=int, default=30)
     p.add_argument("--detector-warmup-episodes", type=int, default=5,
@@ -251,8 +256,8 @@ def main():
     prior = np.load(args.prior_path) if args.prior_path else None
     controller = RestartController(agent, strategy=args.restart_strategy,
                                    prior=prior)
-    detector = None if args.no_detector else GLRChangeDetector(
-        delta=args.delta, min_samples=args.min_samples)
+    detector = None if (args.no_detector or args.oracle_restart) else \
+        GLRChangeDetector(delta=args.delta, min_samples=args.min_samples)
 
     out_dir = args.out_dir or os.path.join(
         project_root, "experiments", "synthetic_multiloop", f"run{args.new_run}")
@@ -270,8 +275,13 @@ def main():
           f"(track={env.tracking_rew}, sensor={env.sensor_rew})")
     print(f"  SARSA(lambda)     : alpha={args.alpha} gamma={args.gamma} "
           f"lambda={args.lam} eps={args.epsilon}")
-    print(f"  Detector          : "
-          f"{'DISABLED (continual-learning baseline)' if detector is None else f'GLR delta={args.delta}, min_samples={args.min_samples}'}")
+    if args.oracle_restart:
+        _det_label = "ORACLE (restart at known switches, no detector)"
+    elif detector is None:
+        _det_label = "DISABLED (continual-learning baseline)"
+    else:
+        _det_label = f"GLR delta={args.delta}, min_samples={args.min_samples}"
+    print(f"  Detector          : {_det_label}")
     print(f"  Restart strategy  : {args.restart_strategy}")
     print(f"  Schedule          : {args.passes} passes x {args.num_loops} loops "
           f"x {args.episodes_per_loop} episodes\n")
@@ -291,6 +301,11 @@ def main():
             env.force_loop(loop_idx)
             if ep > 0:
                 switch_episodes.append(ep)
+                if args.oracle_restart:
+                    # Perfect information: restart precisely at the switch.
+                    controller.restart(segment_reward=float(
+                        np.mean(segments[-1]["mean_accuracy"]) if segments else 0.0))
+                    fired_episodes.append(ep)
             seg_acc, seg_sens, seg_reward = [], [], 0.0
 
             for _ in range(args.episodes_per_loop):
@@ -355,6 +370,7 @@ def main():
         "reward_preset": args.reward_preset,
         "sensor_rew": env.sensor_rew,
         "detector_enabled": detector is not None,
+        "oracle_restart": bool(args.oracle_restart),
         "restart_strategy": args.restart_strategy,
         "n_restarts": controller.n_restarts,
         "episodes_per_loop": args.episodes_per_loop,
@@ -369,7 +385,7 @@ def main():
         "mean_latency_later_passes": _mean_lat(later),
         "ceiling": (args.max_ep_steps - 1) / args.max_ep_steps,
     }
-    if detector is not None:
+    if detector is not None or args.oracle_restart:
         summary["detector"] = detector_scores(
             fired_episodes, switch_episodes,
             tolerance=max(2, args.episodes_per_loop // 5))
@@ -388,7 +404,7 @@ def main():
     print(f"  Segments not recovered: {summary['segments_never_recovered']} "
           f"of {len(segments)}")
     print(f"  Restarts             : {controller.n_restarts}")
-    if detector is not None:
+    if "detector" in summary:
         d = summary["detector"]
         print(f"  Detector             : {d['true_positive']}/{d['n_switches']} "
               f"switches caught, {d['false_alarms']} false alarms")

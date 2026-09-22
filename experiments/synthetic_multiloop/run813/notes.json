@@ -1,0 +1,32 @@
+{
+  "run": 813,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": null,
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv + TabularTDAgent (SARSA-lambda)",
+  "algorithm": "tabular SARSA(lambda)",
+  "time_limit": 1,
+  "max_sensors": 2,
+  "reward_preset": "grid",
+  "sensor_rew": -0.16,
+  "detector_enabled": true,
+  "oracle_restart": false,
+  "restart_strategy": "library",
+  "n_restarts": 73,
+  "best_acc": 0.628596,
+  "sensors_at_best": 1.8756320000000002,
+  "mean_latency_episodes": 8.3,
+  "detector": {
+    "n_detections": 73,
+    "n_switches": 49,
+    "true_positive": 46,
+    "false_alarms": 27,
+    "precision": 0.6301369863013698,
+    "recall": 0.9387755102040817,
+    "tolerance_episodes": 10
+  },
+  "ceiling": 0.99,
+  "hypothesis": "LIBRARY restart: archive the finished segment's table, restore the best-scoring archive.",
+  "findings": "62.86% @ 1.88. Flat across passes. Best-archive selection is a heuristic, not matched-expert, and it shows."
+}

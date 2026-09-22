@@ -1,0 +1,32 @@
+{
+  "run": 810,
+  "date": "2026-09-22",
+  "source_run": null,
+  "checkpoint_path": null,
+  "session": "SYNTHETIC (10 generated loops, seed 20260921)",
+  "env": "MultiLoopIoBTEnv + TabularTDAgent (SARSA-lambda)",
+  "algorithm": "tabular SARSA(lambda)",
+  "time_limit": 1,
+  "max_sensors": 2,
+  "reward_preset": "grid",
+  "sensor_rew": -0.16,
+  "detector_enabled": true,
+  "oracle_restart": false,
+  "restart_strategy": "cold",
+  "n_restarts": 107,
+  "best_acc": 0.47513999999999995,
+  "sensors_at_best": 1.872372,
+  "mean_latency_episodes": 10.68,
+  "detector": {
+    "n_detections": 107,
+    "n_switches": 49,
+    "true_positive": 47,
+    "false_alarms": 60,
+    "precision": 0.4392523364485981,
+    "recall": 0.9591836734693877,
+    "tolerance_episodes": 10
+  },
+  "ceiling": 0.99,
+  "hypothesis": "ONLINE HEADLINE: tabular SARSA(lambda) + GLR detector with COLD restart on a sequential loop schedule (10 loops x 50 episodes x 5 passes) at the regime the lever runs selected (max_sensors=2, tl=1, grid preset). Cold restart is DAL_GLB.reset() semantics: the honest measure of adaptation speed with nothing carried across a switch.",
+  "findings": "WORST ARM, 47.51% @ 1.87, and it never accumulates (50.8 -> 48.5% across passes). 107 restarts over 2500 episodes, 60 of 107 detections false. Combined with 814 this decomposes cleanly - see findings for 814."
+}
