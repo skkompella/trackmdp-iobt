@@ -34,6 +34,12 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
     found = steps = sensors_on = 0
     total_reward = 0.0
     detections: list[int] = []
+    # Per-step extras so a caller can build an alternative detector signal.
+    # `cells` is the OBSERVED cell (None on a miss) -- legitimate, since the env
+    # encodes the true cell into next_state on every successful detection and
+    # the agent already uses it as its own state.
+    cells: list = []
+    rewards: list[float] = []
 
     prev = None   # (state, action, reward) pending SARSA update
 
@@ -59,6 +65,9 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
         reward, next_state, _terminal, time_delay = env.get_reward_next_state(
             current_state, action_sensors, time_delay)
         total_reward += reward
+        cells.append(int(next_state // (time_limit + 1)) if time_delay == 0
+                     else None)
+        rewards.append(float(reward))
 
         # Charge what evaluate_policy charges, or these numbers would not be
         # comparable with PPO's.  It applies its max_sensors clip AFTER the
@@ -82,6 +91,8 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
         "sensors":    sensors_on / max(steps, 1),
         "reward":     total_reward,
         "detections": detections,
+        "cells":      cells,
+        "rewards":    rewards,
     }
 
 

@@ -48,7 +48,12 @@ from src.core.online_schedule import (                         # noqa: E402
     adaptation_latency, detector_scores, run_episode,
 )
 from src.core.switching_grid_env import SwitchingTransitionGridEnv  # noqa: E402
+from src.core.detection_signals import TransitionSurprise      # noqa: E402
 from src.core.tabular_td import TabularTDAgent                 # noqa: E402
+
+# Which divergence suits each signal; only the 0/1 hit stream is Bernoulli.
+SIGNAL_DIVERGENCE = {"hit": "bernoulli", "reward": "gaussian",
+                     "transition_surprise": "gaussian"}
 
 MATRIX_MAKERS = {"A": make_matrix_A, "B": make_matrix_B, "C": make_matrix_C}
 
@@ -105,8 +110,18 @@ def main():
                    help="Control: restart at the KNOWN switch points, no "
                         "detector. Separates 'restarting is harmful' from "
                         "'the detector misfires'")
+    p.add_argument("--detector-signal", type=str, default="hit",
+                   choices=sorted(SIGNAL_DIVERGENCE),
+                   help="What the detector monitors. Calibration found `hit` "
+                        "is the WORST of six signals on this grid (2/5 switches "
+                        "caught) because max_sensors=6 lets the policy hedge, "
+                        "so a switch often does not change tracking success at "
+                        "all. transition_surprise catches 5/5.")
     p.add_argument("--delta", type=float, default=0.01)
     p.add_argument("--min-samples", type=int, default=30)
+    p.add_argument("--max-window", type=int, default=500,
+                   help="Must match the window the delta was calibrated at; "
+                        "the calibration sweep used 200")
     p.add_argument("--detector-warmup-episodes", type=int, default=5)
     p.add_argument("--detector-cooldown-episodes", type=int, default=5)
     p.add_argument("--restart-strategy", type=str, default="cold",
@@ -139,7 +154,13 @@ def main():
     controller = RestartController(agent, strategy=args.restart_strategy,
                                    prior=prior)
     detector = None if (args.no_detector or args.oracle_restart) else \
-        GLRChangeDetector(delta=args.delta, min_samples=args.min_samples)
+        GLRChangeDetector(delta=args.delta, min_samples=args.min_samples,
+                          max_window=args.max_window,
+                          divergence=SIGNAL_DIVERGENCE[args.detector_signal])
+    # Online extractor for the chosen signal. TransitionSurprise is fed the
+    # OBSERVED cell (None on a miss), which run_episode now returns.
+    surprise = (TransitionSurprise(n_cells)
+                if args.detector_signal == "transition_surprise" else None)
 
     out_dir = args.out_dir or os.path.join(
         project_root, "experiments", "switching_grid", f"run{args.new_run}")
@@ -166,6 +187,8 @@ def main():
     print(f"  SARSA(lambda)     : alpha={args.alpha} gamma={args.gamma} "
           f"lambda={args.lam} eps={args.epsilon}")
     print(f"  Detector          : {det_label}")
+    print(f"  Detector signal   : {args.detector_signal} "
+          f"({SIGNAL_DIVERGENCE[args.detector_signal]})")
     print(f"  Restart strategy  : {args.restart_strategy}")
     print(f"  Schedule          : {args.passes} passes x {len(names)} matrices "
           f"x {args.episodes_per_segment} episodes\n")
@@ -199,10 +222,18 @@ def main():
                                 "sensors": res["sensors"],
                                 "reward": res["reward"]})
 
+                if args.detector_signal == "hit":
+                    feed = res["detections"]
+                elif args.detector_signal == "reward":
+                    feed = res["rewards"]
+                else:
+                    feed = [v for v in (surprise.observe(c)
+                                        for c in res["cells"]) if v is not None]
+
                 quiet = (ep < args.detector_warmup_episodes
                          or ep < suppress_until)
                 if detector is not None and not quiet:
-                    for d in res["detections"]:
+                    for d in feed:
                         if detector.update(d):
                             fired_episodes.append(ep)
                             controller.restart(
@@ -242,6 +273,9 @@ def main():
         "time_limit": tl, "max_sensors": args.max_sensors,
         "sensor_rew": env.sensor_rew,
         "detector_enabled": detector is not None,
+        "detector_signal": args.detector_signal,
+        "delta": args.delta,
+        "max_window": args.max_window,
         "oracle_restart": bool(args.oracle_restart),
         "restart_strategy": args.restart_strategy,
         "n_restarts": controller.n_restarts,
