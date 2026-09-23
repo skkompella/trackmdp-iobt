@@ -124,7 +124,11 @@ def main():
         results[name] = curve
 
         best = at_target_arl0(curve, args.target_arl0)
+        met_target = best is not None
         if best is None:
+            # Do NOT silently substitute a row at a different false-alarm rate:
+            # that is precisely the matched-delta mistake this sweep exists to
+            # avoid. Report the best achievable ARL0 and flag it.
             cand = [r for r in curve if r["mean_delay"] is not None]
             best = max(cand, key=lambda r: r["arl0"]) if cand else None
 
@@ -133,11 +137,13 @@ def main():
                   f"{'never':>9} {'0/'+str(len(switches)):>8} {'-':>10} {dt:>6.0f}")
             summary.append({"signal": name, "detectable": False})
         else:
+            flag = "" if met_target else "  << BELOW TARGET ARL0"
             print(f"  {name:>20} {len(a['values']):>9,} {best['arl0']:>10.0f} "
                   f"{best['mean_delay']:>9.0f} "
                   f"{str(best['n_caught'])+'/'+str(best['n_switches']):>8} "
-                  f"{best['delta']:>10.2e} {dt:>6.0f}")
+                  f"{best['delta']:>10.2e} {dt:>6.0f}{flag}")
             summary.append({"signal": name, "detectable": True,
+                            "met_target_arl0": met_target,
                             "arl0": best["arl0"],
                             "mean_delay": best["mean_delay"],
                             "n_caught": best["n_caught"],
@@ -160,7 +166,15 @@ def main():
                               for k, v in results.items()}}, fh, indent=1)
 
     print(f"\n  Wrote {args.out}")
-    ranked = [s for s in summary if s.get("detectable")]
+    ranked = [s for s in summary
+              if s.get("detectable") and s.get("met_target_arl0")]
+    rejected = [s for s in summary
+                if s.get("detectable") and not s.get("met_target_arl0")]
+    if rejected:
+        print(f"\n  Could NOT reach ARL0 >= {args.target_arl0:,.0f} at any "
+              f"delta in the grid (their own streams are non-stationary):")
+        for s in rejected:
+            print(f"    {s['signal']:>20}: best ARL0 {s['arl0']:,.0f}")
     if ranked:
         ranked.sort(key=lambda s: (s["n_switches"] - s["n_caught"],
                                    s["mean_delay"]))
