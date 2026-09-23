@@ -1,0 +1,40 @@
+{
+  "run": 831,
+  "date": "2026-09-22",
+  "learner": "ppo",
+  "env": "SwitchingTransitionGridEnv 5x5, matrices A(NE) and B(SW)",
+  "grid": [
+    5,
+    5
+  ],
+  "matrices": [
+    "A",
+    "B"
+  ],
+  "time_limit": 1,
+  "max_sensors": 6,
+  "sensor_rew": -0.16,
+  "detector_enabled": true,
+  "oracle_restart": false,
+  "restart_strategy": "cold",
+  "n_restarts": 25,
+  "passes": 3,
+  "env_steps": 614400,
+  "mean_accuracy": 0.3007916666666666,
+  "final_accuracy": 0.2659166666666667,
+  "mean_sensors": 5.990058333333333,
+  "mean_latency": 10.666666666666666,
+  "detector": {
+    "n_detections": 25,
+    "n_switches": 5,
+    "true_positive": 4,
+    "false_alarms": 21,
+    "precision": 0.16,
+    "recall": 0.8,
+    "tolerance_episodes": 40
+  },
+  "ceiling": 0.99,
+  "detection_resolution": "one PPO batch (512 env steps)",
+  "hypothesis": "PPO + GLR detection, COLD restart (rebuild the policy network from scratch).",
+  "findings": "30.08% - catastrophic, as cold restart was for tabular. 25 restarts, 21 of them false. Rebuilding a network costs far more than re-filling a table, but the direction is identical."
+}

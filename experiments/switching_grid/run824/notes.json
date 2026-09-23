@@ -1,0 +1,40 @@
+{
+  "run": 824,
+  "date": "2026-09-22",
+  "learner": "tabular",
+  "env": "SwitchingTransitionGridEnv 5x5, matrices A(NE) and B(SW)",
+  "grid": [
+    5,
+    5
+  ],
+  "matrices": [
+    "A",
+    "B"
+  ],
+  "time_limit": 1,
+  "max_sensors": 6,
+  "sensor_rew": -0.16,
+  "detector_enabled": false,
+  "oracle_restart": true,
+  "restart_strategy": "warm",
+  "n_restarts": 5,
+  "passes": 3,
+  "env_steps": 614400,
+  "mean_accuracy": 0.7703531901041667,
+  "final_accuracy": 0.7983166666666667,
+  "mean_sensors": 5.197086588541667,
+  "mean_latency": 49.833333333333336,
+  "detector": {
+    "n_detections": 5,
+    "n_switches": 5,
+    "true_positive": 5,
+    "false_alarms": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tolerance_episodes": 204
+  },
+  "ceiling": 0.99,
+  "detection_resolution": "per step",
+  "hypothesis": "CONTROL for 822: warm restart at the 5 KNOWN switches instead of on detection. Isolates whether the warm arm's win comes from DETECTING the change or merely from periodically restoring a strong generalist.",
+  "findings": "77.04% with PERFECT detection timing (5/5, zero false alarms, 5 restarts) - LOWER than run 822's 82.13% with sloppy timing (4/5 caught but 51 false alarms, 55 restarts). Worse-timed detection scored HIGHER, so detection timing is not the mechanism: the benefit is periodic restoration of a strong generalist, and spurious restarts help rather than hurt because each one resets the learner to a 99% policy before it can specialise into something worse. A plain 'reset to prior every N episodes' would likely match this."
+}

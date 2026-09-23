@@ -1,0 +1,32 @@
+{
+  "run": 830,
+  "date": "2026-09-22",
+  "learner": "ppo",
+  "env": "SwitchingTransitionGridEnv 5x5, matrices A(NE) and B(SW)",
+  "grid": [
+    5,
+    5
+  ],
+  "matrices": [
+    "A",
+    "B"
+  ],
+  "time_limit": 1,
+  "max_sensors": 6,
+  "sensor_rew": -0.16,
+  "detector_enabled": false,
+  "oracle_restart": false,
+  "restart_strategy": "cold",
+  "n_restarts": 0,
+  "passes": 3,
+  "env_steps": 614400,
+  "mean_accuracy": 0.7102666666666667,
+  "final_accuracy": 0.8141666666666668,
+  "mean_sensors": 4.546774999999999,
+  "mean_latency": 48.333333333333336,
+  "detector": null,
+  "ceiling": 0.99,
+  "detection_resolution": "one PPO batch (512 env steps)",
+  "hypothesis": "PPO BASELINE: no detection, same A,B,A,B,A,B schedule and same 102,400 env steps per segment as the tabular arms (200 iterations at batch 512).",
+  "findings": "71.03% mean, 81.42% final, 4.55 sensors. Beats the tabular baseline (66.18%), reversing the IoBT-loop result where tabular was 2.3x PPO. On 25 cells with 51 states, PPO's network generalises across states better than the factored linear-in-cells table."
+}
