@@ -46,28 +46,9 @@ from src.core.multiloop_iobt_env import (                     # noqa: E402
     IOBT_N, REWARD_PRESETS, MultiLoopIoBTEnv,
 )
 from src.core.online_schedule import (                        # noqa: E402
-    adaptation_latency, detector_scores, run_episode,
+    adaptation_latency, detector_scores, greedy_eval, run_episode,
 )
 from src.core.tabular_td import N_GRID, TabularTDAgent        # noqa: E402
-
-
-def greedy_eval(agent, eval_env, cfg, loop_idx, n_episodes):
-    """
-    Score the CURRENT table on ``loop_idx`` with exploration off.
-
-    The training episodes are scored while exploring (epsilon-greedy), which
-    the offline base models and specialists never are, so those two numbers
-    are not comparable.  This is the comparable one.  It runs on a separate
-    env and restores the agent's RNG, so the training trajectory is identical
-    whether or not greedy evaluation is switched on.
-    """
-    rng_state = agent._rng.bit_generator.state
-    eval_env.force_loop(loop_idx)
-    res = [run_episode(agent, eval_env, cfg, learn=False, explore=False)
-           for _ in range(n_episodes)]
-    agent._rng.bit_generator.state = rng_state
-    return (float(np.mean([r["accuracy"] for r in res])),
-            float(np.mean([r["sensors"] for r in res])))
 
 
 # ---------------------------------------------------------------------------
@@ -244,7 +225,8 @@ def main():
                 if eval_env is not None and (
                         (seg_ep + 1) % args.greedy_eval_every == 0
                         or seg_ep + 1 == args.episodes_per_loop):
-                    ga, gs = greedy_eval(agent, eval_env, cfg, loop_idx,
+                    eval_env.force_loop(loop_idx)
+                    ga, gs = greedy_eval(agent, eval_env, cfg,
                                          args.greedy_eval_episodes)
                     g_acc.append(ga)
                     g_sens.append(gs)
@@ -265,6 +247,7 @@ def main():
                     "greedy_final_accuracy": g_acc[-1],
                     "greedy_mean_sensors": float(np.mean(g_sens)),
                     "greedy_curve": g_acc,
+                    "greedy_sensor_curve": g_sens,
                 })
             print(f"  {pass_idx:>4}  {loop_idx:>4}  "
                   f"{np.mean(seg_acc)*100:6.2f}%  {np.mean(seg_sens):8.2f}  "

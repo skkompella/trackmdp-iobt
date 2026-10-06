@@ -96,6 +96,25 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
     }
 
 
+def greedy_eval(agent, eval_env, cfg, n_episodes):
+    """
+    Score the CURRENT policy with exploration off, on whatever regime
+    ``eval_env`` is pinned to.
+
+    Training episodes are scored while exploring (epsilon-greedy), which the
+    offline base models and specialists never are, so those numbers are not
+    comparable with them; this one is.  Use a separate env from the training
+    one: the agent's RNG is restored afterwards, so the training trajectory is
+    identical whether or not greedy evaluation is switched on.
+    """
+    rng_state = agent._rng.bit_generator.state
+    res = [run_episode(agent, eval_env, cfg, learn=False, explore=False)
+           for _ in range(n_episodes)]
+    agent._rng.bit_generator.state = rng_state
+    return (float(np.mean([r["accuracy"] for r in res])),
+            float(np.mean([r["sensors"] for r in res])))
+
+
 def adaptation_latency(accuracies, epsilon, tail_frac=0.3, window=3):
     """
     Episodes until accuracy recovers to within ``epsilon`` of steady state.
@@ -146,4 +165,5 @@ def detector_scores(fired_episodes, switch_episodes, tolerance):
     }
 
 
-__all__ = ["run_episode", "adaptation_latency", "detector_scores"]
+__all__ = ["run_episode", "greedy_eval", "adaptation_latency",
+           "detector_scores"]

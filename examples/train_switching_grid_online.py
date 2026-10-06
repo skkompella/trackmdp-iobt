@@ -45,7 +45,7 @@ from src.core.grid_transition_matrices import (                # noqa: E402
     describe_matrix, make_matrix_A, make_matrix_B, make_matrix_C,
 )
 from src.core.online_schedule import (                         # noqa: E402
-    adaptation_latency, detector_scores, run_episode,
+    adaptation_latency, detector_scores, greedy_eval, run_episode,
 )
 from src.core.switching_grid_env import SwitchingTransitionGridEnv  # noqa: E402
 from src.core.detection_signals import TransitionSurprise      # noqa: E402
@@ -134,6 +134,11 @@ def main():
     p.add_argument("--train-seed", type=int, default=7)
     p.add_argument("--new-run", type=int, default=820)
     p.add_argument("--out-dir", type=str, default=None)
+    p.add_argument("--greedy-eval-every", type=int, default=0,
+                   help="Every N training episodes (and at each segment end), "
+                        "score the policy greedily on the current matrix. 0 = off")
+    p.add_argument("--greedy-eval-episodes", type=int, default=10)
+    p.add_argument("--eval-seed", type=int, default=99)
     args = p.parse_args()
 
     names = [n.strip().upper() for n in args.matrices.split(",") if n.strip()]
@@ -149,6 +154,8 @@ def main():
 
     env   = build_env(args, cfg, matrices)
     agent = build_agent(args, cfg)
+    eval_env = (build_env(args, cfg, matrices, seed=args.eval_seed)
+                if args.greedy_eval_every > 0 else None)
 
     prior = np.load(args.prior_path) if args.prior_path else None
     controller = RestartController(agent, strategy=args.restart_strategy,
@@ -213,7 +220,8 @@ def main():
                     fired_episodes.append(ep)
 
             seg_acc, seg_sens = [], []
-            for _ in range(args.episodes_per_segment):
+            g_acc, g_sens = [], []
+            for seg_ep in range(args.episodes_per_segment):
                 res = run_episode(agent, env, cfg, learn=True, explore=True)
                 seg_acc.append(res["accuracy"])
                 seg_sens.append(res["sensors"])
@@ -245,6 +253,15 @@ def main():
                     detector.reset()
                 ep += 1
 
+                if eval_env is not None and (
+                        (seg_ep + 1) % args.greedy_eval_every == 0
+                        or seg_ep + 1 == args.episodes_per_segment):
+                    eval_env.force_matrix(m_idx)
+                    ga, gs = greedy_eval(agent, eval_env, cfg,
+                                         args.greedy_eval_episodes)
+                    g_acc.append(ga)
+                    g_sens.append(gs)
+
             lat = adaptation_latency(seg_acc, args.latency_epsilon)
             segments.append({
                 "pass": pass_idx, "matrix": m_name,
@@ -254,10 +271,20 @@ def main():
                 "mean_sensors": float(np.mean(seg_sens)),
                 "adaptation_latency": lat,
             })
+            if g_acc:
+                segments[-1].update({
+                    "greedy_mean_accuracy": float(np.mean(g_acc)),
+                    "greedy_final_accuracy": g_acc[-1],
+                    "greedy_mean_sensors": float(np.mean(g_sens)),
+                    "greedy_curve": g_acc,
+                    "greedy_sensor_curve": g_sens,
+                })
             print(f"  {pass_idx:>4}  {m_name:>4}  {np.mean(seg_acc)*100:6.2f}%  "
                   f"{np.mean(seg_sens):8.2f}  "
                   f"{('n/a' if lat is None else lat):>8}  "
-                  f"{controller.n_restarts:>8}")
+                  f"{controller.n_restarts:>8}"
+                  + (f"  greedy {np.mean(g_acc)*100:6.2f}% "
+                     f"(final {g_acc[-1]*100:6.2f}%)" if g_acc else ""))
 
     lats = [s["adaptation_latency"] for s in segments
             if s["adaptation_latency"] is not None]
@@ -293,6 +320,17 @@ def main():
                                                 if s["pass"] > 0]),
         "ceiling": (args.max_ep_steps - 1) / args.max_ep_steps,
     }
+    if eval_env is not None:
+        summary.update({
+            "greedy_eval_every": args.greedy_eval_every,
+            "greedy_eval_episodes": args.greedy_eval_episodes,
+            "greedy_mean_accuracy": float(np.mean(
+                [s["greedy_mean_accuracy"] for s in segments])),
+            "greedy_final_accuracy": float(np.mean(
+                [s["greedy_final_accuracy"] for s in segments])),
+            "greedy_mean_sensors": float(np.mean(
+                [s["greedy_mean_sensors"] for s in segments])),
+        })
     if detector is not None or args.oracle_restart:
         summary["detector"] = detector_scores(
             fired_episodes, switch_episodes,
@@ -305,6 +343,10 @@ def main():
           f"(final-100 {summary['final_accuracy']*100:.2f}%, "
           f"ceiling {summary['ceiling']*100:.2f}%)")
     print(f"  Mean sensors/step    : {summary['mean_sensors']:.2f}")
+    if eval_env is not None:
+        print(f"  Greedy accuracy      : mean {summary['greedy_mean_accuracy']*100:.2f}%, "
+              f"end-of-segment {summary['greedy_final_accuracy']*100:.2f}%, "
+              f"{summary['greedy_mean_sensors']:.2f} sensors/step")
     if lats:
         print(f"  Adaptation latency   : mean "
               f"{summary['mean_latency_episodes']:.1f} episodes "
