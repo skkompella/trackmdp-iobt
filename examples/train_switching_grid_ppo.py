@@ -213,6 +213,14 @@ def main():
 
     algo = build_algo(args, cfg, matrices)
 
+    prior_weights = None
+    if args.restart_strategy == "warm" and args.prior_checkpoint:
+        from ray.rllib.policy.policy import Policy
+        pol = Policy.from_checkpoint(
+            os.path.join(args.prior_checkpoint, "policies", "default_policy"))
+        prior_weights = {"default_policy": pol.get_weights()}
+        del pol
+
     # Dedicated seeded eval env — never the one the workers mutate.
     if args.env == "iobt":
         eval_env = MatrixIoBTEnv(
@@ -287,7 +295,14 @@ def main():
                                 algo.stop()
                                 algo = build_algo(args, cfg, matrices)
                             else:
-                                algo.restore(args.prior_checkpoint)
+                                # Set the base model's WEIGHTS in place rather
+                                # than algo.restore(): restore swaps the policy
+                                # objects under workers that are mid-episode,
+                                # and their half-built batches then mismatch
+                                # (measured: "operands could not be broadcast
+                                # together with shapes (64,) (63,)" in GAE).
+                                algo.set_weights(prior_weights)
+                                algo.env_runner_group.sync_weights()
                             push_matrix(algo, m_idx)
                             suppress_until = (it + 1
                                               + args.detector_cooldown_iters)
