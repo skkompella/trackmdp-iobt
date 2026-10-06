@@ -29,6 +29,24 @@ term is approximated.  It also matches how PPO already treats this action
 space — MultiDiscrete([2]*n) is n independent Bernoulli heads — so the two
 learners score cells the same way.
 
+  "local"     one value per sensor subset, like "subset", but only over the
+              cells the object can have reached since it was last seen: within
+              Manhattan distance delay+1 of the last-seen cell (the object moves
+              once per step, after sensing).  Exact like "subset", tractable
+              like "factored", because the reachable set is small:
+                  5x5 grid, tl=1, max_sensors=5 -> delay 0: 5 cells, 32 subsets
+                                                   delay 1: 13 cells, 2,380 subsets
+              Needs ``grid_shape`` and 4-connected movement.  Each state keeps
+              its own action list; an action is the int state*width + index,
+              so it is a flat index into the (padded) table.
+
+              Why it exists: factored mode applies one TD error to every active
+              cell, so cells switched on together get identical credit no
+              matter which one found the object.  Measured on the 5x5 grid
+              (stationary matrix A, k=4, sensor cost 0): only 28% of the cells it
+              watched were among the true top-4 destinations, and accuracy
+              plateaued at 80.75% against a 98.29% ceiling.
+
 The one behavioural difference: factored mode can choose to activate NOTHING
 when every weight is negative, which subset mode cannot (build_action_map
 starts at size 1).  That is deliberate — with a per-sensor cost, declining to
@@ -60,7 +78,18 @@ from .iobt_loops import IOBT_NUM_NODES
 IOBT_N = 4
 N_GRID = IOBT_N * IOBT_N   # 16
 
-ACTION_MODES = ("subset", "factored")
+ACTION_MODES = ("subset", "factored", "local")
+
+
+def reachable_cells(cell: int, radius: int, nrows: int, ncols: int):
+    """Cells within Manhattan distance ``radius`` of ``cell`` (index y*ncols+x)."""
+    y, x = divmod(int(cell), ncols)
+    out = []
+    for yy in range(max(0, y - radius), min(nrows, y + radius + 1)):
+        for xx in range(max(0, x - radius), min(ncols, x + radius + 1)):
+            if abs(yy - y) + abs(xx - x) <= radius:
+                out.append(yy * ncols + xx)
+    return out
 
 
 def action_index_size(max_sensors: int, n_nodes: int = IOBT_NUM_NODES) -> int:
@@ -91,7 +120,8 @@ class TabularTDAgent:
                  epsilon: float = 0.1, optimistic_init: float = 0.0,
                  seed: int | None = None, n_nodes: int = IOBT_NUM_NODES,
                  grid_width: int | None = None,
-                 action_mode: str = "subset"):
+                 action_mode: str = "subset",
+                 grid_shape: tuple[int, int] | None = None):
         if action_mode not in ACTION_MODES:
             raise ValueError(f"action_mode must be one of {ACTION_MODES}")
 
@@ -116,7 +146,16 @@ class TabularTDAgent:
         self._rng     = np.random.default_rng(seed)
         self.n_states = self.n_nodes * (self.time_limit + 1) + 1
 
-        if action_mode == "subset":
+        if action_mode == "local":
+            if grid_shape is None or grid_shape[0] * grid_shape[1] != self.n_nodes:
+                raise ValueError("local mode needs grid_shape with "
+                                 "nrows*ncols == n_nodes")
+            self._local = self._build_local_actions(*grid_shape)
+            self._n_valid = np.array([len(a) for a in self._local])
+            self.n_actions = None          # differs per state
+            cols = int(self._n_valid.max())
+            self._actions = None
+        elif action_mode == "subset":
             narrow = build_action_map(self.n_nodes, self.max_sensors)
             self._actions = np.zeros((len(narrow), self.grid_width),
                                      dtype=np.int64)
@@ -138,8 +177,35 @@ class TabularTDAgent:
 
         self.q      = np.full((self.n_states, cols), self.optimistic_init,
                               dtype=np.float64)
+        self._mask_padding()
         self.traces = np.zeros_like(self.q)
 
+    def _build_local_actions(self, nrows: int, ncols: int):
+        """Per state: an (n_subsets x grid_width) array of action vectors."""
+        from itertools import combinations
+        tables = []
+        for st in range(self.n_states):
+            if st == self.n_states - 1:
+                # Missing state: the env rescans everything regardless of the
+                # action, so one (empty) action is all there is to choose.
+                cells = []
+            else:
+                cell, delay = divmod(st, self.time_limit + 1)
+                cells = reachable_cells(cell, delay + 1, nrows, ncols)
+            rows = []
+            for size in range(0, min(self.max_sensors, len(cells)) + 1):
+                for combo in combinations(cells, size):
+                    v = np.zeros(self.grid_width, dtype=np.int64)
+                    v[list(combo)] = 1
+                    rows.append(v)
+            tables.append(np.array(rows))
+        return tables
+
+    def _mask_padding(self) -> None:
+        """Local mode pads rows to equal width; padding must never be chosen."""
+        if self.action_mode == "local":
+            for st, n in enumerate(self._n_valid):
+                self.q[st, n:] = -np.inf
     # ── action plumbing ────────────────────────────────────────────────────
 
     def action_vector(self, action) -> np.ndarray:
@@ -151,6 +217,9 @@ class TabularTDAgent:
         """
         if self.action_mode == "subset":
             return self._actions[int(action)].copy()
+        if self.action_mode == "local":
+            st, idx = divmod(int(action), self.q.shape[1])
+            return self._local[st][idx].copy()
         vec = np.zeros(self.grid_width, dtype=np.int64)
         cells = np.asarray(list(action), dtype=int)
         if cells.size:
@@ -173,6 +242,8 @@ class TabularTDAgent:
         """Q(s, a) — a table lookup, or the sum of the activated cells' weights."""
         if self.action_mode == "subset":
             return float(self.q[state, int(action)])
+        if self.action_mode == "local":
+            return float(self.q.flat[int(action)])
         cells = np.asarray(list(action), dtype=int)
         value = float(self.q[state, -1])          # always-on bias
         if cells.size:
@@ -188,6 +259,11 @@ class TabularTDAgent:
             # Random tie-break so an all-equal table (optimistic init) explores
             # rather than always picking action 0.
             return int(best[0] if best.size == 1 else self._rng.choice(best))
+        if self.action_mode == "local":
+            row  = self.q[state, :self._n_valid[state]]
+            best = np.flatnonzero(row == row.max())
+            idx  = int(best[0] if best.size == 1 else self._rng.choice(best))
+            return state * self.q.shape[1] + idx
 
         row = self.q[state, :self.n_nodes]   # the bias is common to all actions
         # Random tie-break. Without it, an all-equal row (which is exactly what
@@ -203,6 +279,9 @@ class TabularTDAgent:
     def _random_action(self, state: int):
         if self.action_mode == "subset":
             return int(self._rng.integers(self.n_actions))
+        if self.action_mode == "local":
+            return (state * self.q.shape[1]
+                    + int(self._rng.integers(self._n_valid[state])))
         k = int(self._rng.integers(1, self.max_sensors + 1))
         return tuple(int(c) for c in
                      self._rng.choice(self.n_nodes, size=k, replace=False))
@@ -225,6 +304,9 @@ class TabularTDAgent:
         if self.action_mode == "subset":
             self.traces[state, int(action)] = 1.0
             return 1
+        if self.action_mode == "local":
+            self.traces.flat[int(action)] = 1.0
+            return 1
         self.traces[state, -1] = 1.0              # bias is always active
         cells = np.asarray(list(action), dtype=int)
         if cells.size:
@@ -246,7 +328,8 @@ class TabularTDAgent:
         # the standard normalised-LMS step for linear TD; in subset mode
         # n_active is 1 and the behaviour is unchanged.
         step = self.alpha / max(1, n_active)
-        self.q += step * delta * self.traces
+        live = self.traces != 0.0
+        self.q[live] += step * delta * self.traces[live]   # never touch padding
         self.traces *= self.gamma * self.lam
         return float(delta)
 
@@ -258,6 +341,7 @@ class TabularTDAgent:
     def reset(self) -> None:
         """Cold restart: forget everything."""
         self.q.fill(self.optimistic_init)
+        self._mask_padding()
         self.traces.fill(0.0)
 
     def snapshot(self) -> np.ndarray:
@@ -274,4 +358,5 @@ class TabularTDAgent:
 
 
 __all__ = ["TabularTDAgent", "state_index", "action_index_size",
+           "reachable_cells",
            "ACTION_MODES", "N_GRID", "IOBT_N"]

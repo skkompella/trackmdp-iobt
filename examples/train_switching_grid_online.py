@@ -66,7 +66,7 @@ def build_agent(args, cfg, seed=None):
         optimistic_init=args.optimistic_init,
         seed=args.train_seed if seed is None else seed,
         n_nodes=cfg["n_cells"], grid_width=cfg["n_cells"],
-        action_mode="factored")
+        action_mode=args.action_mode, grid_shape=(args.nrows, args.ncols))
 
 
 def build_env(args, cfg, matrices, seed=None):
@@ -134,6 +134,10 @@ def main():
     p.add_argument("--train-seed", type=int, default=7)
     p.add_argument("--new-run", type=int, default=820)
     p.add_argument("--out-dir", type=str, default=None)
+    p.add_argument("--action-mode", choices=["factored", "local"],
+                   default="factored",
+                   help="factored: one weight per cell (shared credit). "
+                        "local: exact table over subsets of reachable cells")
     p.add_argument("--greedy-eval-every", type=int, default=0,
                    help="Every N training episodes (and at each segment end), "
                         "score the policy greedily on the current matrix. 0 = off")
@@ -186,8 +190,8 @@ def main():
     for n, T in zip(names, matrices):
         print("  " + describe_matrix(T, args.nrows, args.ncols, f"matrix {n}"))
     print(f"\n  Grid              : {args.nrows}x{args.ncols} = {n_cells} cells")
-    print(f"  Q-weights         : {agent.q.shape[0]} states x "
-          f"{agent.q.shape[1]} cells = {agent.q.size:,} (factored)")
+    print(f"  Q-table           : {agent.q.shape[0]} states x "
+          f"{agent.q.shape[1]} cols = {agent.q.size:,} ({args.action_mode})")
     print(f"  time_limit        : {tl}")
     print(f"  max_sensors       : {args.max_sensors} of {n_cells}")
     print(f"  sensor_rew        : {env.sensor_rew}")
@@ -220,7 +224,7 @@ def main():
                     fired_episodes.append(ep)
 
             seg_acc, seg_sens = [], []
-            g_acc, g_sens = [], []
+            g_acc, g_sens, g_hist = [], [], []
             for seg_ep in range(args.episodes_per_segment):
                 res = run_episode(agent, env, cfg, learn=True, explore=True)
                 seg_acc.append(res["accuracy"])
@@ -257,10 +261,11 @@ def main():
                         (seg_ep + 1) % args.greedy_eval_every == 0
                         or seg_ep + 1 == args.episodes_per_segment):
                     eval_env.force_matrix(m_idx)
-                    ga, gs = greedy_eval(agent, eval_env, cfg,
-                                         args.greedy_eval_episodes)
+                    ga, gs, gh = greedy_eval(agent, eval_env, cfg,
+                                             args.greedy_eval_episodes)
                     g_acc.append(ga)
                     g_sens.append(gs)
+                    g_hist.append(gh)
 
             lat = adaptation_latency(seg_acc, args.latency_epsilon)
             segments.append({
@@ -278,6 +283,11 @@ def main():
                     "greedy_mean_sensors": float(np.mean(g_sens)),
                     "greedy_curve": g_acc,
                     "greedy_sensor_curve": g_sens,
+                    # tracked steps by number of cells switched on, per checkpoint
+                    "greedy_active_hist": g_hist,
+                    "greedy_cells_per_tracked_step": [
+                        float(np.dot(h, np.arange(len(h))) / max(1, sum(h)))
+                        for h in g_hist],
                 })
             print(f"  {pass_idx:>4}  {m_name:>4}  {np.mean(seg_acc)*100:6.2f}%  "
                   f"{np.mean(seg_sens):8.2f}  "
@@ -296,6 +306,9 @@ def main():
 
     summary = {
         "run": args.new_run, "learner": "tabular",
+        "action_mode": args.action_mode, "alpha": args.alpha,
+        "gamma": args.gamma, "lam": args.lam, "epsilon": args.epsilon,
+        "optimistic_init": args.optimistic_init,
         "grid": [args.nrows, args.ncols], "matrices": names,
         "time_limit": tl, "max_sensors": args.max_sensors,
         "sensor_rew": env.sensor_rew,
@@ -330,6 +343,8 @@ def main():
                 [s["greedy_final_accuracy"] for s in segments])),
             "greedy_mean_sensors": float(np.mean(
                 [s["greedy_mean_sensors"] for s in segments])),
+            "greedy_end_cells_per_tracked_step": float(np.mean(
+                [s["greedy_cells_per_tracked_step"][-1] for s in segments])),
         })
     if detector is not None or args.oracle_restart:
         summary["detector"] = detector_scores(
@@ -346,7 +361,9 @@ def main():
     if eval_env is not None:
         print(f"  Greedy accuracy      : mean {summary['greedy_mean_accuracy']*100:.2f}%, "
               f"end-of-segment {summary['greedy_final_accuracy']*100:.2f}%, "
-              f"{summary['greedy_mean_sensors']:.2f} sensors/step")
+              f"{summary['greedy_mean_sensors']:.2f} sensors/step, "
+              f"{summary['greedy_end_cells_per_tracked_step']:.2f} cells per "
+              f"tracked step at segment end")
     if lats:
         print(f"  Adaptation latency   : mean "
               f"{summary['mean_latency_episodes']:.1f} episodes "

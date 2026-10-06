@@ -191,7 +191,7 @@ def main():
                         np.mean(segments[-1]["mean_accuracy"]) if segments else 0.0))
                     fired_episodes.append(ep)
             seg_acc, seg_sens, seg_reward = [], [], 0.0
-            g_acc, g_sens = [], []
+            g_acc, g_sens, g_hist = [], [], []
 
             for seg_ep in range(args.episodes_per_loop):
                 res = run_episode(agent, env, cfg, learn=True, explore=True)
@@ -226,10 +226,11 @@ def main():
                         (seg_ep + 1) % args.greedy_eval_every == 0
                         or seg_ep + 1 == args.episodes_per_loop):
                     eval_env.force_loop(loop_idx)
-                    ga, gs = greedy_eval(agent, eval_env, cfg,
-                                         args.greedy_eval_episodes)
+                    ga, gs, gh = greedy_eval(agent, eval_env, cfg,
+                                             args.greedy_eval_episodes)
                     g_acc.append(ga)
                     g_sens.append(gs)
+                    g_hist.append(gh)
 
             lat = adaptation_latency(seg_acc, args.latency_epsilon)
             segments.append({
@@ -248,6 +249,11 @@ def main():
                     "greedy_mean_sensors": float(np.mean(g_sens)),
                     "greedy_curve": g_acc,
                     "greedy_sensor_curve": g_sens,
+                    # tracked steps by number of cells switched on, per checkpoint
+                    "greedy_active_hist": g_hist,
+                    "greedy_cells_per_tracked_step": [
+                        float(np.dot(h, np.arange(len(h))) / max(1, sum(h)))
+                        for h in g_hist],
                 })
             print(f"  {pass_idx:>4}  {loop_idx:>4}  "
                   f"{np.mean(seg_acc)*100:6.2f}%  {np.mean(seg_sens):8.2f}  "
@@ -299,6 +305,8 @@ def main():
                 [s["greedy_final_accuracy"] for s in segments])),
             "greedy_mean_sensors": float(np.mean(
                 [s["greedy_mean_sensors"] for s in segments])),
+            "greedy_end_cells_per_tracked_step": float(np.mean(
+                [s["greedy_cells_per_tracked_step"][-1] for s in segments])),
         })
     if detector is not None or args.oracle_restart:
         summary["detector"] = detector_scores(
@@ -314,7 +322,9 @@ def main():
     if eval_env is not None:
         print(f"  Greedy accuracy      : mean {summary['greedy_mean_accuracy']*100:.2f}%, "
               f"end-of-segment {summary['greedy_final_accuracy']*100:.2f}%, "
-              f"{summary['greedy_mean_sensors']:.2f} sensors/step")
+              f"{summary['greedy_mean_sensors']:.2f} sensors/step, "
+              f"{summary['greedy_end_cells_per_tracked_step']:.2f} cells per "
+              f"tracked step at segment end")
     if lats:
         print(f"  Adaptation latency   : mean {summary['mean_latency_episodes']:.1f}, "
               f"median {summary['median_latency_episodes']:.1f} episodes")

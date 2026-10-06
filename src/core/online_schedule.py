@@ -40,6 +40,9 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
     # the agent already uses it as its own state.
     cells: list = []
     rewards: list[float] = []
+    # Cells actually switched on, per TRACKED step (the missing state is a
+    # forced full rescan, billed at max_sensors above, so it is left out here).
+    active: list[int] = []
 
     prev = None   # (state, action, reward) pending SARSA update
 
@@ -74,6 +77,8 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
         # missing-state branch, so a full rescan is billed at max_sensors even
         # though the env internally scans everything to guarantee re-acquisition.
         sensors_on += max_sensors if was_missing else int(action_sensors.sum())
+        if not was_missing:
+            active.append(int(action_sensors.sum()))
 
         if learn:
             if prev is not None:
@@ -93,6 +98,7 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
         "detections": detections,
         "cells":      cells,
         "rewards":    rewards,
+        "active":     active,
     }
 
 
@@ -106,13 +112,20 @@ def greedy_eval(agent, eval_env, cfg, n_episodes):
     comparable with them; this one is.  Use a separate env from the training
     one: the agent's RNG is restored afterwards, so the training trajectory is
     identical whether or not greedy evaluation is switched on.
+
+    Returns (accuracy, sensors_per_step, active_hist): sensors_per_step bills a
+    missing-state rescan at max_sensors, as evaluate_policy does;
+    active_hist[n] counts TRACKED steps on which exactly n cells were switched on.
     """
     rng_state = agent._rng.bit_generator.state
     res = [run_episode(agent, eval_env, cfg, learn=False, explore=False)
            for _ in range(n_episodes)]
     agent._rng.bit_generator.state = rng_state
+    active = [n for r in res for n in r["active"]]
+    hist = np.bincount(active, minlength=cfg["max_sensors"] + 1)
     return (float(np.mean([r["accuracy"] for r in res])),
-            float(np.mean([r["sensors"] for r in res])))
+            float(np.mean([r["sensors"] for r in res])),
+            [int(c) for c in hist])
 
 
 def adaptation_latency(accuracies, epsilon, tail_frac=0.3, window=3):
