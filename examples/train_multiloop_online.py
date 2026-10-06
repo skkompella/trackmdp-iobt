@@ -51,6 +51,25 @@ from src.core.online_schedule import (                        # noqa: E402
 from src.core.tabular_td import N_GRID, TabularTDAgent        # noqa: E402
 
 
+def greedy_eval(agent, eval_env, cfg, loop_idx, n_episodes):
+    """
+    Score the CURRENT table on ``loop_idx`` with exploration off.
+
+    The training episodes are scored while exploring (epsilon-greedy), which
+    the offline base models and specialists never are, so those two numbers
+    are not comparable.  This is the comparable one.  It runs on a separate
+    env and restores the agent's RNG, so the training trajectory is identical
+    whether or not greedy evaluation is switched on.
+    """
+    rng_state = agent._rng.bit_generator.state
+    eval_env.force_loop(loop_idx)
+    res = [run_episode(agent, eval_env, cfg, learn=False, explore=False)
+           for _ in range(n_episodes)]
+    agent._rng.bit_generator.state = rng_state
+    return (float(np.mean([r["accuracy"] for r in res])),
+            float(np.mean([r["sensors"] for r in res])))
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -104,6 +123,11 @@ def main():
     p.add_argument("--train-seed", type=int, default=7)
     p.add_argument("--new-run", type=int, default=810)
     p.add_argument("--out-dir", type=str, default=None)
+    p.add_argument("--greedy-eval-every", type=int, default=0,
+                   help="Every N training episodes (and at each segment end), "
+                        "score the table greedily on the current loop. 0 = off")
+    p.add_argument("--greedy-eval-episodes", type=int, default=10)
+    p.add_argument("--eval-seed", type=int, default=99)
     args = p.parse_args()
 
     loops = sample_loops(args.num_loops, seed=args.loop_seed)
@@ -120,6 +144,11 @@ def main():
         loops, seed=args.train_seed, no_moore_constraint=True,
         reward_preset=args.reward_preset, sensor_rew=args.sensor_rew,
     )
+    eval_env = MultiLoopIoBTEnv(
+        args.max_sensors, args.max_sensors, cfg["missing_state"], tl,
+        loops, seed=args.eval_seed, no_moore_constraint=True,
+        reward_preset=args.reward_preset, sensor_rew=args.sensor_rew,
+    ) if args.greedy_eval_every > 0 else None
     agent = TabularTDAgent(
         time_limit=tl, max_sensors=args.max_sensors,
         missing_state=cfg["missing_state"], alpha=args.alpha, gamma=args.gamma,
@@ -181,8 +210,9 @@ def main():
                         np.mean(segments[-1]["mean_accuracy"]) if segments else 0.0))
                     fired_episodes.append(ep)
             seg_acc, seg_sens, seg_reward = [], [], 0.0
+            g_acc, g_sens = [], []
 
-            for _ in range(args.episodes_per_loop):
+            for seg_ep in range(args.episodes_per_loop):
                 res = run_episode(agent, env, cfg, learn=True, explore=True)
                 seg_acc.append(res["accuracy"])
                 seg_sens.append(res["sensors"])
@@ -211,6 +241,14 @@ def main():
                     detector.reset()
                 ep += 1
 
+                if eval_env is not None and (
+                        (seg_ep + 1) % args.greedy_eval_every == 0
+                        or seg_ep + 1 == args.episodes_per_loop):
+                    ga, gs = greedy_eval(agent, eval_env, cfg, loop_idx,
+                                         args.greedy_eval_episodes)
+                    g_acc.append(ga)
+                    g_sens.append(gs)
+
             lat = adaptation_latency(seg_acc, args.latency_epsilon)
             segments.append({
                 "pass": pass_idx, "loop": loop_idx,
@@ -221,10 +259,19 @@ def main():
                 "adaptation_latency": lat,
                 "segment_reward": seg_reward,
             })
+            if g_acc:
+                segments[-1].update({
+                    "greedy_mean_accuracy": float(np.mean(g_acc)),
+                    "greedy_final_accuracy": g_acc[-1],
+                    "greedy_mean_sensors": float(np.mean(g_sens)),
+                    "greedy_curve": g_acc,
+                })
             print(f"  {pass_idx:>4}  {loop_idx:>4}  "
                   f"{np.mean(seg_acc)*100:6.2f}%  {np.mean(seg_sens):8.2f}  "
                   f"{('n/a' if lat is None else lat):>8}  "
-                  f"{controller.n_restarts:>8}")
+                  f"{controller.n_restarts:>8}"
+                  + (f"  greedy {np.mean(g_acc)*100:6.2f}% "
+                     f"(final {g_acc[-1]*100:6.2f}%)" if g_acc else ""))
 
     # ── summary ────────────────────────────────────────────────────────────
     lats = [s["adaptation_latency"] for s in segments
@@ -259,6 +306,17 @@ def main():
         "mean_latency_later_passes": _mean_lat(later),
         "ceiling": (args.max_ep_steps - 1) / args.max_ep_steps,
     }
+    if eval_env is not None:
+        summary.update({
+            "greedy_eval_every": args.greedy_eval_every,
+            "greedy_eval_episodes": args.greedy_eval_episodes,
+            "greedy_mean_accuracy": float(np.mean(
+                [s["greedy_mean_accuracy"] for s in segments])),
+            "greedy_final_accuracy": float(np.mean(
+                [s["greedy_final_accuracy"] for s in segments])),
+            "greedy_mean_sensors": float(np.mean(
+                [s["greedy_mean_sensors"] for s in segments])),
+        })
     if detector is not None or args.oracle_restart:
         summary["detector"] = detector_scores(
             fired_episodes, switch_episodes,
@@ -270,6 +328,10 @@ def main():
     print(f"  Mean accuracy        : {summary['mean_accuracy']*100:.2f}%  "
           f"(ceiling {summary['ceiling']*100:.2f}%)")
     print(f"  Mean sensors/step    : {summary['mean_sensors']:.2f}")
+    if eval_env is not None:
+        print(f"  Greedy accuracy      : mean {summary['greedy_mean_accuracy']*100:.2f}%, "
+              f"end-of-segment {summary['greedy_final_accuracy']*100:.2f}%, "
+              f"{summary['greedy_mean_sensors']:.2f} sensors/step")
     if lats:
         print(f"  Adaptation latency   : mean {summary['mean_latency_episodes']:.1f}, "
               f"median {summary['median_latency_episodes']:.1f} episodes")
