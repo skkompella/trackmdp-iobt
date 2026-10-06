@@ -1,0 +1,47 @@
+{
+  "summary": {
+    "run": 0,
+    "learner": "ppo",
+    "env": "grid",
+    "matrix_seed": 20261006,
+    "grid": [
+      5,
+      5
+    ],
+    "matrices": [
+      "C"
+    ],
+    "time_limit": 1,
+    "max_sensors": 4,
+    "sensor_rew": -0.16,
+    "detector_enabled": false,
+    "restart_strategy": "cold",
+    "n_restarts": 0,
+    "iterations_per_segment": 1200,
+    "passes": 1,
+    "env_steps": 614400,
+    "mean_accuracy": 0.47546666666666665,
+    "final_accuracy": 0.7915000000000001,
+    "mean_sensors": 3.9691833333333335,
+    "final_sensors": 3.910500000000001,
+    "final_cells_per_tracked_step": 3.903627141547271,
+    "mean_latency_iterations": 796.0,
+    "mean_latency_first_pass": 796.0,
+    "mean_latency_later_passes": null,
+    "ceiling": 0.99,
+    "detection_resolution": "one PPO batch (512 env steps)"
+  },
+  "segments": [
+    {
+      "pass": 0,
+      "matrix": "C",
+      "start_iteration": 0,
+      "mean_accuracy": 0.47546666666666665,
+      "final_accuracy": 0.7915000000000001,
+      "mean_sensors": 3.9691833333333335,
+      "final_sensors": 3.910500000000001,
+      "final_cells_per_tracked_step": 3.903627141547271,
+      "adaptation_latency": 796
+    }
+  ]
+}

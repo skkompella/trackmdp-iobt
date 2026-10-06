@@ -1,0 +1,214 @@
+{
+  "summary": {
+    "run": 1010,
+    "learner": "ppo",
+    "env": "grid",
+    "matrix_seed": 20261006,
+    "grid": [
+      5,
+      5
+    ],
+    "matrices": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4"
+    ],
+    "time_limit": 1,
+    "max_sensors": 5,
+    "sensor_rew": -0.16,
+    "detector_enabled": true,
+    "restart_strategy": "warm",
+    "n_restarts": 46,
+    "iterations_per_segment": 200,
+    "passes": 3,
+    "env_steps": 1536000,
+    "mean_accuracy": 0.9778966666666669,
+    "final_accuracy": 0.9861666666666662,
+    "mean_sensors": 4.4124300000000005,
+    "final_sensors": 4.4273,
+    "final_cells_per_tracked_step": 4.42078659871738,
+    "mean_latency_iterations": 2.066666666666667,
+    "mean_latency_first_pass": 5.8,
+    "mean_latency_later_passes": 0.2,
+    "ceiling": 0.99,
+    "detection_resolution": "one PPO batch (512 env steps)",
+    "detector": {
+      "n_detections": 46,
+      "n_switches": 14,
+      "true_positive": 7,
+      "false_alarms": 39,
+      "precision": 0.15217391304347827,
+      "recall": 0.5,
+      "tolerance_episodes": 40
+    }
+  },
+  "segments": [
+    {
+      "pass": 0,
+      "matrix": "R0",
+      "start_iteration": 0,
+      "mean_accuracy": 0.8714500000000001,
+      "final_accuracy": 0.9869999999999998,
+      "mean_sensors": 4.427,
+      "final_sensors": 4.270999999999999,
+      "final_cells_per_tracked_step": 4.262865771113194,
+      "adaptation_latency": 29
+    },
+    {
+      "pass": 0,
+      "matrix": "R1",
+      "start_iteration": 200,
+      "mean_accuracy": 0.9847000000000001,
+      "final_accuracy": 0.9899999999999997,
+      "mean_sensors": 4.582800000000001,
+      "final_sensors": 4.654999999999999,
+      "final_cells_per_tracked_step": 4.651515151515151,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 0,
+      "matrix": "R2",
+      "start_iteration": 400,
+      "mean_accuracy": 0.9866000000000003,
+      "final_accuracy": 0.9899999999999997,
+      "mean_sensors": 4.1501,
+      "final_sensors": 4.1575,
+      "final_cells_per_tracked_step": 4.148989898989899,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 0,
+      "matrix": "R3",
+      "start_iteration": 600,
+      "mean_accuracy": 0.9878500000000001,
+      "final_accuracy": 0.9814999999999998,
+      "mean_sensors": 4.4216,
+      "final_sensors": 4.3935,
+      "final_cells_per_tracked_step": 4.385390885501343,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 0,
+      "matrix": "R4",
+      "start_iteration": 800,
+      "mean_accuracy": 0.98225,
+      "final_accuracy": 0.9899999999999997,
+      "mean_sensors": 4.4787,
+      "final_sensors": 4.577,
+      "final_cells_per_tracked_step": 4.572727272727273,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 1,
+      "matrix": "R0",
+      "start_iteration": 1000,
+      "mean_accuracy": 0.9843500000000001,
+      "final_accuracy": 0.9819999999999997,
+      "mean_sensors": 4.32245,
+      "final_sensors": 4.338500000000001,
+      "final_cells_per_tracked_step": 4.329957740672026,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 1,
+      "matrix": "R1",
+      "start_iteration": 1200,
+      "mean_accuracy": 0.9879500000000001,
+      "final_accuracy": 0.9869999999999998,
+      "mean_sensors": 4.549049999999999,
+      "final_sensors": 4.573,
+      "final_cells_per_tracked_step": 4.568424036281179,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 1,
+      "matrix": "R2",
+      "start_iteration": 1400,
+      "mean_accuracy": 0.9869000000000001,
+      "final_accuracy": 0.9824999999999997,
+      "mean_sensors": 4.1909,
+      "final_sensors": 4.2195,
+      "final_cells_per_tracked_step": 4.209664124943949,
+      "adaptation_latency": 1
+    },
+    {
+      "pass": 1,
+      "matrix": "R3",
+      "start_iteration": 1600,
+      "mean_accuracy": 0.98555,
+      "final_accuracy": 0.9864999999999998,
+      "mean_sensors": 4.4412,
+      "final_sensors": 4.4695,
+      "final_cells_per_tracked_step": 4.463765203050917,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 1,
+      "matrix": "R4",
+      "start_iteration": 1800,
+      "mean_accuracy": 0.9851500000000002,
+      "final_accuracy": 0.9834999999999997,
+      "mean_sensors": 4.51065,
+      "final_sensors": 4.5845,
+      "final_cells_per_tracked_step": 4.579576376004948,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 2,
+      "matrix": "R0",
+      "start_iteration": 2000,
+      "mean_accuracy": 0.9844500000000003,
+      "final_accuracy": 0.9899999999999997,
+      "mean_sensors": 4.3383,
+      "final_sensors": 4.282500000000001,
+      "final_cells_per_tracked_step": 4.275252525252526,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 2,
+      "matrix": "R1",
+      "start_iteration": 2200,
+      "mean_accuracy": 0.9857500000000001,
+      "final_accuracy": 0.9859999999999998,
+      "mean_sensors": 4.650449999999999,
+      "final_sensors": 4.643,
+      "final_cells_per_tracked_step": 4.638987816307404,
+      "adaptation_latency": 1
+    },
+    {
+      "pass": 2,
+      "matrix": "R2",
+      "start_iteration": 2400,
+      "mean_accuracy": 0.98625,
+      "final_accuracy": 0.9819999999999997,
+      "mean_sensors": 4.1837,
+      "final_sensors": 4.2215,
+      "final_cells_per_tracked_step": 4.211540558116406,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 2,
+      "matrix": "R3",
+      "start_iteration": 2600,
+      "mean_accuracy": 0.9854500000000002,
+      "final_accuracy": 0.9879999999999998,
+      "mean_sensors": 4.43175,
+      "final_sensors": 4.419,
+      "final_cells_per_tracked_step": 4.412894248608534,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 2,
+      "matrix": "R4",
+      "start_iteration": 2800,
+      "mean_accuracy": 0.9838,
+      "final_accuracy": 0.9864999999999998,
+      "mean_sensors": 4.5078,
+      "final_sensors": 4.6045,
+      "final_cells_per_tracked_step": 4.600247371675943,
+      "adaptation_latency": 0
+    }
+  ]
+}
