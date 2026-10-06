@@ -50,6 +50,7 @@ from src.core.online_schedule import (                         # noqa: E402
 from src.core.switching_grid_env import SwitchingTransitionGridEnv  # noqa: E402
 from src.core.detection_signals import TransitionSurprise      # noqa: E402
 from src.core.tabular_td import TabularTDAgent                 # noqa: E402
+from src.core.random_transition_matrices import parse_matrix_spec  # noqa: E402
 
 # Which divergence suits each signal; only the 0/1 hit stream is Bernoulli.
 SIGNAL_DIVERGENCE = {"hit": "bernoulli", "reward": "gaussian",
@@ -134,6 +135,9 @@ def main():
     p.add_argument("--train-seed", type=int, default=7)
     p.add_argument("--new-run", type=int, default=820)
     p.add_argument("--out-dir", type=str, default=None)
+    p.add_argument("--matrix-seed", type=int, default=20261006,
+                   help="Seed base for random matrices R<i> in --matrices")
+    p.add_argument("--concentration", type=float, default=1.0)
     p.add_argument("--action-mode", choices=["factored", "local"],
                    default="factored",
                    help="factored: one weight per cell (shared credit). "
@@ -145,8 +149,8 @@ def main():
     p.add_argument("--eval-seed", type=int, default=99)
     args = p.parse_args()
 
-    names = [n.strip().upper() for n in args.matrices.split(",") if n.strip()]
-    matrices = [MATRIX_MAKERS[n](args.nrows, args.ncols) for n in names]
+    names, matrices = parse_matrix_spec(args.matrices, "grid", args.matrix_seed,
+                                        args.concentration, args.nrows, args.ncols)
 
     n_cells = args.nrows * args.ncols
     tl = args.time_limit
@@ -310,6 +314,7 @@ def main():
         "gamma": args.gamma, "lam": args.lam, "epsilon": args.epsilon,
         "optimistic_init": args.optimistic_init,
         "grid": [args.nrows, args.ncols], "matrices": names,
+        "matrix_seed": args.matrix_seed,
         "time_limit": tl, "max_sensors": args.max_sensors,
         "sensor_rew": env.sensor_rew,
         "detector_enabled": detector is not None,

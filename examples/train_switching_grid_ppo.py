@@ -56,6 +56,13 @@ from src.core.grid_wrapper_rect import grid_environment_rect   # noqa: E402
 from src.core.online_schedule import (                         # noqa: E402
     adaptation_latency, detector_scores,
 )
+from src.core.gym_wrapper import grid_environment              # noqa: E402
+from src.core.matrix_iobt_env import (                         # noqa: E402
+    MatrixIoBTEnv, MatrixIoBTLearner,
+)
+from src.core.random_transition_matrices import (              # noqa: E402
+    describe_random, parse_matrix_spec,
+)
 from src.core.switching_grid_env import (                      # noqa: E402
     SwitchingGridLearner, SwitchingTransitionGridEnv,
 )
@@ -70,13 +77,22 @@ PPO_HPARAMS = dict(lr=5e-4, train_batch_size=512, num_sgd_iter=20,
 
 
 def build_algo(args, cfg, matrices):
-    """Fresh PPO over the switching grid. Used at start and for cold restarts."""
-    qobj = SwitchingGridLearner(
-        run_number=args.new_run, nrows=args.nrows, ncols=args.ncols,
-        max_sensors=args.max_sensors, max_sensors_null=args.max_sensors,
-        time_limit=cfg["time_limit"], time_limit_max=cfg["time_limit"],
-        matrices=matrices, seed=args.train_seed, no_moore_constraint=True,
-        sensor_rew=args.sensor_rew)
+    """Fresh PPO over the switching env. Used at start and for cold restarts."""
+    if args.env == "iobt":
+        qobj = MatrixIoBTLearner(
+            args.new_run, 6, args.max_sensors, args.max_sensors,
+            cfg["time_limit"], cfg["time_limit"], matrices,
+            seed=args.train_seed, no_moore_constraint=True,
+            reward_preset="grid", sensor_rew=args.sensor_rew)
+        wrapper = grid_environment
+    else:
+        qobj = SwitchingGridLearner(
+            run_number=args.new_run, nrows=args.nrows, ncols=args.ncols,
+            max_sensors=args.max_sensors, max_sensors_null=args.max_sensors,
+            time_limit=cfg["time_limit"], time_limit_max=cfg["time_limit"],
+            matrices=matrices, seed=args.train_seed, no_moore_constraint=True,
+            sensor_rew=args.sensor_rew)
+        wrapper = grid_environment_rect
 
     env_config = {"qobj": qobj,
                   "time_limit_schedule": [2000],
@@ -101,7 +117,7 @@ def build_algo(args, cfg, matrices):
                      ("clip_epsilon", PPO_HPARAMS["clip_param"])]))
 
     ppo_cfg = (PPOConfig()
-               .environment(grid_environment_rect, env_config=env_config)
+               .environment(wrapper, env_config=env_config)
                .framework("torch").training(**tk)
                .env_runners(num_env_runners=PPO_HPARAMS["num_workers"],
                             rollout_fragment_length=PPO_HPARAMS["rollout_fragment_length"])
@@ -134,6 +150,12 @@ def push_matrix(algo, idx):
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--env", choices=["grid", "iobt"], default="grid",
+                   help="grid: 5x5 SwitchingTransitionGridEnv. iobt: the 10-node "
+                        "Camp Buckner graph with a matrix-driven object")
+    p.add_argument("--matrix-seed", type=int, default=20261006,
+                   help="Seed base for random matrices R<i> in --matrices")
+    p.add_argument("--concentration", type=float, default=1.0)
     p.add_argument("--nrows", type=int, default=5)
     p.add_argument("--ncols", type=int, default=5)
     p.add_argument("--time-limit", type=int, default=1)
@@ -170,10 +192,11 @@ def main():
             and not args.prior_checkpoint:
         raise SystemExit("--restart-strategy warm requires --prior-checkpoint")
 
-    names = [n.strip().upper() for n in args.matrices.split(",") if n.strip()]
-    matrices = [MATRIX_MAKERS[n](args.nrows, args.ncols) for n in names]
+    names, matrices = parse_matrix_spec(args.matrices, args.env, args.matrix_seed,
+                                        args.concentration, args.nrows, args.ncols)
 
-    n_cells = args.nrows * args.ncols
+    # IoBT observations and actions live on the 4x4 backing grid (16 cells).
+    n_cells = args.nrows * args.ncols if args.env == "grid" else 16
     tl = args.time_limit
     cfg = {"time_limit": tl, "time_limit_max": tl,
            "missing_state": n_cells * (tl + 1) + 1,
@@ -191,10 +214,16 @@ def main():
     algo = build_algo(args, cfg, matrices)
 
     # Dedicated seeded eval env — never the one the workers mutate.
-    eval_env = SwitchingTransitionGridEnv(
-        args.nrows, args.ncols, args.max_sensors, args.max_sensors,
-        cfg["missing_state"], tl, matrices, seed=args.eval_seed,
-        no_moore_constraint=True, sensor_rew=args.sensor_rew)
+    if args.env == "iobt":
+        eval_env = MatrixIoBTEnv(
+            args.max_sensors, args.max_sensors, cfg["missing_state"], tl,
+            matrices, seed=args.eval_seed, no_moore_constraint=True,
+            reward_preset="grid", sensor_rew=args.sensor_rew)
+    else:
+        eval_env = SwitchingTransitionGridEnv(
+            args.nrows, args.ncols, args.max_sensors, args.max_sensors,
+            cfg["missing_state"], tl, matrices, seed=args.eval_seed,
+            no_moore_constraint=True, sensor_rew=args.sensor_rew)
 
     detector = None if args.no_detector else GLRChangeDetector(
         delta=args.delta, min_samples=args.min_samples)
@@ -207,7 +236,7 @@ def main():
     print("  TRACK-MDP — PPO ON A SWITCHING 5x5 GRID")
     print("=" * 76)
     for n, T in zip(names, matrices):
-        print("  " + describe_matrix(T, args.nrows, args.ncols, f"matrix {n}"))
+        print("  " + describe_random(T, n))
     print(f"\n  Grid              : {args.nrows}x{args.ncols} = {n_cells} cells")
     print(f"  max_sensors       : {args.max_sensors} of {n_cells}")
     print(f"  sensor_rew        : {eval_env.sensor_rew}")
@@ -234,12 +263,14 @@ def main():
             if it > 0:
                 switch_iters.append(it)
 
-            seg_acc, seg_sens = [], []
+            seg_acc, seg_sens, seg_cells = [], [], []
             for _ in range(args.iterations_per_segment):
                 algo.train()
                 m = evaluate_policy(algo, eval_env, cfg, return_detections=True)
                 seg_acc.append(m["tracking_accuracy"])
                 seg_sens.append(m["mean_sensors_used"])
+                if m["active_tracked"]:
+                    seg_cells.append(float(np.mean(m["active_tracked"])))
                 history.append({"iteration": it, "pass": pass_idx,
                                 "matrix": m_name,
                                 "accuracy": m["tracking_accuracy"],
@@ -272,6 +303,10 @@ def main():
                 "mean_accuracy": float(np.mean(seg_acc)),
                 "final_accuracy": float(np.mean(seg_acc[-20:])),
                 "mean_sensors": float(np.mean(seg_sens)),
+                "final_sensors": float(np.mean(seg_sens[-20:])),
+                # cells switched on per TRACKED step (missing-state rescans excluded)
+                "final_cells_per_tracked_step": (
+                    float(np.mean(seg_cells[-20:])) if seg_cells else None),
                 "adaptation_latency": lat})
             print(f"  {pass_idx:>4}  {m_name:>4}  {np.mean(seg_acc)*100:6.2f}%  "
                   f"{np.mean(seg_sens):8.2f}  "
@@ -286,7 +321,8 @@ def main():
         return float(np.mean(v)) if v else None
 
     summary = {
-        "run": args.new_run, "learner": "ppo",
+        "run": args.new_run, "learner": "ppo", "env": args.env,
+        "matrix_seed": args.matrix_seed,
         "grid": [args.nrows, args.ncols], "matrices": names,
         "time_limit": tl, "max_sensors": args.max_sensors,
         "sensor_rew": eval_env.sensor_rew,
@@ -299,6 +335,10 @@ def main():
         "mean_accuracy": float(np.mean([s["mean_accuracy"] for s in segments])),
         "final_accuracy": float(np.mean([s["final_accuracy"] for s in segments])),
         "mean_sensors": float(np.mean([s["mean_sensors"] for s in segments])),
+        "final_sensors": float(np.mean([s["final_sensors"] for s in segments])),
+        "final_cells_per_tracked_step": float(np.mean(
+            [s["final_cells_per_tracked_step"] for s in segments
+             if s["final_cells_per_tracked_step"] is not None] or [np.nan])),
         "mean_latency_iterations": float(np.mean(lats)) if lats else None,
         "mean_latency_first_pass": _mean_lat([s for s in segments
                                               if s["pass"] == 0]),
@@ -317,7 +357,9 @@ def main():
     print("=" * 76)
     print(f"  Mean accuracy        : {summary['mean_accuracy']*100:.2f}%  "
           f"(final-20 {summary['final_accuracy']*100:.2f}%)")
-    print(f"  Mean sensors/step    : {summary['mean_sensors']:.2f}")
+    print(f"  Mean sensors/step    : {summary['mean_sensors']:.2f}  "
+          f"(final-20 {summary['final_sensors']:.2f}; cells per tracked step "
+          f"{summary['final_cells_per_tracked_step']:.2f})")
     if lats:
         print(f"  Adaptation latency   : mean "
               f"{summary['mean_latency_iterations']:.1f} iterations "

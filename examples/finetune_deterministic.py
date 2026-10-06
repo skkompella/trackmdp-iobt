@@ -1204,6 +1204,7 @@ def evaluate_policy(algo, env, cfg, return_detections=False):
 
     total_rewards, ep_lengths, sensors_ep = [], [], []
     detections: list[int] = []
+    active_tracked: list[int] = []   # cells switched on, per tracked step
     total_steps = total_found = 0
 
     for _ in range(cfg["eval_episodes"]):
@@ -1260,6 +1261,8 @@ def evaluate_policy(algo, env, cfg, return_detections=False):
             obj_detected = int(obj_in_window == 1 and
                                action_sensors[int(obj_rel_pos)] == 1)
             detections.append(int(not was_missing and obj_detected))
+            if not was_missing:
+                active_tracked.append(int(action_sensors.sum()))
             if not was_missing and obj_detected:
                 total_found += 1
 
@@ -1296,6 +1299,7 @@ def evaluate_policy(algo, env, cfg, return_detections=False):
     }
     if return_detections:
         out["detections"] = detections
+        out["active_tracked"] = active_tracked
     return out
 
 

@@ -49,6 +49,10 @@ from src.core.online_schedule import (                        # noqa: E402
     adaptation_latency, detector_scores, greedy_eval, run_episode,
 )
 from src.core.tabular_td import N_GRID, TabularTDAgent        # noqa: E402
+from src.core.matrix_iobt_env import MatrixIoBTEnv            # noqa: E402
+from src.core.random_transition_matrices import (             # noqa: E402
+    describe_random, parse_matrix_spec,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -109,9 +113,21 @@ def main():
                         "score the table greedily on the current loop. 0 = off")
     p.add_argument("--greedy-eval-episodes", type=int, default=10)
     p.add_argument("--eval-seed", type=int, default=99)
+    p.add_argument("--matrices", type=str, default=None,
+                   help="Use a matrix-driven object instead of loops, e.g. "
+                        "'R0,R1,R2,R3,R4' (random) or 'C' (equal probability)")
+    p.add_argument("--matrix-seed", type=int, default=20261006)
+    p.add_argument("--concentration", type=float, default=1.0)
     args = p.parse_args()
 
-    loops = sample_loops(args.num_loops, seed=args.loop_seed)
+    if args.matrices:
+        regime_names, matrices = parse_matrix_spec(
+            args.matrices, "iobt", args.matrix_seed, args.concentration)
+        loops = None
+    else:
+        loops = sample_loops(args.num_loops, seed=args.loop_seed)
+        regime_names = [str(i) for i in range(len(loops))]
+    n_regimes = len(regime_names)
     tl = args.time_limit
     cfg = {
         "time_limit":    tl,
@@ -120,16 +136,19 @@ def main():
         "max_sensors":   args.max_sensors,
     }
 
-    env = MultiLoopIoBTEnv(
-        args.max_sensors, args.max_sensors, cfg["missing_state"], tl,
-        loops, seed=args.train_seed, no_moore_constraint=True,
-        reward_preset=args.reward_preset, sensor_rew=args.sensor_rew,
-    )
-    eval_env = MultiLoopIoBTEnv(
-        args.max_sensors, args.max_sensors, cfg["missing_state"], tl,
-        loops, seed=args.eval_seed, no_moore_constraint=True,
-        reward_preset=args.reward_preset, sensor_rew=args.sensor_rew,
-    ) if args.greedy_eval_every > 0 else None
+    def _make_env(seed):
+        if loops is None:
+            return MatrixIoBTEnv(
+                args.max_sensors, args.max_sensors, cfg["missing_state"], tl,
+                matrices, seed=seed, no_moore_constraint=True,
+                reward_preset=args.reward_preset, sensor_rew=args.sensor_rew)
+        return MultiLoopIoBTEnv(
+            args.max_sensors, args.max_sensors, cfg["missing_state"], tl,
+            loops, seed=seed, no_moore_constraint=True,
+            reward_preset=args.reward_preset, sensor_rew=args.sensor_rew)
+
+    env = _make_env(args.train_seed)
+    eval_env = _make_env(args.eval_seed) if args.greedy_eval_every > 0 else None
     agent = TabularTDAgent(
         time_limit=tl, max_sensors=args.max_sensors,
         missing_state=cfg["missing_state"], alpha=args.alpha, gamma=args.gamma,
@@ -150,7 +169,11 @@ def main():
     print("=" * 74)
     print("  TRACK-MDP — ONLINE TABULAR TD ON A SEQUENTIAL LOOP SCHEDULE")
     print("=" * 74)
-    print(describe_loops(loops))
+    if loops is None:
+        for n_, T_ in zip(regime_names, matrices):
+            print("  " + describe_random(T_, n_))
+    else:
+        print(describe_loops(loops))
     print(f"\n  Q-table           : {agent.n_states} states x "
           f"{agent.n_actions} actions = {agent.q.size:,} entries")
     print(f"  time_limit        : {tl}")
@@ -167,7 +190,7 @@ def main():
         _det_label = f"GLR delta={args.delta}, min_samples={args.min_samples}"
     print(f"  Detector          : {_det_label}")
     print(f"  Restart strategy  : {args.restart_strategy}")
-    print(f"  Schedule          : {args.passes} passes x {args.num_loops} loops "
+    print(f"  Schedule          : {args.passes} passes x {n_regimes} regimes "
           f"x {args.episodes_per_loop} episodes\n")
 
     # ── the schedule ───────────────────────────────────────────────────────
@@ -181,7 +204,7 @@ def main():
     print(f"  {'-'*4}  {'-'*4}  {'-'*7}  {'-'*8}  {'-'*8}  {'-'*8}")
 
     for pass_idx in range(args.passes):
-        for loop_idx in range(args.num_loops):
+        for loop_idx in range(n_regimes):
             env.force_loop(loop_idx)
             if ep > 0:
                 switch_episodes.append(ep)
@@ -339,6 +362,8 @@ def main():
               f"switches caught, {d['false_alarms']} false alarms")
 
     with open(os.path.join(out_dir, "online_summary.json"), "w") as fh:
+        summary["regimes"] = regime_names
+        summary["matrix_seed"] = args.matrix_seed if loops is None else None
         json.dump({"summary": summary, "segments": segments, "loops": loops},
                   fh, indent=2)
     with open(os.path.join(out_dir, "online_history.csv"), "w", newline="") as fh:
