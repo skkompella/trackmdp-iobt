@@ -50,6 +50,11 @@ from src.core.online_schedule import (                        # noqa: E402
 )
 from src.core.tabular_td import N_GRID, TabularTDAgent        # noqa: E402
 from src.core.matrix_iobt_env import MatrixIoBTEnv            # noqa: E402
+from src.core.detection_signals import TransitionSurprise     # noqa: E402
+
+# Which divergence suits each detector signal (Bernoulli only for 0/1 hits).
+SIGNAL_DIVERGENCE = {"hit": "bernoulli", "reward": "gaussian",
+                     "transition_surprise": "gaussian"}
 from src.core.random_transition_matrices import (             # noqa: E402
     describe_random, parse_matrix_spec,
 )
@@ -90,6 +95,11 @@ def main():
                         "this is the best any restart policy could do")
     p.add_argument("--delta", type=float, default=0.01)
     p.add_argument("--min-samples", type=int, default=30)
+    p.add_argument("--detector-signal", choices=sorted(SIGNAL_DIVERGENCE),
+                   default="hit",
+                   help="Per-step stream the detector watches (see "
+                        "examples/calibrate_detector.py)")
+    p.add_argument("--max-window", type=int, default=500)
     p.add_argument("--detector-warmup-episodes", type=int, default=5,
                    help="Do not feed the detector until the learner has had "
                         "this many episodes to stabilise")
@@ -160,7 +170,11 @@ def main():
     controller = RestartController(agent, strategy=args.restart_strategy,
                                    prior=prior)
     detector = None if (args.no_detector or args.oracle_restart) else \
-        GLRChangeDetector(delta=args.delta, min_samples=args.min_samples)
+        GLRChangeDetector(delta=args.delta, min_samples=args.min_samples,
+                          max_window=args.max_window,
+                          divergence=SIGNAL_DIVERGENCE[args.detector_signal])
+    surprise = (TransitionSurprise(10)
+                if args.detector_signal == "transition_surprise" else None)
 
     out_dir = args.out_dir or os.path.join(
         project_root, "experiments", "synthetic_multiloop", f"run{args.new_run}")
@@ -233,8 +247,15 @@ def main():
                 # than genuine changepoints.
                 quiet = (ep < args.detector_warmup_episodes
                          or ep < suppress_until)
+                if args.detector_signal == "hit":
+                    feed = res["detections"]
+                elif args.detector_signal == "reward":
+                    feed = res["rewards"]
+                else:
+                    feed = ([v for v in (surprise.observe(c) for c in res["cells"])
+                             if v is not None] if surprise is not None else [])
                 if detector is not None and not quiet:
-                    for d in res["detections"]:
+                    for d in feed:
                         if detector.update(d):
                             fired_episodes.append(ep)
                             controller.restart(
@@ -303,6 +324,8 @@ def main():
         "reward_preset": args.reward_preset,
         "sensor_rew": env.sensor_rew,
         "detector_enabled": detector is not None,
+        "detector_signal": args.detector_signal,
+        "delta": args.delta, "max_window": args.max_window,
         "oracle_restart": bool(args.oracle_restart),
         "restart_strategy": args.restart_strategy,
         "n_restarts": controller.n_restarts,

@@ -50,6 +50,8 @@ from src.core.iobt_loops import sample_loops                   # noqa: E402
 from src.core.multiloop_iobt_env import MultiLoopIoBTEnv       # noqa: E402
 from src.core.switching_grid_env import SwitchingTransitionGridEnv  # noqa: E402
 from src.core.tabular_td import TabularTDAgent                 # noqa: E402
+from src.core.matrix_iobt_env import MatrixIoBTEnv             # noqa: E402
+from src.core.random_transition_matrices import parse_matrix_spec  # noqa: E402
 
 MATRIX_MAKERS = {"A": make_matrix_A, "B": make_matrix_B, "C": make_matrix_C}
 
@@ -113,12 +115,12 @@ def build_grid(args):
     cfg = {"time_limit": tl, "missing_state": n_cells * (tl + 1) + 1,
            "max_ep_steps": args.max_ep_steps, "max_sensors": args.max_sensors,
            "n_cells": n_cells}
-    names = [n.strip().upper() for n in args.matrices.split(",") if n.strip()]
-    regimes = [MATRIX_MAKERS[n](args.nrows, args.ncols) for n in names]
+    names, regimes = parse_matrix_spec(args.matrices, "grid", args.matrix_seed,
+                                       nrows=args.nrows, ncols=args.ncols)
     env = SwitchingTransitionGridEnv(
         args.nrows, args.ncols, args.max_sensors, args.max_sensors,
         cfg["missing_state"], tl, regimes, seed=args.seed,
-        no_moore_constraint=True)
+        no_moore_constraint=True, sensor_rew=args.sensor_rew)
     return cfg, env, names, env.force_matrix
 
 
@@ -128,10 +130,17 @@ def build_iobt(args):
     cfg = {"time_limit": tl, "missing_state": n_grid * (tl + 1) + 1,
            "max_ep_steps": args.max_ep_steps, "max_sensors": args.max_sensors,
            "n_cells": 10}
+    if args.iobt_matrices:
+        names, mats = parse_matrix_spec(args.iobt_matrices, "iobt", args.matrix_seed)
+        env = MatrixIoBTEnv(args.max_sensors, args.max_sensors,
+                            cfg["missing_state"], tl, mats, seed=args.seed,
+                            reward_preset="grid", sensor_rew=args.sensor_rew)
+        return cfg, env, names, env.force_matrix
     loops = sample_loops(args.num_loops, seed=args.loop_seed)
     env = MultiLoopIoBTEnv(args.max_sensors, args.max_sensors,
                            cfg["missing_state"], tl, loops, seed=args.seed,
-                           no_moore_constraint=True, reward_preset="grid")
+                           no_moore_constraint=True, reward_preset="grid",
+                           sensor_rew=args.sensor_rew)
     return cfg, env, [str(i) for i in range(len(loops))], env.force_loop
 
 
@@ -146,7 +155,15 @@ def main():
     # grid
     p.add_argument("--nrows", type=int, default=5)
     p.add_argument("--ncols", type=int, default=5)
-    p.add_argument("--matrices", type=str, default="A,B")
+    p.add_argument("--matrices", type=str, default="A,B",
+                   help="grid regimes: A, B, C or random R<i>")
+    p.add_argument("--iobt-matrices", type=str, default=None,
+                   help="IoBT: matrix-driven object (e.g. R0,R1,R2,R3,R4) "
+                        "instead of loops")
+    p.add_argument("--matrix-seed", type=int, default=20261006)
+    p.add_argument("--sensor-rew", type=float, default=None)
+    p.add_argument("--action-mode", choices=["factored", "local", "subset"],
+                   default=None, help="default: factored on grid, subset on IoBT")
     # iobt
     p.add_argument("--num-loops", type=int, default=10)
     p.add_argument("--loop-seed", type=int, default=20260921)
@@ -172,14 +189,15 @@ def main():
     cfg, env, names, force = (build_grid(args) if args.env == "grid"
                               else build_iobt(args))
 
-    action_mode = "factored" if args.env == "grid" else "subset"
+    action_mode = args.action_mode or ("factored" if args.env == "grid" else "subset")
     agent = TabularTDAgent(
         time_limit=cfg["time_limit"], max_sensors=args.max_sensors,
         missing_state=cfg["missing_state"], alpha=args.alpha, gamma=args.gamma,
         lam=args.lam, epsilon=args.epsilon,
         optimistic_init=args.optimistic_init, seed=args.seed,
         n_nodes=cfg["n_cells"], grid_width=cfg["n_cells"] if args.env == "grid" else 16,
-        action_mode=action_mode)
+        action_mode=action_mode,
+        grid_shape=(args.nrows, args.ncols) if action_mode == "local" else None)
 
     if args.condition == "frozen":
         if not args.frozen_q:
