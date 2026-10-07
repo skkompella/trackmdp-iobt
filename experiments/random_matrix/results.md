@@ -75,3 +75,21 @@ Base models (greedy): online tables mean on R0-R4 / PPO checkpoints final on C:
 - Grid PPO warm runs 832/835 from the earlier A/B experiment used algo.restore(),
   which crashed rollout workers on restore; RLlib restarted them, so those runs may
   have lost samples. Fixed here (set_weights in place, commit 38179b1).
+
+---
+
+# 10x10 grid (runs 1100-1115)
+
+Same design; 10x10 random matrices (seed 20261006). PPO uses `--moore` (25-cell local
+action window); the full 100-cell action space never learned (2.5% flat over 1200
+iterations). Base models: online tables on C (greedy mean on R0-R4) / PPO on C (final).
+
+| k | cost | ref best | online | online + DAL | PPO | PPO + DAL | base online / PPO |
+|---:|---:|---:|---|---|---|---|---|
+| 4 | -0.16 | 93.7 | 60.25 / 61.67, 2.89c | 54.50 / 52.72, 2.99c, r902 (14/14) | **67.75 / 68.27**, 3.96c | 53.81 / 53.23, 3.99c, r187 (14/14) | 48.2 / 49.9 |
+| 4 | -0.04 | 93.7 | **85.46 / 86.93**, 3.75c | 77.29 / 76.71, 3.81c, r590 (14/14) | 71.00 / 70.96, 3.96c | 73.23 / 72.39, 3.96c, r214 (14/14) | 73.9 / 72.2 |
+| 5 | -0.16 | 99.0 | 55.11 / 55.77, 2.79c | 45.05 / 43.70, 2.93c, r908 (14/14) | 91.28 / 93.13, 4.65c | **96.70 / 97.01**, 4.61c, r91 (8/14) | 44.2 / 94.5 |
+| 5 | -0.04 | 99.0 | 94.15 / 95.43, 4.26c | **97.23 / 97.41**, 4.55c, r118 (12/14) | 92.86 / 94.33, 4.66c | **97.10 / 97.33**, 4.61c, r121 (12/14) | 95.7 / 95.6 |
+
+Online: 1108-1111 (no DAL), 1112-1115 (DAL). PPO: 1100-1103 (no DAL), 1104-1107 (DAL).
+Headroom (base - alone) vs DAL gain: correlation 0.98, sign correct 8/8.

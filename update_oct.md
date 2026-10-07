@@ -1,6 +1,6 @@
 # Track-MDP IoBT — October Update: online learning, change detection, random environments
 
-_Updated 2026-10-06. Covers the synthetic (simulated) work since update.md: one agent
+_Updated 2026-10-07. Covers the synthetic (simulated) work since update.md: one agent
 across many movement patterns, an online (tabular) learner versus PPO, and DAL-style
 change detection with restart. Every number is one seed unless stated._
 
@@ -47,6 +47,29 @@ equal-probability base model. Budgets k = 4 and 5, sensor cost −0.16 and −0.
    and that decides PPO + DAL more than the detector does.
 6. **The detector over-fires on random movement** (31–609 restarts for 14 switches).
    Harmless with a good base model, costly (−1 to −5 points) with a weak one.
+
+
+### 10×10 grid (5 random matrices, same design)
+
+PPO here uses Track-MDP's **local action window** (25 cells around the last-seen cell):
+with one action per cell (100) it never learned (flat at ~2.5% for 1,200 iterations).
+Best possible at 10×10: ~93.7% at k=4, 99% at k=5 (losing the object triggers a
+100-cell rescan, so even at cost −0.16 the best tracker uses every sensor).
+
+| k | Cost | Best possible | Online | Online + DAL | PPO | PPO + DAL |
+|---:|---:|---:|---:|---:|---:|---:|
+| 4 | −0.16 | 93.7% | 60.3% (2.9) | 54.5% (3.0) | **67.8%** (4.0) | 53.8% (4.0) |
+| 4 | −0.04 | 93.7% | **85.5%** (3.8) | 77.3% (3.8) | 71.0% (4.0) | 73.2% (4.0) |
+| 5 | −0.16 | 99.0% | 55.1% (2.8) | 45.1% (2.9) | 91.3% (4.7) | **96.7%** (4.6) |
+| 5 | −0.04 | 99.0% | 94.2% (4.3) | **97.2%** (4.6) | 92.9% (4.7) | **97.1%** (4.6) |
+
+- **k=5 with DAL reaches ~97% for both learners** (cost −0.04), and PPO + DAL reaches
+  96.7% even at cost −0.16 — within ~2 points of best possible on a 100-cell grid.
+- **k=4 is hard at 10×10**: nobody exceeds 86%, and both base models are weak (online
+  48–74%, PPO 50–72%), so DAL hurts there.
+- **The online learner again fails at cost −0.16** (45–60%, ~2.8 cells).
+- **Headroom law holds again: correlation 0.98, sign correct 8/8.**
+- Full table with restarts: `experiments/random_matrix/results.md` (runs 1100–1115).
 
 Full table with restart counts and end-of-segment numbers:
 `experiments/random_matrix/results.md`. Runs 1000–1031.
@@ -192,6 +215,7 @@ Across every experiment: **DAL warm gain ≈ base-model accuracy − learner-alo
 | Loops + A/B grid (6 settings) | 0.90 | 6/6 |
 | Random matrices, PPO (8) | 0.997 | 8/8 |
 | Random matrices, online (8) | 0.78 | 6/8 |
+| Random 10×10, online + PPO (8) | 0.98 | 8/8 |
 
 The detector's job is only to trigger the reload. What matters is (a) having a base model
 better than what the learner reaches alone, and (b) that base model being reliably
@@ -205,4 +229,5 @@ trained.
 2. Calibrate the detector threshold on random-matrix streams (it fires 2–40× too often).
 3. Fix the online learner at high sensor cost (under-watching at −0.16).
 4. Multiple seeds for the headline online results at cost −0.04.
-5. Scale-up: 5 random 10×10 grids, with and without DAL (queued).
+5. 10×10: improve k=4 (all arms ≤86%) — better base models, or a larger local window.
+6. PPO on large grids needs the local action window; full-grid actions do not learn.

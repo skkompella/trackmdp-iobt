@@ -1,0 +1,219 @@
+{
+  "summary": {
+    "run": 1105,
+    "learner": "ppo",
+    "env": "grid",
+    "moore": true,
+    "grid_shape": [
+      10,
+      10
+    ],
+    "matrix_seed": 20261006,
+    "grid": [
+      10,
+      10
+    ],
+    "matrices": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4"
+    ],
+    "time_limit": 1,
+    "max_sensors": 4,
+    "sensor_rew": -0.04,
+    "detector_enabled": true,
+    "restart_strategy": "warm",
+    "n_restarts": 214,
+    "iterations_per_segment": 200,
+    "passes": 3,
+    "env_steps": 1536000,
+    "mean_accuracy": 0.7323200000000001,
+    "final_accuracy": 0.7239,
+    "mean_sensors": 3.957266666666667,
+    "final_sensors": 3.9618333333333333,
+    "final_cells_per_tracked_step": 3.9587970375348607,
+    "mean_latency_iterations": 1.9333333333333333,
+    "mean_latency_first_pass": 5.2,
+    "mean_latency_later_passes": 0.3,
+    "ceiling": 0.99,
+    "detection_resolution": "one PPO batch (512 env steps)",
+    "detector": {
+      "n_detections": 214,
+      "n_switches": 14,
+      "true_positive": 14,
+      "false_alarms": 200,
+      "precision": 0.06542056074766354,
+      "recall": 1.0,
+      "tolerance_episodes": 40
+    }
+  },
+  "segments": [
+    {
+      "pass": 0,
+      "matrix": "R0",
+      "start_iteration": 0,
+      "mean_accuracy": 0.7064500000000001,
+      "final_accuracy": 0.7459999999999999,
+      "mean_sensors": 3.9855,
+      "final_sensors": 3.9775,
+      "final_cells_per_tracked_step": 3.9756154763290636,
+      "adaptation_latency": 11
+    },
+    {
+      "pass": 0,
+      "matrix": "R1",
+      "start_iteration": 200,
+      "mean_accuracy": 0.7554500000000001,
+      "final_accuracy": 0.8,
+      "mean_sensors": 3.9358,
+      "final_sensors": 3.932,
+      "final_cells_per_tracked_step": 3.928910867743274,
+      "adaptation_latency": 14
+    },
+    {
+      "pass": 0,
+      "matrix": "R2",
+      "start_iteration": 400,
+      "mean_accuracy": 0.7262000000000001,
+      "final_accuracy": 0.7235000000000001,
+      "mean_sensors": 3.9617,
+      "final_sensors": 3.9605000000000006,
+      "final_cells_per_tracked_step": 3.957483895377448,
+      "adaptation_latency": 1
+    },
+    {
+      "pass": 0,
+      "matrix": "R3",
+      "start_iteration": 600,
+      "mean_accuracy": 0.7171500000000001,
+      "final_accuracy": 0.7090000000000001,
+      "mean_sensors": 3.9926,
+      "final_sensors": 3.9995,
+      "final_cells_per_tracked_step": 3.999473684210526,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 0,
+      "matrix": "R4",
+      "start_iteration": 800,
+      "mean_accuracy": 0.7425,
+      "final_accuracy": 0.7385,
+      "mean_sensors": 3.9060499999999996,
+      "final_sensors": 3.9210000000000003,
+      "final_cells_per_tracked_step": 3.915149094210637,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 1,
+      "matrix": "R0",
+      "start_iteration": 1000,
+      "mean_accuracy": 0.7241,
+      "final_accuracy": 0.6984999999999999,
+      "mean_sensors": 3.9885,
+      "final_sensors": 3.9909999999999997,
+      "final_cells_per_tracked_step": 3.990113239609021,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 1,
+      "matrix": "R1",
+      "start_iteration": 1200,
+      "mean_accuracy": 0.7650999999999999,
+      "final_accuracy": 0.7205,
+      "mean_sensors": 3.926,
+      "final_sensors": 3.9495000000000005,
+      "final_cells_per_tracked_step": 3.94602195374656,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 1,
+      "matrix": "R2",
+      "start_iteration": 1400,
+      "mean_accuracy": 0.7171000000000001,
+      "final_accuracy": 0.693,
+      "mean_sensors": 3.9642,
+      "final_sensors": 3.9685,
+      "final_cells_per_tracked_step": 3.965265517248718,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 1,
+      "matrix": "R3",
+      "start_iteration": 1600,
+      "mean_accuracy": 0.72515,
+      "final_accuracy": 0.7235,
+      "mean_sensors": 3.99095,
+      "final_sensors": 3.9840000000000004,
+      "final_cells_per_tracked_step": 3.9822169520419464,
+      "adaptation_latency": 3
+    },
+    {
+      "pass": 1,
+      "matrix": "R4",
+      "start_iteration": 1800,
+      "mean_accuracy": 0.75315,
+      "final_accuracy": 0.7304999999999999,
+      "mean_sensors": 3.9076,
+      "final_sensors": 3.9255000000000004,
+      "final_cells_per_tracked_step": 3.918964547816015,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 2,
+      "matrix": "R0",
+      "start_iteration": 2000,
+      "mean_accuracy": 0.7281,
+      "final_accuracy": 0.7024999999999999,
+      "mean_sensors": 3.9867500000000002,
+      "final_sensors": 3.9810000000000003,
+      "final_cells_per_tracked_step": 3.9791016450270384,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 2,
+      "matrix": "R1",
+      "start_iteration": 2200,
+      "mean_accuracy": 0.7408500000000001,
+      "final_accuracy": 0.737,
+      "mean_sensors": 3.9445500000000004,
+      "final_sensors": 3.9435000000000002,
+      "final_cells_per_tracked_step": 3.9393338809244427,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 2,
+      "matrix": "R2",
+      "start_iteration": 2400,
+      "mean_accuracy": 0.7184999999999999,
+      "final_accuracy": 0.6945,
+      "mean_sensors": 3.9619999999999997,
+      "final_sensors": 3.9699999999999998,
+      "final_cells_per_tracked_step": 3.967151040017284,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 2,
+      "matrix": "R3",
+      "start_iteration": 2600,
+      "mean_accuracy": 0.7161,
+      "final_accuracy": 0.7094999999999999,
+      "mean_sensors": 3.9922000000000004,
+      "final_sensors": 3.992,
+      "final_cells_per_tracked_step": 3.9912900028185128,
+      "adaptation_latency": 0
+    },
+    {
+      "pass": 2,
+      "matrix": "R4",
+      "start_iteration": 2800,
+      "mean_accuracy": 0.7489,
+      "final_accuracy": 0.732,
+      "mean_sensors": 3.9146000000000005,
+      "final_sensors": 3.932,
+      "final_cells_per_tracked_step": 3.925863765902424,
+      "adaptation_latency": 0
+    }
+  ]
+}
