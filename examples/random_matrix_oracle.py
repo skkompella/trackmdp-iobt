@@ -81,6 +81,7 @@ def main():
     p.add_argument("--matrix-seed", type=int, default=20261006)
     p.add_argument("--episodes", type=int, default=200)
     p.add_argument("--envs", default="grid,iobt")
+    p.add_argument("--ks", default="4,5")
     p.add_argument("--nrows", type=int, default=5)
     p.add_argument("--ncols", type=int, default=5)
     p.add_argument("--out", required=True)
@@ -93,7 +94,7 @@ def main():
         names, mats = parse_matrix_spec(args.matrices, env, args.matrix_seed,
                                         nrows=args.nrows, ncols=args.ncols)
         for name, T in zip(names, mats):
-            for k in (4, 5):
+            for k in (int(x) for x in args.ks.split(",")):
                 for cost in (0.16, 0.04):
                     rows = [run_oracle(env, T, k, cost, m, args.episodes, 3,
                                        args.nrows, args.ncols)
