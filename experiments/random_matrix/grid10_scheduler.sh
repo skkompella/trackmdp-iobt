@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # 10x10 random-matrix switching experiment: 5 random matrices (R0-R4), 3 passes,
 # online and PPO, with and without DAL warm restart, k in {4,5}, cost in {-0.16,-0.04}.
-# Same design as the 5x5/IoBT runs (results.md) at 10x10.
+# Same design as the 5x5/IoBT runs (results.md) at 10x10. PPO uses --moore (local
+# action window): with one action per cell (100) it never learned (flat ~2.5%).
 #
 #   runs 1100-1103 PPO no DAL      1104-1107 PPO + DAL warm
 #   runs 1108-1111 online no DAL   1112-1115 online + DAL warm
@@ -39,7 +40,7 @@ while true; do
   pending=0
   for j in "${jobs[@]}"; do
     set -- $j; kind=$1 k=$2 c=$3 r=$4
-    ptag=ppo_grid10_C_k${k}_c${c}; ttag=tab_grid10_C_k${k}_c${c}
+    ptag=ppo_grid10m_C_k${k}_c${c}; ttag=tab_grid10_C_k${k}_c${c}
     case $kind in
       ppo_prior) done_file=$P/$ptag/rllib_checkpoint.json; key="--save-checkpoint $P/$ptag ";;
       tab_prior) done_file=$P/$ttag.npy;                     key="--save-q $P/$ttag.npy ";;
@@ -59,10 +60,10 @@ while true; do
     esac
     tries[$j]=$(( ${tries[$j]:-0} + 1 ))
     case $kind in
-      ppo_prior) cmd="examples/train_switching_grid_ppo.py --env grid $G --new-run 0 --matrices C --iterations-per-segment 1200 --passes 1 --max-sensors $k --sensor-rew -$c --no-detector --save-checkpoint $P/$ptag --out-dir $P/${ptag}_train"; log=prior_$ptag;;
+      ppo_prior) cmd="examples/train_switching_grid_ppo.py --env grid $G --moore --new-run 0 --matrices C --iterations-per-segment 1200 --passes 1 --max-sensors $k --sensor-rew -$c --no-detector --save-checkpoint $P/$ptag --out-dir $P/${ptag}_train"; log=prior_$ptag;;
       tab_prior) cmd="examples/train_switching_grid_online.py $G --action-mode local --episodes-per-segment 6000 --matrices C --passes 1 --max-sensors $k --sensor-rew -$c --no-detector $HP --new-run 0 --save-q $P/$ttag.npy --out-dir $P/${ttag}_train"; log=prior_$ttag;;
-      ppo_none)  cmd="examples/train_switching_grid_ppo.py --env grid $G --new-run $r --matrices R0,R1,R2,R3,R4 --iterations-per-segment 200 --passes 3 --max-sensors $k --sensor-rew -$c --no-detector --out-dir $O/run$r"; log=run$r;;
-      ppo_warm)  cmd="examples/train_switching_grid_ppo.py --env grid $G --new-run $r --matrices R0,R1,R2,R3,R4 --iterations-per-segment 200 --passes 3 --max-sensors $k --sensor-rew -$c --restart-strategy warm --prior-checkpoint $(pwd)/$P/$ptag --delta 0.01 --out-dir $O/run$r"; log=run$r;;
+      ppo_none)  cmd="examples/train_switching_grid_ppo.py --env grid $G --moore --new-run $r --matrices R0,R1,R2,R3,R4 --iterations-per-segment 200 --passes 3 --max-sensors $k --sensor-rew -$c --no-detector --out-dir $O/run$r"; log=run$r;;
+      ppo_warm)  cmd="examples/train_switching_grid_ppo.py --env grid $G --moore --new-run $r --matrices R0,R1,R2,R3,R4 --iterations-per-segment 200 --passes 3 --max-sensors $k --sensor-rew -$c --restart-strategy warm --prior-checkpoint $(pwd)/$P/$ptag --delta 0.01 --out-dir $O/run$r"; log=run$r;;
       tab_none)  cmd="examples/train_switching_grid_online.py $G --action-mode local --episodes-per-segment 1000 --matrices R0,R1,R2,R3,R4 --passes 3 --max-sensors $k --sensor-rew -$c --no-detector $HP --greedy-eval-every 100 --greedy-eval-episodes 10 --new-run $r --out-dir $O/run$r"; log=run$r;;
       tab_warm)  cmd="examples/train_switching_grid_online.py $G --action-mode local --episodes-per-segment 1000 --matrices R0,R1,R2,R3,R4 --passes 3 --max-sensors $k --sensor-rew -$c --restart-strategy warm --prior-path $P/$ttag.npy --delta 1e-4 $HP --greedy-eval-every 100 --greedy-eval-episodes 10 --new-run $r --out-dir $O/run$r"; log=run$r;;
     esac

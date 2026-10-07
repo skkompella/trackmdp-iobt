@@ -82,7 +82,7 @@ def build_algo(args, cfg, matrices):
         qobj = MatrixIoBTLearner(
             args.new_run, 6, args.max_sensors, args.max_sensors,
             cfg["time_limit"], cfg["time_limit"], matrices,
-            seed=args.train_seed, no_moore_constraint=True,
+            seed=args.train_seed, no_moore_constraint=not args.moore,
             reward_preset="grid", sensor_rew=args.sensor_rew)
         wrapper = grid_environment
     else:
@@ -90,7 +90,7 @@ def build_algo(args, cfg, matrices):
             run_number=args.new_run, nrows=args.nrows, ncols=args.ncols,
             max_sensors=args.max_sensors, max_sensors_null=args.max_sensors,
             time_limit=cfg["time_limit"], time_limit_max=cfg["time_limit"],
-            matrices=matrices, seed=args.train_seed, no_moore_constraint=True,
+            matrices=matrices, seed=args.train_seed, no_moore_constraint=not args.moore,
             sensor_rew=args.sensor_rew)
         wrapper = grid_environment_rect
 
@@ -98,7 +98,7 @@ def build_algo(args, cfg, matrices):
                   "time_limit_schedule": [2000],
                   "time_limit_max": cfg["time_limit"],
                   "max_ep_steps": cfg["max_ep_steps"],
-                  "no_moore_constraint": True}
+                  "no_moore_constraint": not args.moore}
 
     def _pick(pairs):
         accepted = set(inspect.signature(PPOConfig.training).parameters)
@@ -153,6 +153,11 @@ def main():
     p.add_argument("--env", choices=["grid", "iobt"], default="grid",
                    help="grid: 5x5 SwitchingTransitionGridEnv. iobt: the 10-node "
                         "Camp Buckner graph with a matrix-driven object")
+    p.add_argument("--moore", action="store_true",
+                   help="Track-MDP's local action window ((2t+3)^2 cells around the "
+                        "last-seen cell) instead of one action per grid cell. Needed "
+                        "for large grids: on 10x10 the full 100-cell action space "
+                        "never learned (flat ~2.5% over 1200 iterations)")
     p.add_argument("--matrix-seed", type=int, default=20261006,
                    help="Seed base for random matrices R<i> in --matrices")
     p.add_argument("--concentration", type=float, default=1.0)
@@ -202,7 +207,7 @@ def main():
            "missing_state": n_cells * (tl + 1) + 1,
            "max_ep_steps": args.max_ep_steps, "max_sensors": args.max_sensors,
            "max_sensors_null": args.max_sensors,
-           "n_cells": n_cells, "no_moore_constraint": True,
+           "n_cells": n_cells, "no_moore_constraint": not args.moore,
            "clip_mode": "random", "clip_seed": args.eval_seed,
            "eval_episodes": args.eval_episodes}
 
@@ -225,13 +230,13 @@ def main():
     if args.env == "iobt":
         eval_env = MatrixIoBTEnv(
             args.max_sensors, args.max_sensors, cfg["missing_state"], tl,
-            matrices, seed=args.eval_seed, no_moore_constraint=True,
+            matrices, seed=args.eval_seed, no_moore_constraint=not args.moore,
             reward_preset="grid", sensor_rew=args.sensor_rew)
     else:
         eval_env = SwitchingTransitionGridEnv(
             args.nrows, args.ncols, args.max_sensors, args.max_sensors,
             cfg["missing_state"], tl, matrices, seed=args.eval_seed,
-            no_moore_constraint=True, sensor_rew=args.sensor_rew)
+            no_moore_constraint=not args.moore, sensor_rew=args.sensor_rew)
 
     detector = None if args.no_detector else GLRChangeDetector(
         delta=args.delta, min_samples=args.min_samples)
@@ -337,6 +342,7 @@ def main():
 
     summary = {
         "run": args.new_run, "learner": "ppo", "env": args.env,
+        "moore": bool(args.moore), "grid_shape": [args.nrows, args.ncols],
         "matrix_seed": args.matrix_seed,
         "grid": [args.nrows, args.ncols], "matrices": names,
         "time_limit": tl, "max_sensors": args.max_sensors,
