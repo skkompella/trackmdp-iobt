@@ -1,0 +1,942 @@
+[
+ {
+  "env": "grid",
+  "matrix": "R0",
+  "k": 4,
+  "cost": -0.16,
+  "best_reward": {
+   "m": 4,
+   "accuracy": 0.9464,
+   "reward_per_step": -0.0284479999999896,
+   "cells_per_tracked_step": 4.0
+  },
+  "full_budget": {
+   "m": 4,
+   "accuracy": 0.9464,
+   "reward_per_step": -0.0284479999999896,
+   "cells_per_tracked_step": 4.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.33615,
+    "reward_per_step": -3.0504580000012362,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.57415,
+    "reward_per_step": -1.7920899999997826,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78095,
+    "reward_per_step": -0.7784659999997071,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9464,
+    "reward_per_step": -0.0284479999999896,
+    "cells_per_tracked_step": 4.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R0",
+  "k": 4,
+  "cost": -0.04,
+  "best_reward": {
+   "m": 4,
+   "accuracy": 0.9464,
+   "reward_per_step": 0.7026880000001166,
+   "cells_per_tracked_step": 4.0
+  },
+  "full_budget": {
+   "m": 4,
+   "accuracy": 0.9464,
+   "reward_per_step": 0.7026880000001166,
+   "cells_per_tracked_step": 4.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.33615,
+    "reward_per_step": -0.5105020000001056,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.57415,
+    "reward_per_step": -0.017409999999995283,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78095,
+    "reward_per_step": 0.3910960000000889,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9464,
+    "reward_per_step": 0.7026880000001166,
+    "cells_per_tracked_step": 4.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R0",
+  "k": 5,
+  "cost": -0.16,
+  "best_reward": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.03800000000000885,
+   "cells_per_tracked_step": 5.0
+  },
+  "full_budget": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.03800000000000885,
+   "cells_per_tracked_step": 5.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.33615,
+    "reward_per_step": -3.0504580000012362,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.57415,
+    "reward_per_step": -1.7920899999997826,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78095,
+    "reward_per_step": -0.7784659999997071,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9464,
+    "reward_per_step": -0.0284479999999896,
+    "cells_per_tracked_step": 4.0
+   },
+   {
+    "m": 5,
+    "accuracy": 0.99,
+    "reward_per_step": 0.03800000000000885,
+    "cells_per_tracked_step": 5.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R0",
+  "k": 5,
+  "cost": -0.04,
+  "best_reward": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.7519999999997412,
+   "cells_per_tracked_step": 5.0
+  },
+  "full_budget": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.7519999999997412,
+   "cells_per_tracked_step": 5.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.33615,
+    "reward_per_step": -0.5105020000001056,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.57415,
+    "reward_per_step": -0.017409999999995283,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78095,
+    "reward_per_step": 0.3910960000000889,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9464,
+    "reward_per_step": 0.7026880000001166,
+    "cells_per_tracked_step": 4.0
+   },
+   {
+    "m": 5,
+    "accuracy": 0.99,
+    "reward_per_step": 0.7519999999997412,
+    "cells_per_tracked_step": 5.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R1",
+  "k": 4,
+  "cost": -0.16,
+  "best_reward": {
+   "m": 4,
+   "accuracy": 0.93485,
+   "reward_per_step": -0.08300600000003744,
+   "cells_per_tracked_step": 4.0
+  },
+  "full_budget": {
+   "m": 4,
+   "accuracy": 0.93485,
+   "reward_per_step": -0.08300600000003744,
+   "cells_per_tracked_step": 4.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.35155,
+    "reward_per_step": -2.937642000001167,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.59335,
+    "reward_per_step": -1.6788099999997816,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.81605,
+    "reward_per_step": -0.56255799999973,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.93485,
+    "reward_per_step": -0.08300600000003744,
+    "cells_per_tracked_step": 4.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R1",
+  "k": 4,
+  "cost": -0.04,
+  "best_reward": {
+   "m": 4,
+   "accuracy": 0.93485,
+   "reward_per_step": 0.6803860000001146,
+   "cells_per_tracked_step": 4.0
+  },
+  "full_budget": {
+   "m": 4,
+   "accuracy": 0.93485,
+   "reward_per_step": 0.6803860000001146,
+   "cells_per_tracked_step": 4.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.35155,
+    "reward_per_step": -0.47074800000006234,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.59335,
+    "reward_per_step": 0.025309999999998042,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.81605,
+    "reward_per_step": 0.47139799999997456,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.93485,
+    "reward_per_step": 0.6803860000001146,
+    "cells_per_tracked_step": 4.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R1",
+  "k": 5,
+  "cost": -0.16,
+  "best_reward": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.03800000000000885,
+   "cells_per_tracked_step": 5.0
+  },
+  "full_budget": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.03800000000000885,
+   "cells_per_tracked_step": 5.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.35155,
+    "reward_per_step": -2.937642000001167,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.59335,
+    "reward_per_step": -1.6788099999997816,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.81605,
+    "reward_per_step": -0.56255799999973,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.93485,
+    "reward_per_step": -0.08300600000003744,
+    "cells_per_tracked_step": 4.0
+   },
+   {
+    "m": 5,
+    "accuracy": 0.99,
+    "reward_per_step": 0.03800000000000885,
+    "cells_per_tracked_step": 5.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R1",
+  "k": 5,
+  "cost": -0.04,
+  "best_reward": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.7519999999997412,
+   "cells_per_tracked_step": 5.0
+  },
+  "full_budget": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.7519999999997412,
+   "cells_per_tracked_step": 5.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.35155,
+    "reward_per_step": -0.47074800000006234,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.59335,
+    "reward_per_step": 0.025309999999998042,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.81605,
+    "reward_per_step": 0.47139799999997456,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.93485,
+    "reward_per_step": 0.6803860000001146,
+    "cells_per_tracked_step": 4.0
+   },
+   {
+    "m": 5,
+    "accuracy": 0.99,
+    "reward_per_step": 0.7519999999997412,
+    "cells_per_tracked_step": 5.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R2",
+  "k": 4,
+  "cost": -0.16,
+  "best_reward": {
+   "m": 4,
+   "accuracy": 0.93555,
+   "reward_per_step": -0.08307400000003015,
+   "cells_per_tracked_step": 4.0
+  },
+  "full_budget": {
+   "m": 4,
+   "accuracy": 0.93555,
+   "reward_per_step": -0.08307400000003015,
+   "cells_per_tracked_step": 4.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3263,
+    "reward_per_step": -3.132380000001249,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.5796,
+    "reward_per_step": -1.7278399999997838,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78635,
+    "reward_per_step": -0.7334899999997109,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.93555,
+    "reward_per_step": -0.08307400000003015,
+    "cells_per_tracked_step": 4.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R2",
+  "k": 4,
+  "cost": -0.04,
+  "best_reward": {
+   "m": 4,
+   "accuracy": 0.93555,
+   "reward_per_step": 0.6808940000001162,
+   "cells_per_tracked_step": 4.0
+  },
+  "full_budget": {
+   "m": 4,
+   "accuracy": 0.93555,
+   "reward_per_step": 0.6808940000001162,
+   "cells_per_tracked_step": 4.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3263,
+    "reward_per_step": -0.5383700000001482,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.5796,
+    "reward_per_step": 0.002740000000001136,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78635,
+    "reward_per_step": 0.4063900000000891,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.93555,
+    "reward_per_step": 0.6808940000001162,
+    "cells_per_tracked_step": 4.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R2",
+  "k": 5,
+  "cost": -0.16,
+  "best_reward": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.03800000000000885,
+   "cells_per_tracked_step": 5.0
+  },
+  "full_budget": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.03800000000000885,
+   "cells_per_tracked_step": 5.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3263,
+    "reward_per_step": -3.132380000001249,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.5796,
+    "reward_per_step": -1.7278399999997838,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78635,
+    "reward_per_step": -0.7334899999997109,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.93555,
+    "reward_per_step": -0.08307400000003015,
+    "cells_per_tracked_step": 4.0
+   },
+   {
+    "m": 5,
+    "accuracy": 0.99,
+    "reward_per_step": 0.03800000000000885,
+    "cells_per_tracked_step": 5.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R2",
+  "k": 5,
+  "cost": -0.04,
+  "best_reward": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.7519999999997412,
+   "cells_per_tracked_step": 5.0
+  },
+  "full_budget": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.7519999999997412,
+   "cells_per_tracked_step": 5.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3263,
+    "reward_per_step": -0.5383700000001482,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.5796,
+    "reward_per_step": 0.002740000000001136,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78635,
+    "reward_per_step": 0.4063900000000891,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.93555,
+    "reward_per_step": 0.6808940000001162,
+    "cells_per_tracked_step": 4.0
+   },
+   {
+    "m": 5,
+    "accuracy": 0.99,
+    "reward_per_step": 0.7519999999997412,
+    "cells_per_tracked_step": 5.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R3",
+  "k": 4,
+  "cost": -0.16,
+  "best_reward": {
+   "m": 4,
+   "accuracy": 0.9353,
+   "reward_per_step": -0.09100400000003306,
+   "cells_per_tracked_step": 4.0
+  },
+  "full_budget": {
+   "m": 4,
+   "accuracy": 0.9353,
+   "reward_per_step": -0.09100400000003306,
+   "cells_per_tracked_step": 4.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3486,
+    "reward_per_step": -2.9500960000012046,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.5845,
+    "reward_per_step": -1.7041239999997815,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.79265,
+    "reward_per_step": -0.6914939999997112,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9353,
+    "reward_per_step": -0.09100400000003306,
+    "cells_per_tracked_step": 4.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R3",
+  "k": 4,
+  "cost": -0.04,
+  "best_reward": {
+   "m": 4,
+   "accuracy": 0.9353,
+   "reward_per_step": 0.6787240000001145,
+   "cells_per_tracked_step": 4.0
+  },
+  "full_budget": {
+   "m": 4,
+   "accuracy": 0.9353,
+   "reward_per_step": 0.6787240000001145,
+   "cells_per_tracked_step": 4.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3486,
+    "reward_per_step": -0.4760740000000664,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.5845,
+    "reward_per_step": 0.012343999999999623,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.79265,
+    "reward_per_step": 0.4216140000000655,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9353,
+    "reward_per_step": 0.6787240000001145,
+    "cells_per_tracked_step": 4.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R3",
+  "k": 5,
+  "cost": -0.16,
+  "best_reward": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.03800000000000885,
+   "cells_per_tracked_step": 5.0
+  },
+  "full_budget": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.03800000000000885,
+   "cells_per_tracked_step": 5.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3486,
+    "reward_per_step": -2.9500960000012046,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.5845,
+    "reward_per_step": -1.7041239999997815,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.79265,
+    "reward_per_step": -0.6914939999997112,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9353,
+    "reward_per_step": -0.09100400000003306,
+    "cells_per_tracked_step": 4.0
+   },
+   {
+    "m": 5,
+    "accuracy": 0.99,
+    "reward_per_step": 0.03800000000000885,
+    "cells_per_tracked_step": 5.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R3",
+  "k": 5,
+  "cost": -0.04,
+  "best_reward": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.7519999999997412,
+   "cells_per_tracked_step": 5.0
+  },
+  "full_budget": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.7519999999997412,
+   "cells_per_tracked_step": 5.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3486,
+    "reward_per_step": -0.4760740000000664,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.5845,
+    "reward_per_step": 0.012343999999999623,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.79265,
+    "reward_per_step": 0.4216140000000655,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9353,
+    "reward_per_step": 0.6787240000001145,
+    "cells_per_tracked_step": 4.0
+   },
+   {
+    "m": 5,
+    "accuracy": 0.99,
+    "reward_per_step": 0.7519999999997412,
+    "cells_per_tracked_step": 5.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R4",
+  "k": 4,
+  "cost": -0.16,
+  "best_reward": {
+   "m": 4,
+   "accuracy": 0.9323,
+   "reward_per_step": -0.10936400000002332,
+   "cells_per_tracked_step": 4.0
+  },
+  "full_budget": {
+   "m": 4,
+   "accuracy": 0.9323,
+   "reward_per_step": -0.10936400000002332,
+   "cells_per_tracked_step": 4.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3198,
+    "reward_per_step": -3.1396720000012794,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.57445,
+    "reward_per_step": -1.7212299999997798,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78715,
+    "reward_per_step": -0.729585999999708,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9323,
+    "reward_per_step": -0.10936400000002332,
+    "cells_per_tracked_step": 4.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R4",
+  "k": 4,
+  "cost": -0.04,
+  "best_reward": {
+   "m": 4,
+   "accuracy": 0.9323,
+   "reward_per_step": 0.6718840000001145,
+   "cells_per_tracked_step": 4.0
+  },
+  "full_budget": {
+   "m": 4,
+   "accuracy": 0.9323,
+   "reward_per_step": 0.6718840000001145,
+   "cells_per_tracked_step": 4.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3198,
+    "reward_per_step": -0.5450680000001601,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.57445,
+    "reward_per_step": 0.0005299999999994586,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78715,
+    "reward_per_step": 0.40796600000008815,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9323,
+    "reward_per_step": 0.6718840000001145,
+    "cells_per_tracked_step": 4.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R4",
+  "k": 5,
+  "cost": -0.16,
+  "best_reward": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.03800000000000885,
+   "cells_per_tracked_step": 5.0
+  },
+  "full_budget": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.03800000000000885,
+   "cells_per_tracked_step": 5.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3198,
+    "reward_per_step": -3.1396720000012794,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.57445,
+    "reward_per_step": -1.7212299999997798,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78715,
+    "reward_per_step": -0.729585999999708,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9323,
+    "reward_per_step": -0.10936400000002332,
+    "cells_per_tracked_step": 4.0
+   },
+   {
+    "m": 5,
+    "accuracy": 0.99,
+    "reward_per_step": 0.03800000000000885,
+    "cells_per_tracked_step": 5.0
+   }
+  ]
+ },
+ {
+  "env": "grid",
+  "matrix": "R4",
+  "k": 5,
+  "cost": -0.04,
+  "best_reward": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.7519999999997412,
+   "cells_per_tracked_step": 5.0
+  },
+  "full_budget": {
+   "m": 5,
+   "accuracy": 0.99,
+   "reward_per_step": 0.7519999999997412,
+   "cells_per_tracked_step": 5.0
+  },
+  "all": [
+   {
+    "m": 1,
+    "accuracy": 0.3198,
+    "reward_per_step": -0.5450680000001601,
+    "cells_per_tracked_step": 1.0
+   },
+   {
+    "m": 2,
+    "accuracy": 0.57445,
+    "reward_per_step": 0.0005299999999994586,
+    "cells_per_tracked_step": 2.0
+   },
+   {
+    "m": 3,
+    "accuracy": 0.78715,
+    "reward_per_step": 0.40796600000008815,
+    "cells_per_tracked_step": 3.0
+   },
+   {
+    "m": 4,
+    "accuracy": 0.9323,
+    "reward_per_step": 0.6718840000001145,
+    "cells_per_tracked_step": 4.0
+   },
+   {
+    "m": 5,
+    "accuracy": 0.99,
+    "reward_per_step": 0.7519999999997412,
+    "cells_per_tracked_step": 5.0
+   }
+  ]
+ }
+]

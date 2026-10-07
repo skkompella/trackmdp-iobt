@@ -36,19 +36,20 @@ from src.core.switching_grid_env import SwitchingTransitionGridEnv  # noqa: E402
 TL = 1
 
 
-def make_env(env, T, k, cost, seed):
+def make_env(env, T, k, cost, seed, nrows=5, ncols=5):
     if env == "grid":
-        e = SwitchingTransitionGridEnv(5, 5, k, k, 25 * (TL + 1) + 1, TL, [T],
-                                       seed=seed, no_moore_constraint=True,
+        n = nrows * ncols
+        e = SwitchingTransitionGridEnv(nrows, ncols, k, k, n * (TL + 1) + 1, TL,
+                                       [T], seed=seed, no_moore_constraint=True,
                                        sensor_rew=-cost)
-        return e, 25, 25
+        return e, n, n
     e = MatrixIoBTEnv(k, k, 16 * (TL + 1) + 1, TL, [T], seed=seed,
                       reward_preset="grid", sensor_rew=-cost)
     return e, 10, 16          # 10 real nodes, 16-wide action vector
 
 
-def run_oracle(env, T, k, cost, m, episodes, seed):
-    e, n, width = make_env(env, T, k, cost, seed)
+def run_oracle(env, T, k, cost, m, episodes, seed, nrows=5, ncols=5):
+    e, n, width = make_env(env, T, k, cost, seed, nrows, ncols)
     e.force_matrix(0)
     miss = e.missing_state
     T2 = T @ T
@@ -79,18 +80,23 @@ def main():
     p.add_argument("--matrices", default="R0,R1,R2,R3,R4")
     p.add_argument("--matrix-seed", type=int, default=20261006)
     p.add_argument("--episodes", type=int, default=200)
+    p.add_argument("--envs", default="grid,iobt")
+    p.add_argument("--nrows", type=int, default=5)
+    p.add_argument("--ncols", type=int, default=5)
     p.add_argument("--out", required=True)
     args = p.parse_args()
 
     results = []
     print(f"{'env':>4} {'mat':>3} {'k':>2} {'cost':>5} | {'best-reward m':>13} "
           f"{'acc':>7} {'cells':>5} | {'full-budget acc':>15}")
-    for env in ("grid", "iobt"):
-        names, mats = parse_matrix_spec(args.matrices, env, args.matrix_seed)
+    for env in args.envs.split(","):
+        names, mats = parse_matrix_spec(args.matrices, env, args.matrix_seed,
+                                        nrows=args.nrows, ncols=args.ncols)
         for name, T in zip(names, mats):
             for k in (4, 5):
                 for cost in (0.16, 0.04):
-                    rows = [run_oracle(env, T, k, cost, m, args.episodes, 3)
+                    rows = [run_oracle(env, T, k, cost, m, args.episodes, 3,
+                                       args.nrows, args.ncols)
                             for m in range(1, k + 1)]
                     best = max(rows, key=lambda r: r["reward_per_step"])
                     full = rows[-1]
