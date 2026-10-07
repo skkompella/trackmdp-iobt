@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "run": 0,
+    "learner": "tabular",
+    "action_mode": "local",
+    "alpha": 0.05,
+    "gamma": 0.9,
+    "lam": 0.0,
+    "epsilon": 0.1,
+    "optimistic_init": 5.0,
+    "grid": [
+      10,
+      10
+    ],
+    "matrices": [
+      "C"
+    ],
+    "matrix_seed": 20261006,
+    "time_limit": 1,
+    "max_sensors": 6,
+    "sensor_rew": -0.04,
+    "detector_enabled": false,
+    "detector_signal": "hit",
+    "delta": 0.01,
+    "max_window": 500,
+    "oracle_restart": false,
+    "restart_strategy": "cold",
+    "n_restarts": 0,
+    "episodes_per_segment": 6000,
+    "passes": 1,
+    "env_steps": 600000,
+    "q_entries": 823296,
+    "mean_accuracy": 0.8250066666666667,
+    "final_accuracy": 0.8805,
+    "mean_sensors": 4.363833333333333,
+    "mean_latency_episodes": 215.0,
+    "mean_latency_first_pass": 215.0,
+    "mean_latency_later_passes": null,
+    "ceiling": 0.99
+  },
+  "segments": [
+    {
+      "pass": 0,
+      "matrix": "C",
+      "start_episode": 0,
+      "mean_accuracy": 0.8250066666666667,
+      "final_accuracy": 0.8805,
+      "mean_sensors": 4.363833333333333,
+      "adaptation_latency": 215
+    }
+  ]
+}

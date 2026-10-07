@@ -69,7 +69,12 @@ Best possible at 10×10: ~93.7% at k=4, 99% at k=5 (losing the object triggers a
   48–74%, PPO 50–72%), so DAL hurts there.
 - **The online learner again fails at cost −0.16** (45–60%, ~2.8 cells).
 - **Headroom law holds again: correlation 0.98, sign correct 8/8.**
-- Full table with restarts: `experiments/random_matrix/results.md` (runs 1100–1115).
+- **k=6 (DAL arms only, runs 1120–1123):** PPO + DAL **98.5% (−0.16) / 98.8% (−0.04)**,
+  99.0% at segment end, 4.6 cells, only 1–3 restarts. Its base model already watches
+  every reachable cell (98–99% on the equal-probability walk), so it is right for every
+  random matrix and the detector has nothing to catch. Online + DAL gains nothing from
+  the 6th sensor: 97.3% (−0.04), 44.0% (−0.16).
+- Full table with restarts: `experiments/random_matrix/results.md` (runs 1100–1123).
 
 Full table with restart counts and end-of-segment numbers:
 `experiments/random_matrix/results.md`. Runs 1000–1031.

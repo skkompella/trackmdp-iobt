@@ -93,3 +93,16 @@ iterations). Base models: online tables on C (greedy mean on R0-R4) / PPO on C (
 
 Online: 1108-1111 (no DAL), 1112-1115 (DAL). PPO: 1100-1103 (no DAL), 1104-1107 (DAL).
 Headroom (base - alone) vs DAL gain: correlation 0.98, sign correct 8/8.
+
+## 10x10, k=6 (DAL arms only, runs 1120-1123)
+
+| learner | cost | mean / end | cells | restarts (caught) | base model |
+|---|---:|---|---:|---|---:|
+| PPO + DAL (1120) | -0.16 | **98.50 / 99.00** | 4.61 | 1 (0/14) | 98.15 (PPO, C) |
+| PPO + DAL (1121) | -0.04 | **98.81 / 98.99** | 4.61 | 3 (0/14) | 99.00 (PPO, C) |
+| online + DAL (1122) | -0.16 | 43.98 / 43.13 | 2.99 | 702 (14/14) | |
+| online + DAL (1123) | -0.04 | 97.31 / 97.25 | 4.53 | 108 (12/14) | |
+
+The k=6 PPO base model watches every reachable cell, so it is correct under every random
+matrix; the hit rate never drops at a switch and DAL barely fires. Best possible at k=6 is
+99% (same as k=5: only 5 cells are reachable right after a detection).
