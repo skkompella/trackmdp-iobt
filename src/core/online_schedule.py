@@ -12,7 +12,7 @@ from __future__ import annotations
 import numpy as np
 
 
-def run_episode(agent, env, cfg, learn=True, explore=True):
+def run_episode(agent, env, cfg, learn=True, explore=True, hook=None):
     """
     One episode on whichever regime the env is currently pinned to.
 
@@ -20,6 +20,14 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
     agree: episodes start in the missing state, and that first step counts in
     the denominator but can never count as a detection — which is why the
     ceiling is (max_ep_steps-1)/max_ep_steps rather than 1.0.
+
+    ``hook`` (optional) sees every step whose state is (cell, tau=0), the
+    only steps whose next cell is drawn from M[cell, .] independently of the
+    learner.  ``hook.probe(cell)`` may return a list of cells to switch on
+    instead of the policy's action (a coverage probe; the probe transition is
+    never learned from).  ``hook.observe(cell, watched, found, probed)`` then
+    receives the switched-on cells and where the object was found (None on a
+    miss).  The episode ends early if the object leaves the grid.
     """
     time_limit    = cfg["time_limit"]
     missing_state = cfg["missing_state"]
@@ -31,7 +39,7 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
     current_state = missing_state
     time_delay    = 0
 
-    found = steps = sensors_on = 0
+    found = steps = sensors_on = n_probes = 0
     total_reward = 0.0
     detections: list[int] = []
     # Per-step extras so a caller can build an alternative detector signal.
@@ -58,15 +66,34 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
         action = agent.select_action(s, explore=explore)
         action_sensors = agent.action_vector(action)
 
+        # Object left the grid (exit_prob > 0): absorbing, end the episode.
+        if env.object_pos >= len(action_sensors):
+            break
+
+        tau0 = hook is not None and not was_missing and state_time == 0
+        probed = False
+        if tau0:
+            cells_on = hook.probe(int(state_pos))
+            if cells_on is not None:
+                probed = True
+                n_probes += 1
+                action_sensors = np.zeros_like(action_sensors)
+                action_sensors[list(cells_on)] = 1
+
         # Accuracy accounting, matching evaluate_policy: a hit only counts
         # while the tracker is actually tracking.
         hit = int(not was_missing and action_sensors[env.object_pos] == 1)
         found += hit
         steps += 1
         detections.append(hit)
+        found_cell = int(env.object_pos) if hit else None
 
         reward, next_state, _terminal, time_delay = env.get_reward_next_state(
             current_state, action_sensors, time_delay)
+        if tau0:
+            hook.observe(int(state_pos),
+                         [int(c) for c in np.flatnonzero(action_sensors)],
+                         found_cell, probed)
         total_reward += reward
         cells.append(int(next_state // (time_limit + 1)) if time_delay == 0
                      else None)
@@ -83,7 +110,10 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
         if learn:
             if prev is not None:
                 agent.observe(prev[0], prev[1], prev[2], s, action, done=False)
-            prev = (s, action, reward)
+            # A probe's action is not the policy's: never learn from it.  The
+            # previous step above still bootstrapped through the policy's own
+            # action at this state.
+            prev = None if probed else (s, action, reward)
 
         current_state = next_state
 
@@ -99,6 +129,7 @@ def run_episode(agent, env, cfg, learn=True, explore=True):
         "cells":      cells,
         "rewards":    rewards,
         "active":     active,
+        "n_probes":   n_probes,
     }
 
 
