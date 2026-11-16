@@ -227,3 +227,8 @@ agent_run194_a2c/
 # ...but do track this worktree's own experiment run logs (notes.json), even
 # though *.json is ignored above.
 !/experiments/**/notes.json
+experiments/transition_dal/**/ckpt/
+experiments/transition_dal/**/streams.npz
+experiments/transition_dal/logs/
+experiments/transition_dal/PAUSE_ALL
+experiments/transition_dal/**/PAUSE
