@@ -1,0 +1,31 @@
+{
+  "streams": "experiments/transition_dal/null/grid_transition_monitor_s2/streams.npz",
+  "n_streams": 105,
+  "n_samples": 4656912,
+  "replay": {
+    "0.01": {
+      "ordered": 0,
+      "shuffled": [
+        0,
+        0,
+        0
+      ]
+    },
+    "0.1": {
+      "ordered": 0,
+      "shuffled": [
+        0,
+        0,
+        0
+      ]
+    },
+    "0.5": {
+      "ordered": 1,
+      "shuffled": [
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}

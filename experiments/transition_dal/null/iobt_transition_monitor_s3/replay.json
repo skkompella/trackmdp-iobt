@@ -1,0 +1,31 @@
+{
+  "streams": "experiments/transition_dal/null/iobt_transition_monitor_s3/streams.npz",
+  "n_streams": 41,
+  "n_samples": 4424041,
+  "replay": {
+    "0.01": {
+      "ordered": 0,
+      "shuffled": [
+        0,
+        0,
+        0
+      ]
+    },
+    "0.1": {
+      "ordered": 0,
+      "shuffled": [
+        0,
+        0,
+        0
+      ]
+    },
+    "0.5": {
+      "ordered": 0,
+      "shuffled": [
+        0,
+        1,
+        0
+      ]
+    }
+  }
+}
