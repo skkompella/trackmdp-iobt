@@ -77,3 +77,23 @@ def test_fast_glr_matches_reference_detector():
     want = [t for t, v in enumerate(x) if ref.update(v)]
     assert len(want) >= 2
     assert glr_alarm_steps(x, 1e-3, min_samples=30, max_window=500) == want
+
+
+def test_summary_reports_training_sensors_including_probes(tmp_path):
+    run = tmp_path / "r"
+    run.mkdir()
+    (run / "online_summary.json").write_text(json.dumps({"summary": {
+        "env": "grid", "detector": "transition", "mean_sensors": 4.25,
+        "greedy_mean_sensors": 4.0}, "segments": []}))
+    (run / "alarms.json").write_text(json.dumps({"alarms": [], "switches": []}))
+    rows, md = summarize_runs([str(run)], 300)
+    assert rows[0]["train_sensors"] == 4.25
+    assert "train sensors/step" in md and "4.25" in md
+
+
+def test_summary_warns_on_run_without_alarms(tmp_path, capsys):
+    run = tmp_path / "r"
+    run.mkdir()
+    (run / "online_summary.json").write_text(json.dumps({"summary": {}, "segments": []}))
+    rows, _ = summarize_runs([str(run)], 300)
+    assert rows == [] and "missing alarms.json" in capsys.readouterr().err

@@ -15,6 +15,8 @@ Tabular SARSA, k = 5, cost -0.04, R0..R4 x 3 passes (14 switches), 1000 episodes
 | iobt | oracle-warm | 97.69 ± 0.06 | 97.78 ± 0.12 | 4.64 ± 0.01 | 0.0 | 0.0 | 14.0 | 0.0000 |
 | iobt | transition-warm | 97.64 ± 0.14 | 97.77 ± 0.14 | 4.63 ± 0.01 | 14.0 | 0.0 | 14.0 | 0.0008 |
 
+Sensors/step here is from greedy evaluation, which never probes; transition arms spend at most 0.5% of training steps on probes (probe frac column), about +0.005 sensors/step.
+
 "caught" and "false alarms" apply to the transition arms only (oracle arms restart at the known switches and raise no alarms).
 
 - The detector matches the oracle: every transition run caught 14/14 switches with 0 false alarms, and its accuracy is within 0.25 points of the oracle arm with the same restart strategy in all four (env, strategy) pairs.

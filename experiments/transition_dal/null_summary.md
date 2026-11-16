@@ -1,13 +1,13 @@
 Tolerance: 300 episodes
 
-| run | env | detector | mode | rho | seed | caught | false alarms | median delay (ep) | greedy mean % | greedy end % | sensors/step | probe frac | restarts |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| grid_transition_monitor_s1 | grid | transition | monitor | 0.20 | 1 | 0/0 | 0 | - | 93.40 | 93.35 | 3.63 | 0.01 | 0 |
-| grid_transition_monitor_s2 | grid | transition | monitor | 0.20 | 2 | 0/0 | 0 | - | 93.55 | 93.93 | 3.65 | 0.01 | 0 |
-| grid_transition_monitor_s3 | grid | transition | monitor | 0.20 | 3 | 0/0 | 0 | - | 93.58 | 94.11 | 3.63 | 0.01 | 0 |
-| iobt_transition_monitor_s1 | iobt | transition | monitor | 0.20 | 1 | 0/0 | 0 | - | 93.42 | 94.08 | 4.40 | 0.04 | 0 |
-| iobt_transition_monitor_s2 | iobt | transition | monitor | 0.20 | 2 | 0/0 | 0 | - | 94.27 | 94.47 | 4.30 | 0.05 | 0 |
-| iobt_transition_monitor_s3 | iobt | transition | monitor | 0.20 | 3 | 0/0 | 0 | - | 94.15 | 94.05 | 4.37 | 0.04 | 0 |
+| run | env | detector | mode | rho | seed | caught | false alarms | median delay (ep) | greedy mean % | greedy end % | greedy sensors/step | train sensors/step | probe frac % | restarts |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| grid_transition_monitor_s1 | grid | transition | monitor | 0.20 | 1 | 0/0 | 0 | - | 93.40 | 93.35 | 3.63 | 3.58 | 1.11 | 0 |
+| grid_transition_monitor_s2 | grid | transition | monitor | 0.20 | 2 | 0/0 | 0 | - | 93.55 | 93.93 | 3.65 | 3.58 | 0.96 | 0 |
+| grid_transition_monitor_s3 | grid | transition | monitor | 0.20 | 3 | 0/0 | 0 | - | 93.58 | 94.11 | 3.63 | 3.57 | 0.98 | 0 |
+| iobt_transition_monitor_s1 | iobt | transition | monitor | 0.20 | 1 | 0/0 | 0 | - | 93.42 | 94.08 | 4.40 | 4.38 | 3.80 | 0 |
+| iobt_transition_monitor_s2 | iobt | transition | monitor | 0.20 | 2 | 0/0 | 0 | - | 94.27 | 94.47 | 4.30 | 4.32 | 5.14 | 0 |
+| iobt_transition_monitor_s3 | iobt | transition | monitor | 0.20 | 3 | 0/0 | 0 | - | 94.15 | 94.05 | 4.37 | 4.38 | 3.56 | 0 |
 
 ## Ordered vs shuffled replay (examples/replay_streams.py, 3 shuffles)
 

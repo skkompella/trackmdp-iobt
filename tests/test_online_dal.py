@@ -147,3 +147,20 @@ def test_sigterm_pauses_and_resumes(tmp_path):
                    stdout=subprocess.DEVNULL)
     assert _read(straight, "online_history.csv") == \
         _read(paused, "online_history.csv")
+
+
+def test_crash_while_finishing_is_not_reported_done(tmp_path, monkeypatch):
+    import numpy as np
+    straight, crashed = tmp_path / "s", tmp_path / "c"
+    _run(straight, "--save-streams")
+
+    def boom(*a, **k):
+        raise OSError("disk full")
+    monkeypatch.setattr(np, "savez_compressed", boom)
+    with pytest.raises(OSError):
+        _run(crashed, "--save-streams")
+    monkeypatch.undo()
+    assert not os.path.exists(crashed / "online_summary.json")
+    _run(crashed, "--save-streams", "--resume", "--checkpoint-every", "200")
+    assert _read(straight, "online_history.csv") == _read(crashed, "online_history.csv")
+    assert _read(straight, "alarms.json") == _read(crashed, "alarms.json")

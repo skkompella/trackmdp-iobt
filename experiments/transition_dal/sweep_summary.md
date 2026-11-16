@@ -1,17 +1,19 @@
 Tolerance: 300 episodes
 
-| run | env | detector | mode | rho | seed | caught | false alarms | median delay (ep) | greedy mean % | greedy end % | sensors/step | probe frac | restarts |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| grid_rho0.05_s1 | grid | transition | monitor | 0.05 | 1 | 14/14 | 0 | 1.00 | 94.65 | 94.77 | 3.82 | 0.00 | 0 |
-| grid_rho0.1_s1 | grid | transition | monitor | 0.10 | 1 | 14/14 | 0 | 1.00 | 94.26 | 94.73 | 3.81 | 0.00 | 0 |
-| grid_rho0.2_s1 | grid | transition | monitor | 0.20 | 1 | 14/14 | 0 | 0.50 | 94.98 | 94.81 | 3.81 | 0.02 | 0 |
-| grid_rho0.3_s1 | grid | transition | monitor | 0.30 | 1 | 14/14 | 0 | 1.00 | 95.07 | 95.25 | 3.84 | 0.03 | 0 |
-| grid_rho0_s1 | grid | transition | monitor | 0.00 | 1 | 14/14 | 0 | 1.00 | 94.64 | 95.80 | 3.83 | 0.00 | 0 |
-| iobt_rho0.05_s1 | iobt | transition | monitor | 0.05 | 1 | 14/14 | 0 | 0.50 | 94.81 | 95.35 | 4.65 | 0.00 | 0 |
-| iobt_rho0.1_s1 | iobt | transition | monitor | 0.10 | 1 | 14/14 | 0 | 0.50 | 95.60 | 95.89 | 4.70 | 0.01 | 0 |
-| iobt_rho0.2_s1 | iobt | transition | monitor | 0.20 | 1 | 14/14 | 0 | 1.00 | 94.79 | 95.00 | 4.58 | 0.03 | 0 |
-| iobt_rho0.3_s1 | iobt | transition | monitor | 0.30 | 1 | 14/14 | 0 | 0.50 | 94.95 | 95.03 | 4.71 | 0.05 | 0 |
-| iobt_rho0_s1 | iobt | transition | monitor | 0.00 | 1 | 14/14 | 0 | 0.50 | 94.87 | 95.69 | 4.63 | 0.00 | 0 |
+| run | env | detector | mode | rho | seed | caught | false alarms | median delay (ep) | greedy mean % | greedy end % | greedy sensors/step | train sensors/step | probe frac % | restarts |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| grid_rho0.05_s1 | grid | transition | monitor | 0.05 | 1 | 14/14 | 0 | 1.00 | 94.65 | 94.77 | 3.82 | 3.75 | 0.03 | 0 |
+| grid_rho0.1_s1 | grid | transition | monitor | 0.10 | 1 | 14/14 | 0 | 1.00 | 94.26 | 94.73 | 3.81 | 3.76 | 0.34 | 0 |
+| grid_rho0.2_s1 | grid | transition | monitor | 0.20 | 1 | 14/14 | 0 | 0.50 | 94.98 | 94.81 | 3.81 | 3.75 | 1.55 | 0 |
+| grid_rho0.3_s1 | grid | transition | monitor | 0.30 | 1 | 14/14 | 0 | 1.00 | 95.07 | 95.25 | 3.84 | 3.78 | 3.15 | 0 |
+| grid_rho0_s1 | grid | transition | monitor | 0.00 | 1 | 14/14 | 0 | 1.00 | 94.64 | 95.80 | 3.83 | 3.75 | 0.00 | 0 |
+| iobt_rho0.05_s1 | iobt | transition | monitor | 0.05 | 1 | 14/14 | 0 | 0.50 | 94.81 | 95.35 | 4.65 | 4.61 | 0.17 | 0 |
+| iobt_rho0.1_s1 | iobt | transition | monitor | 0.10 | 1 | 14/14 | 0 | 0.50 | 95.60 | 95.89 | 4.70 | 4.65 | 1.20 | 0 |
+| iobt_rho0.2_s1 | iobt | transition | monitor | 0.20 | 1 | 14/14 | 0 | 1.00 | 94.79 | 95.00 | 4.58 | 4.55 | 3.02 | 0 |
+| iobt_rho0.3_s1 | iobt | transition | monitor | 0.30 | 1 | 14/14 | 0 | 0.50 | 94.95 | 95.03 | 4.71 | 4.66 | 5.19 | 0 |
+| iobt_rho0_s1 | iobt | transition | monitor | 0.00 | 1 | 14/14 | 0 | 0.50 | 94.87 | 95.69 | 4.63 | 4.58 | 0.00 | 0 |
+
+"train sensors/step" includes probe steps; greedy evaluation never probes. Re-applying the rho rule to training sensors: every rho is within +1.6% of rho = 0 (grid max 1.009, IoBT max 1.016).
 
 ## rho* choice
 

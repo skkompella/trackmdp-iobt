@@ -17,6 +17,7 @@ import argparse
 import glob
 import json
 import os
+import sys
 
 import numpy as np
 
@@ -48,7 +49,11 @@ def summarize_runs(run_dirs: list[str], tolerance_episodes: int):
     rows = []
     for d in sorted(run_dirs):
         sp, ap = os.path.join(d, "online_summary.json"), os.path.join(d, "alarms.json")
-        if not (os.path.exists(sp) and os.path.exists(ap)):
+        if not os.path.exists(sp):
+            continue
+        if not os.path.exists(ap):
+            print(f"warning: {d} has online_summary.json but is missing alarms.json; skipped",
+                  file=sys.stderr)
             continue
         with open(sp) as fh:
             s = json.load(fh)["summary"]
@@ -65,19 +70,23 @@ def summarize_runs(run_dirs: list[str], tolerance_episodes: int):
             "greedy_mean": s.get("greedy_mean_accuracy"),
             "greedy_end": s.get("greedy_final_accuracy"),
             "sensors": s.get("greedy_mean_sensors"),
+            # training sensors/step: the only figure that includes probe steps
+            # (greedy evaluation never probes)
+            "train_sensors": s.get("mean_sensors"),
             "probe_fraction": s.get("probe_fraction"),
             "restarts": s.get("n_restarts")})
     head = ("| run | env | detector | mode | rho | seed | caught | false alarms | "
-            "median delay (ep) | greedy mean % | greedy end % | sensors/step | "
-            "probe frac | restarts |")
-    lines = [head, "|" + "---|" * 14]
+            "median delay (ep) | greedy mean % | greedy end % | greedy sensors/step | "
+            "train sensors/step | probe frac % | restarts |")
+    lines = [head, "|" + "---|" * 15]
     for r in rows:
         lines.append(
             f"| {r['run']} | {r['env']} | {r['detector']} | {r['mode']} | "
             f"{_fmt(r['rho'])} | {r['seed']} | {r['caught']}/{r['n_switches']} | "
             f"{r['false_alarms']} | {_fmt(r['median_delay'])} | "
             f"{_fmt(r['greedy_mean'], True)} | {_fmt(r['greedy_end'], True)} | "
-            f"{_fmt(r['sensors'])} | {_fmt(r['probe_fraction'])} | {r['restarts']} |")
+            f"{_fmt(r['sensors'])} | {_fmt(r['train_sensors'])} | "
+            f"{_fmt(r['probe_fraction'], True)} | {r['restarts']} |")
     return rows, "\n".join(lines) + "\n"
 
 

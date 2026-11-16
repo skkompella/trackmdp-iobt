@@ -251,8 +251,6 @@ def _summary(st, args):
 
 def _finish(st, args, out):
     summary = _summary(st, args)
-    _write_json(os.path.join(out, "online_summary.json"),
-                {"summary": summary, "segments": st["segments"]})
     with open(os.path.join(out, "online_history.csv"), "w", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=list(st["history"][0].keys()))
         w.writeheader()
@@ -264,6 +262,10 @@ def _finish(st, args, out):
         np.savez_compressed(os.path.join(out, "streams.npz"), **{
             f"{i}_{j}": np.asarray(v, dtype=np.int8)
             for (i, j), v in hook.streams.items()})
+    # online_summary.json is the "done" marker (resume and the scheduler skip a
+    # run that has it), so it is written only after every other output.
+    _write_json(os.path.join(out, "online_summary.json"),
+                {"summary": summary, "segments": st["segments"]})
     _write_json(os.path.join(out, "status.json"),
                 {"state": "done", "episode": st["episode"]})
     return summary
@@ -356,7 +358,9 @@ def run_online(args) -> dict:
             stop = args.stop_after_episodes is not None and ep >= args.stop_after_episodes
             paused = pause.requested() or stop
             finished = st["seg"] >= len(schedule)
-            if not finished and (paused or ep % args.checkpoint_every == 0):
+            # Always checkpoint the final state too, so a crash while writing
+            # the outputs can be resumed straight into _finish.
+            if finished or paused or ep % args.checkpoint_every == 0:
                 save_checkpoint(ckpt_dir, st, args_dict)
             if paused and not finished:
                 _write_json(os.path.join(out, "status.json"),
