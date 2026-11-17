@@ -1,0 +1,3490 @@
+============================================================
+  TRACK-MDP  —  RECTANGULAR GRID TRAINING
+============================================================
+  Run number  : 1500
+  Grid        : 10 rows × 10 cols (100 cells)
+  Iterations  : 2005
+  Eval every  : 10
+  Mode        : train + eval (from scratch)
+
+  Grid       : 10 rows × 10 cols  (100 cells)
+  num_trans  : 4
+  movement   : original   max_sensors (k): 9   seed: None   train ep cap: none
+  missing_state = 201
+  cum_probs  : [0.2817, 0.5633, 0.845, 0.995]
+2026-11-13 23:44:49,376	INFO worker.py:2013 -- Started a local Ray instance.
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/_private/worker.py:2052: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+2026-11-13 23:44:51,927	WARNING training_grid_rect.py:292 -- DeprecationWarning: `build` has been deprecated. Use `AlgorithmConfig.build_algo` instead. This will raise an error in the future!
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/rllib/algorithms/algorithm.py:527: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+`UnifiedLogger` will be removed in Ray 2.7.
+  return UnifiedLogger(config, logdir, loggers=None)
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `JsonLogger interface is deprecated in favor of the `ray.tune.json.JsonLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `CSVLogger interface is deprecated in favor of the `ray.tune.csv.CSVLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `TBXLogger interface is deprecated in favor of the `ray.tune.tensorboardx.TBXLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+[2026-11-13 23:44:51,982 E 2775461 2775461] core_worker.cc:2232: Actor with class name: 'RolloutWorker' and ID: '2efb620b236b0b3d91ea283e01000000' has constructor arguments in the object store and max_restarts > 0. If the arguments in the object store go out of scope or are lost, the actor restart will fail. See https://github.com/ray-project/ray/issues/53727 for more details.
+2026-11-13 23:44:57,720	WARNING util.py:62 -- Install gputil for GPU system monitoring.
+Training from scratch (use --resume to continue from a checkpoint).
+
+Training for 2005 iterations (eval every 10) ...
+
+2026-11-13 23:45:00,320	WARNING train_ops.py:114 -- DeprecationWarning: `ray.rllib.execution.train_ops.multi_gpu_train_one_step` has been deprecated. This will raise an error in the future!
+  iter     1/2005  reward=-490.893
+  iter     2/2005  reward=-472.261
+  iter     3/2005  reward=-488.595
+  iter     4/2005  reward=-486.743
+  iter     5/2005  reward=-498.535
+  iter     6/2005  reward=-542.462
+  iter     7/2005  reward=-523.835
+  iter     8/2005  reward=-519.588
+  iter     9/2005  reward=-507.622
+  iter    10/2005  reward=-524.499
+2026-11-13 23:46:57,990	WARNING training_grid_rect.py:113 -- DeprecationWarning: `compute_single_action` has been deprecated. `Algorithm.compute_single_action` should no longer be used. Get the RLModule instance through `Algorithm.get_module([module ID])`, then compute actions through `RLModule.forward_inference({'obs': [obs batch]})`. This will raise an error in the future!
+
+  ── EVAL @ iter 10 ──
+     Accuracy    : 0.4387  (43.87%)
+     Reward      : -451.137 ± 408.211
+     Ep length   : 185.8 steps
+     Sensors/step: 5.61
+
+  ★ New best: 0.4387
+  iter    11/2005  reward=-510.867
+  iter    12/2005  reward=-526.859
+  iter    13/2005  reward=-515.597
+  iter    14/2005  reward=-552.194
+  iter    15/2005  reward=-538.611
+  iter    16/2005  reward=-541.809
+  iter    17/2005  reward=-524.738
+  iter    18/2005  reward=-555.812
+  iter    19/2005  reward=-542.290
+  iter    20/2005  reward=-545.923
+
+  ── EVAL @ iter 20 ──
+     Accuracy    : 0.4848  (48.48%)
+     Reward      : -438.546 ± 443.952
+     Ep length   : 202.0 steps
+     Sensors/step: 5.55
+
+  ★ New best: 0.4848
+  iter    21/2005  reward=-499.861
+  iter    22/2005  reward=-515.451
+  iter    23/2005  reward=-516.588
+  iter    24/2005  reward=-495.682
+  iter    25/2005  reward=-460.574
+  iter    26/2005  reward=-392.929
+  iter    27/2005  reward=-405.957
+  iter    28/2005  reward=-394.360
+  iter    29/2005  reward=-391.083
+  iter    30/2005  reward=-461.485
+
+  ── EVAL @ iter 30 ──
+     Accuracy    : 0.4663  (46.63%)
+     Reward      : -509.610 ± 496.943
+     Ep length   : 249.3 steps
+     Sensors/step: 5.51
+
+  iter    31/2005  reward=-472.239
+  iter    32/2005  reward=-458.719
+  iter    33/2005  reward=-504.317
+  iter    34/2005  reward=-494.973
+  iter    35/2005  reward=-501.381
+  iter    36/2005  reward=-545.315
+  iter    37/2005  reward=-553.108
+  iter    38/2005  reward=-550.509
+  iter    39/2005  reward=-551.135
+  iter    40/2005  reward=-528.426
+
+  ── EVAL @ iter 40 ──
+     Accuracy    : 0.5238  (52.38%)
+     Reward      : -330.839 ± 337.482
+     Ep length   : 192.7 steps
+     Sensors/step: 5.37
+
+  ★ New best: 0.5238
+  iter    41/2005  reward=-537.480
+  iter    42/2005  reward=-499.952
+  iter    43/2005  reward=-550.277
+  iter    44/2005  reward=-500.450
+  iter    45/2005  reward=-560.729
+  iter    46/2005  reward=-539.276
+  iter    47/2005  reward=-537.812
+  iter    48/2005  reward=-549.232
+  iter    49/2005  reward=-528.281
+  iter    50/2005  reward=-492.258
+
+  ── EVAL @ iter 50 ──
+     Accuracy    : 0.5283  (52.83%)
+     Reward      : -348.483 ± 324.540
+     Ep length   : 194.5 steps
+     Sensors/step: 5.47
+
+  ★ New best: 0.5283
+  iter    51/2005  reward=-498.052
+  iter    52/2005  reward=-440.239
+  iter    53/2005  reward=-439.703
+  iter    54/2005  reward=-443.794
+  iter    55/2005  reward=-465.781
+  iter    56/2005  reward=-467.795
+  iter    57/2005  reward=-513.081
+  iter    58/2005  reward=-558.530
+  iter    59/2005  reward=-504.795
+  iter    60/2005  reward=-482.180
+
+  ── EVAL @ iter 60 ──
+     Accuracy    : 0.5720  (57.20%)
+     Reward      : -242.535 ± 248.252
+     Ep length   : 139.6 steps
+     Sensors/step: 5.55
+
+  ★ New best: 0.5720
+  iter    61/2005  reward=-511.956
+  iter    62/2005  reward=-499.180
+  iter    63/2005  reward=-472.074
+  iter    64/2005  reward=-465.486
+  iter    65/2005  reward=-414.056
+  iter    66/2005  reward=-390.408
+  iter    67/2005  reward=-360.057
+  iter    68/2005  reward=-379.379
+  iter    69/2005  reward=-412.062
+  iter    70/2005  reward=-421.794
+
+  ── EVAL @ iter 70 ──
+     Accuracy    : 0.6709  (67.09%)
+     Reward      : -307.789 ± 311.888
+     Ep length   : 237.2 steps
+     Sensors/step: 5.48
+
+  ★ New best: 0.6709
+  iter    71/2005  reward=-430.104
+  iter    72/2005  reward=-451.630
+  iter    73/2005  reward=-425.775
+  iter    74/2005  reward=-370.707
+  iter    75/2005  reward=-371.006
+  iter    76/2005  reward=-344.663
+  iter    77/2005  reward=-318.060
+  iter    78/2005  reward=-319.132
+  iter    79/2005  reward=-282.836
+  iter    80/2005  reward=-292.320
+
+  ── EVAL @ iter 80 ──
+     Accuracy    : 0.6549  (65.49%)
+     Reward      : -286.467 ± 260.691
+     Ep length   : 224.1 steps
+     Sensors/step: 5.52
+
+  iter    81/2005  reward=-340.754
+  iter    82/2005  reward=-350.938
+  iter    83/2005  reward=-394.190
+  iter    84/2005  reward=-413.595
+  iter    85/2005  reward=-437.731
+  iter    86/2005  reward=-445.647
+  iter    87/2005  reward=-415.631
+  iter    88/2005  reward=-399.672
+  iter    89/2005  reward=-398.668
+  iter    90/2005  reward=-388.483
+
+  ── EVAL @ iter 90 ──
+     Accuracy    : 0.7381  (73.81%)
+     Reward      : -218.920 ± 184.688
+     Ep length   : 204.2 steps
+     Sensors/step: 5.50
+
+  ★ New best: 0.7381
+  iter    91/2005  reward=-375.908
+  iter    92/2005  reward=-359.955
+  iter    93/2005  reward=-322.528
+  iter    94/2005  reward=-328.940
+  iter    95/2005  reward=-283.758
+  iter    96/2005  reward=-292.105
+  iter    97/2005  reward=-306.470
+  iter    98/2005  reward=-332.001
+  iter    99/2005  reward=-326.171
+  iter   100/2005  reward=-354.072
+
+  ── EVAL @ iter 100 ──
+     Accuracy    : 0.7730  (77.30%)
+     Reward      : -171.934 ± 168.602
+     Ep length   : 197.4 steps
+     Sensors/step: 5.73
+
+  ★ New best: 0.7730
+  iter   101/2005  reward=-343.023
+  iter   102/2005  reward=-354.280
+  iter   103/2005  reward=-341.576
+  iter   104/2005  reward=-350.244
+  iter   105/2005  reward=-360.746
+  iter   106/2005  reward=-349.850
+  iter   107/2005  reward=-321.389
+  iter   108/2005  reward=-314.815
+  iter   109/2005  reward=-277.611
+  iter   110/2005  reward=-272.079
+
+  ── EVAL @ iter 110 ──
+     Accuracy    : 0.7556  (75.56%)
+     Reward      : -165.532 ± 169.732
+     Ep length   : 174.4 steps
+     Sensors/step: 5.63
+
+  iter   111/2005  reward=-329.953
+  iter   112/2005  reward=-349.468
+  iter   113/2005  reward=-377.024
+  iter   114/2005  reward=-373.866
+  iter   115/2005  reward=-385.899
+  iter   116/2005  reward=-363.314
+  iter   117/2005  reward=-371.390
+  iter   118/2005  reward=-366.866
+  iter   119/2005  reward=-343.237
+  iter   120/2005  reward=-340.730
+
+  ── EVAL @ iter 120 ──
+     Accuracy    : 0.7862  (78.62%)
+     Reward      : -195.598 ± 194.573
+     Ep length   : 241.6 steps
+     Sensors/step: 5.62
+
+  ★ New best: 0.7862
+  iter   121/2005  reward=-334.447
+  iter   122/2005  reward=-317.979
+  iter   123/2005  reward=-324.790
+  iter   124/2005  reward=-331.801
+  iter   125/2005  reward=-318.889
+  iter   126/2005  reward=-314.892
+  iter   127/2005  reward=-309.100
+  iter   128/2005  reward=-277.630
+  iter   129/2005  reward=-278.706
+  iter   130/2005  reward=-296.505
+
+  ── EVAL @ iter 130 ──
+     Accuracy    : 0.7760  (77.60%)
+     Reward      : -169.506 ± 174.220
+     Ep length   : 211.1 steps
+     Sensors/step: 5.79
+
+  iter   131/2005  reward=-283.824
+  iter   132/2005  reward=-295.011
+  iter   133/2005  reward=-309.962
+  iter   134/2005  reward=-320.432
+  iter   135/2005  reward=-298.961
+  iter   136/2005  reward=-295.155
+  iter   137/2005  reward=-291.007
+  iter   138/2005  reward=-280.947
+  iter   139/2005  reward=-286.391
+  iter   140/2005  reward=-312.444
+
+  ── EVAL @ iter 140 ──
+     Accuracy    : 0.7803  (78.03%)
+     Reward      : -143.332 ± 145.937
+     Ep length   : 189.5 steps
+     Sensors/step: 5.65
+
+  iter   141/2005  reward=-271.734
+  iter   142/2005  reward=-259.444
+  iter   143/2005  reward=-255.777
+  iter   144/2005  reward=-236.219
+  iter   145/2005  reward=-235.634
+  iter   146/2005  reward=-248.403
+  iter   147/2005  reward=-252.822
+  iter   148/2005  reward=-272.005
+  iter   149/2005  reward=-272.330
+  iter   150/2005  reward=-257.858
+
+  ── EVAL @ iter 150 ──
+     Accuracy    : 0.8301  (83.01%)
+     Reward      : -131.678 ± 120.181
+     Ep length   : 212.2 steps
+     Sensors/step: 5.49
+
+  ★ New best: 0.8301
+  iter   151/2005  reward=-250.740
+  iter   152/2005  reward=-259.174
+  iter   153/2005  reward=-239.820
+  iter   154/2005  reward=-222.998
+  iter   155/2005  reward=-241.612
+  iter   156/2005  reward=-233.406
+  iter   157/2005  reward=-246.658
+  iter   158/2005  reward=-239.184
+  iter   159/2005  reward=-244.216
+  iter   160/2005  reward=-242.049
+
+  ── EVAL @ iter 160 ──
+     Accuracy    : 0.8264  (82.64%)
+     Reward      : -122.221 ± 107.080
+     Ep length   : 203.0 steps
+     Sensors/step: 5.76
+
+  iter   161/2005  reward=-259.456
+  iter   162/2005  reward=-242.174
+  iter   163/2005  reward=-252.524
+  iter   164/2005  reward=-248.807
+  iter   165/2005  reward=-271.198
+  iter   166/2005  reward=-266.796
+  iter   167/2005  reward=-276.811
+  iter   168/2005  reward=-287.775
+  iter   169/2005  reward=-279.474
+  iter   170/2005  reward=-292.993
+
+  ── EVAL @ iter 170 ──
+     Accuracy    : 0.8720  (87.20%)
+     Reward      : -72.241 ± 65.089
+     Ep length   : 190.8 steps
+     Sensors/step: 5.68
+
+  ★ New best: 0.8720
+  iter   171/2005  reward=-269.067
+  iter   172/2005  reward=-232.300
+  iter   173/2005  reward=-219.577
+  iter   174/2005  reward=-214.428
+  iter   175/2005  reward=-203.618
+  iter   176/2005  reward=-190.376
+  iter   177/2005  reward=-187.841
+  iter   178/2005  reward=-187.672
+  iter   179/2005  reward=-205.509
+  iter   180/2005  reward=-218.035
+
+  ── EVAL @ iter 180 ──
+     Accuracy    : 0.8362  (83.62%)
+     Reward      : -81.768 ± 69.143
+     Ep length   : 175.4 steps
+     Sensors/step: 5.66
+
+  iter   181/2005  reward=-215.085
+  iter   182/2005  reward=-234.075
+  iter   183/2005  reward=-235.595
+  iter   184/2005  reward=-240.316
+  iter   185/2005  reward=-246.086
+  iter   186/2005  reward=-236.993
+  iter   187/2005  reward=-246.321
+  iter   188/2005  reward=-227.171
+  iter   189/2005  reward=-226.462
+  iter   190/2005  reward=-186.992
+
+  ── EVAL @ iter 190 ──
+     Accuracy    : 0.8274  (82.74%)
+     Reward      : -92.525 ± 85.647
+     Ep length   : 168.8 steps
+     Sensors/step: 5.66
+
+  iter   191/2005  reward=-203.593
+  iter   192/2005  reward=-198.036
+  iter   193/2005  reward=-195.634
+  iter   194/2005  reward=-191.676
+  iter   195/2005  reward=-200.426
+  iter   196/2005  reward=-183.486
+  iter   197/2005  reward=-159.438
+  iter   198/2005  reward=-169.128
+  iter   199/2005  reward=-178.948
+  iter   200/2005  reward=-181.364
+
+  ── EVAL @ iter 200 ──
+     Accuracy    : 0.8267  (82.67%)
+     Reward      : -112.796 ± 98.889
+     Ep length   : 177.6 steps
+     Sensors/step: 5.75
+
+  iter   201/2005  reward=-187.438
+  iter   202/2005  reward=-206.622
+  iter   203/2005  reward=-185.490
+  iter   204/2005  reward=-170.416
+  iter   205/2005  reward=-175.315
+  iter   206/2005  reward=-184.746
+  iter   207/2005  reward=-187.075
+  iter   208/2005  reward=-194.090
+  iter   209/2005  reward=-199.835
+  iter   210/2005  reward=-205.922
+
+  ── EVAL @ iter 210 ──
+     Accuracy    : 0.8371  (83.71%)
+     Reward      : -131.450 ± 121.842
+     Ep length   : 250.0 steps
+     Sensors/step: 5.76
+
+  iter   211/2005  reward=-189.171
+  iter   212/2005  reward=-171.044
+  iter   213/2005  reward=-161.675
+  iter   214/2005  reward=-145.922
+  iter   215/2005  reward=-150.698
+  iter   216/2005  reward=-151.704
+  iter   217/2005  reward=-151.933
+  iter   218/2005  reward=-152.564
+  iter   219/2005  reward=-162.081
+  iter   220/2005  reward=-153.303
+
+  ── EVAL @ iter 220 ──
+     Accuracy    : 0.8716  (87.16%)
+     Reward      : -102.103 ± 99.078
+     Ep length   : 212.3 steps
+     Sensors/step: 5.79
+
+  iter   221/2005  reward=-162.084
+  iter   222/2005  reward=-162.209
+  iter   223/2005  reward=-161.597
+  iter   224/2005  reward=-153.838
+  iter   225/2005  reward=-155.735
+  iter   226/2005  reward=-158.282
+  iter   227/2005  reward=-155.344
+  iter   228/2005  reward=-160.543
+  iter   229/2005  reward=-163.100
+  iter   230/2005  reward=-168.292
+
+  ── EVAL @ iter 230 ──
+     Accuracy    : 0.8871  (88.71%)
+     Reward      : -68.277 ± 69.322
+     Ep length   : 158.3 steps
+     Sensors/step: 5.76
+
+  ★ New best: 0.8871
+  iter   231/2005  reward=-151.763
+  iter   232/2005  reward=-158.486
+  iter   233/2005  reward=-150.252
+  iter   234/2005  reward=-145.170
+  iter   235/2005  reward=-142.473
+  iter   236/2005  reward=-137.956
+  iter   237/2005  reward=-139.416
+  iter   238/2005  reward=-137.928
+  iter   239/2005  reward=-127.235
+  iter   240/2005  reward=-128.670
+
+  ── EVAL @ iter 240 ──
+     Accuracy    : 0.8955  (89.55%)
+     Reward      : -66.006 ± 71.658
+     Ep length   : 201.2 steps
+     Sensors/step: 5.75
+
+  ★ New best: 0.8955
+  iter   241/2005  reward=-136.679
+  iter   242/2005  reward=-147.511
+  iter   243/2005  reward=-139.318
+  iter   244/2005  reward=-134.756
+  iter   245/2005  reward=-131.890
+  iter   246/2005  reward=-126.710
+  iter   247/2005  reward=-115.636
+  iter   248/2005  reward=-118.503
+  iter   249/2005  reward=-116.937
+  iter   250/2005  reward=-112.830
+
+  ── EVAL @ iter 250 ──
+     Accuracy    : 0.8893  (88.93%)
+     Reward      : -67.847 ± 72.507
+     Ep length   : 216.1 steps
+     Sensors/step: 5.52
+
+  iter   251/2005  reward=-104.467
+  iter   252/2005  reward=-102.596
+  iter   253/2005  reward= -97.536
+  iter   254/2005  reward= -97.573
+  iter   255/2005  reward= -98.722
+  iter   256/2005  reward=-105.674
+  iter   257/2005  reward=-102.928
+  iter   258/2005  reward=-102.409
+  iter   259/2005  reward=-108.614
+  iter   260/2005  reward=-113.911
+
+  ── EVAL @ iter 260 ──
+     Accuracy    : 0.9022  (90.22%)
+     Reward      : -62.375 ± 79.302
+     Ep length   : 211.6 steps
+     Sensors/step: 5.28
+
+  ★ New best: 0.9022
+  iter   261/2005  reward=-120.582
+  iter   262/2005  reward=-120.528
+  iter   263/2005  reward=-120.546
+  iter   264/2005  reward=-118.607
+  iter   265/2005  reward=-105.185
+  iter   266/2005  reward= -96.154
+  iter   267/2005  reward= -97.861
+  iter   268/2005  reward= -98.870
+  iter   269/2005  reward=-101.379
+  iter   270/2005  reward=-102.199
+
+  ── EVAL @ iter 270 ──
+     Accuracy    : 0.9337  (93.37%)
+     Reward      : -28.827 ± 46.725
+     Ep length   : 208.6 steps
+     Sensors/step: 5.40
+
+  ★ New best: 0.9337
+  iter   271/2005  reward=-111.954
+  iter   272/2005  reward=-111.712
+  iter   273/2005  reward=-110.368
+  iter   274/2005  reward=-112.521
+  iter   275/2005  reward=-107.627
+  iter   276/2005  reward=-111.037
+  iter   277/2005  reward=-108.789
+  iter   278/2005  reward=-102.272
+  iter   279/2005  reward=-100.060
+  iter   280/2005  reward= -99.867
+
+  ── EVAL @ iter 280 ──
+     Accuracy    : 0.9318  (93.18%)
+     Reward      : -30.391 ± 44.350
+     Ep length   : 167.5 steps
+     Sensors/step: 5.49
+
+  iter   281/2005  reward= -83.745
+  iter   282/2005  reward= -80.912
+  iter   283/2005  reward= -83.120
+  iter   284/2005  reward= -83.096
+  iter   285/2005  reward= -85.142
+  iter   286/2005  reward= -86.248
+  iter   287/2005  reward= -92.563
+  iter   288/2005  reward= -93.437
+  iter   289/2005  reward= -88.664
+  iter   290/2005  reward= -82.639
+
+  ── EVAL @ iter 290 ──
+     Accuracy    : 0.9333  (93.33%)
+     Reward      : -31.815 ± 41.527
+     Ep length   : 185.6 steps
+     Sensors/step: 5.43
+
+  iter   291/2005  reward= -76.776
+  iter   292/2005  reward= -72.671
+  iter   293/2005  reward= -66.446
+  iter   294/2005  reward= -71.242
+  iter   295/2005  reward= -70.760
+  iter   296/2005  reward= -77.681
+  iter   297/2005  reward= -79.212
+  iter   298/2005  reward= -78.306
+  iter   299/2005  reward= -81.217
+  iter   300/2005  reward= -74.768
+
+  ── EVAL @ iter 300 ──
+     Accuracy    : 0.9318  (93.18%)
+     Reward      : -35.326 ± 51.469
+     Ep length   : 204.3 steps
+     Sensors/step: 5.42
+
+  iter   301/2005  reward= -67.576
+  iter   302/2005  reward= -61.428
+  iter   303/2005  reward= -63.662
+  iter   304/2005  reward= -64.361
+  iter   305/2005  reward= -67.417
+  iter   306/2005  reward= -68.462
+  iter   307/2005  reward= -73.468
+  iter   308/2005  reward= -72.462
+  iter   309/2005  reward= -74.342
+  iter   310/2005  reward= -71.608
+
+  ── EVAL @ iter 310 ──
+     Accuracy    : 0.9403  (94.03%)
+     Reward      : -24.472 ± 45.905
+     Ep length   : 184.9 steps
+     Sensors/step: 5.28
+
+  ★ New best: 0.9403
+  iter   311/2005  reward= -75.670
+  iter   312/2005  reward= -70.392
+  iter   313/2005  reward= -71.528
+  iter   314/2005  reward= -70.645
+  iter   315/2005  reward= -62.212
+  iter   316/2005  reward= -64.654
+  iter   317/2005  reward= -65.497
+  iter   318/2005  reward= -64.004
+  iter   319/2005  reward= -65.030
+  iter   320/2005  reward= -66.601
+
+  ── EVAL @ iter 320 ──
+     Accuracy    : 0.9485  (94.85%)
+     Reward      : -12.809 ± 40.935
+     Ep length   : 166.2 steps
+     Sensors/step: 5.27
+
+  ★ New best: 0.9485
+  iter   321/2005  reward= -69.772
+  iter   322/2005  reward= -67.787
+  iter   323/2005  reward= -70.878
+  iter   324/2005  reward= -72.875
+  iter   325/2005  reward= -77.424
+  iter   326/2005  reward= -69.241
+  iter   327/2005  reward= -62.797
+  iter   328/2005  reward= -65.932
+  iter   329/2005  reward= -63.469
+  iter   330/2005  reward= -65.342
+
+  ── EVAL @ iter 330 ──
+     Accuracy    : 0.9397  (93.97%)
+     Reward      : -14.636 ± 41.335
+     Ep length   : 172.0 steps
+     Sensors/step: 5.19
+
+  iter   331/2005  reward= -61.613
+  iter   332/2005  reward= -60.894
+  iter   333/2005  reward= -64.244
+  iter   334/2005  reward= -59.135
+  iter   335/2005  reward= -60.189
+  iter   336/2005  reward= -58.933
+  iter   337/2005  reward= -63.064
+  iter   338/2005  reward= -61.545
+  iter   339/2005  reward= -64.111
+  iter   340/2005  reward= -61.622
+
+  ── EVAL @ iter 340 ──
+     Accuracy    : 0.9362  (93.62%)
+     Reward      : -16.744 ± 46.630
+     Ep length   : 184.2 steps
+     Sensors/step: 5.15
+
+  iter   341/2005  reward= -62.191
+  iter   342/2005  reward= -58.947
+  iter   343/2005  reward= -51.252
+  iter   344/2005  reward= -49.592
+  iter   345/2005  reward= -46.450
+  iter   346/2005  reward= -48.016
+  iter   347/2005  reward= -55.092
+  iter   348/2005  reward= -54.968
+  iter   349/2005  reward= -57.962
+  iter   350/2005  reward= -63.206
+
+  ── EVAL @ iter 350 ──
+     Accuracy    : 0.9325  (93.25%)
+     Reward      : -18.366 ± 45.894
+     Ep length   : 176.3 steps
+     Sensors/step: 5.11
+
+  iter   351/2005  reward= -61.782
+  iter   352/2005  reward= -59.193
+  iter   353/2005  reward= -61.510
+  iter   354/2005  reward= -60.305
+  iter   355/2005  reward= -59.654
+  iter   356/2005  reward= -57.682
+  iter   357/2005  reward= -56.936
+  iter   358/2005  reward= -52.376
+  iter   359/2005  reward= -51.523
+  iter   360/2005  reward= -54.003
+
+  ── EVAL @ iter 360 ──
+     Accuracy    : 0.9480  (94.80%)
+     Reward      : -10.807 ± 43.827
+     Ep length   : 198.6 steps
+     Sensors/step: 5.13
+
+  iter   361/2005  reward= -53.049
+  iter   362/2005  reward= -52.624
+  iter   363/2005  reward= -50.932
+  iter   364/2005  reward= -45.940
+  iter   365/2005  reward= -44.962
+  iter   366/2005  reward= -48.707
+  iter   367/2005  reward= -44.310
+  iter   368/2005  reward= -46.525
+  iter   369/2005  reward= -46.574
+  iter   370/2005  reward= -49.566
+
+  ── EVAL @ iter 370 ──
+     Accuracy    : 0.9488  (94.88%)
+     Reward      : -6.052 ± 47.467
+     Ep length   : 203.3 steps
+     Sensors/step: 5.08
+
+  ★ New best: 0.9488
+  iter   371/2005  reward= -46.587
+  iter   372/2005  reward= -43.528
+  iter   373/2005  reward= -47.764
+  iter   374/2005  reward= -44.454
+  iter   375/2005  reward= -43.031
+  iter   376/2005  reward= -45.698
+  iter   377/2005  reward= -46.596
+  iter   378/2005  reward= -45.377
+  iter   379/2005  reward= -49.414
+  iter   380/2005  reward= -51.364
+
+  ── EVAL @ iter 380 ──
+     Accuracy    : 0.9548  (95.48%)
+     Reward      : +0.786 ± 52.131
+     Ep length   : 218.8 steps
+     Sensors/step: 5.23
+
+  ★ New best: 0.9548
+  iter   381/2005  reward= -49.593
+  iter   382/2005  reward= -47.628
+  iter   383/2005  reward= -48.684
+  iter   384/2005  reward= -40.457
+  iter   385/2005  reward= -35.633
+  iter   386/2005  reward= -37.374
+  iter   387/2005  reward= -34.802
+  iter   388/2005  reward= -25.739
+  iter   389/2005  reward= -31.684
+  iter   390/2005  reward= -32.370
+
+  ── EVAL @ iter 390 ──
+     Accuracy    : 0.9315  (93.15%)
+     Reward      : -27.753 ± 44.699
+     Ep length   : 187.1 steps
+     Sensors/step: 5.14
+
+  iter   391/2005  reward= -32.358
+  iter   392/2005  reward= -36.881
+  iter   393/2005  reward= -41.340
+  iter   394/2005  reward= -41.554
+  iter   395/2005  reward= -47.489
+  iter   396/2005  reward= -46.065
+  iter   397/2005  reward= -40.680
+  iter   398/2005  reward= -41.120
+  iter   399/2005  reward= -39.494
+  iter   400/2005  reward= -35.289
+
+  ── EVAL @ iter 400 ──
+     Accuracy    : 0.9505  (95.05%)
+     Reward      : -11.743 ± 48.704
+     Ep length   : 221.8 steps
+     Sensors/step: 5.17
+
+  iter   401/2005  reward= -40.983
+  iter   402/2005  reward= -41.271
+  iter   403/2005  reward= -39.490
+  iter   404/2005  reward= -39.252
+  iter   405/2005  reward= -42.056
+  iter   406/2005  reward= -41.233
+  iter   407/2005  reward= -41.320
+  iter   408/2005  reward= -36.610
+  iter   409/2005  reward= -33.540
+  iter   410/2005  reward= -31.350
+
+  ── EVAL @ iter 410 ──
+     Accuracy    : 0.9437  (94.37%)
+     Reward      : -18.576 ± 42.205
+     Ep length   : 172.0 steps
+     Sensors/step: 5.25
+
+  iter   411/2005  reward= -26.920
+  iter   412/2005  reward= -27.438
+  iter   413/2005  reward= -31.561
+  iter   414/2005  reward= -37.415
+  iter   415/2005  reward= -40.097
+  iter   416/2005  reward= -45.729
+  iter   417/2005  reward= -42.645
+  iter   418/2005  reward= -40.722
+  iter   419/2005  reward= -38.738
+  iter   420/2005  reward= -35.554
+
+  ── EVAL @ iter 420 ──
+     Accuracy    : 0.9587  (95.87%)
+     Reward      : +1.734 ± 44.664
+     Ep length   : 188.2 steps
+     Sensors/step: 4.99
+
+  ★ New best: 0.9587
+  iter   421/2005  reward= -31.492
+  iter   422/2005  reward= -35.290
+  iter   423/2005  reward= -34.277
+  iter   424/2005  reward= -32.326
+  iter   425/2005  reward= -35.944
+  iter   426/2005  reward= -37.444
+  iter   427/2005  reward= -33.790
+  iter   428/2005  reward= -28.865
+  iter   429/2005  reward= -29.024
+  iter   430/2005  reward= -28.704
+
+  ── EVAL @ iter 430 ──
+     Accuracy    : 0.9492  (94.92%)
+     Reward      : -7.187 ± 45.574
+     Ep length   : 205.8 steps
+     Sensors/step: 5.11
+
+  iter   431/2005  reward= -30.705
+  iter   432/2005  reward= -33.483
+  iter   433/2005  reward= -35.841
+  iter   434/2005  reward= -31.548
+  iter   435/2005  reward= -34.980
+  iter   436/2005  reward= -29.660
+  iter   437/2005  reward= -28.708
+  iter   438/2005  reward= -31.538
+  iter   439/2005  reward= -30.376
+  iter   440/2005  reward= -32.656
+
+  ── EVAL @ iter 440 ──
+     Accuracy    : 0.9421  (94.21%)
+     Reward      : -10.896 ± 43.994
+     Ep length   : 171.8 steps
+     Sensors/step: 4.91
+
+  iter   441/2005  reward= -32.119
+  iter   442/2005  reward= -30.630
+  iter   443/2005  reward= -34.218
+  iter   444/2005  reward= -33.010
+  iter   445/2005  reward= -29.566
+  iter   446/2005  reward= -32.055
+  iter   447/2005  reward= -33.821
+  iter   448/2005  reward= -26.045
+  iter   449/2005  reward= -27.947
+  iter   450/2005  reward= -28.536
+
+  ── EVAL @ iter 450 ──
+     Accuracy    : 0.9552  (95.52%)
+     Reward      : -2.017 ± 46.896
+     Ep length   : 206.2 steps
+     Sensors/step: 4.97
+
+  iter   451/2005  reward= -26.364
+  iter   452/2005  reward= -27.999
+  iter   453/2005  reward= -30.466
+  iter   454/2005  reward= -28.165
+  iter   455/2005  reward= -24.054
+  iter   456/2005  reward= -28.771
+  iter   457/2005  reward= -28.311
+  iter   458/2005  reward= -28.290
+  iter   459/2005  reward= -24.876
+  iter   460/2005  reward= -21.910
+
+  ── EVAL @ iter 460 ──
+     Accuracy    : 0.9557  (95.57%)
+     Reward      : -3.489 ± 42.728
+     Ep length   : 196.9 steps
+     Sensors/step: 5.04
+
+  iter   461/2005  reward= -18.934
+  iter   462/2005  reward= -21.373
+  iter   463/2005  reward= -21.376
+  iter   464/2005  reward= -18.299
+  iter   465/2005  reward= -19.672
+  iter   466/2005  reward= -20.242
+  iter   467/2005  reward= -18.917
+  iter   468/2005  reward= -23.564
+  iter   469/2005  reward= -24.521
+  iter   470/2005  reward= -21.335
+
+  ── EVAL @ iter 470 ──
+     Accuracy    : 0.9648  (96.48%)
+     Reward      : +7.824 ± 44.903
+     Ep length   : 186.6 steps
+     Sensors/step: 4.93
+
+  ★ New best: 0.9648
+  iter   471/2005  reward= -18.897
+  iter   472/2005  reward= -18.818
+  iter   473/2005  reward= -16.522
+  iter   474/2005  reward= -13.570
+  iter   475/2005  reward= -15.923
+  iter   476/2005  reward= -17.618
+  iter   477/2005  reward= -14.561
+  iter   478/2005  reward= -13.750
+  iter   479/2005  reward= -11.531
+  iter   480/2005  reward= -11.818
+
+  ── EVAL @ iter 480 ──
+     Accuracy    : 0.9647  (96.47%)
+     Reward      : +8.050 ± 45.274
+     Ep length   : 192.6 steps
+     Sensors/step: 5.08
+
+  iter   481/2005  reward=  -9.922
+  iter   482/2005  reward=  -9.479
+  iter   483/2005  reward= -13.229
+  iter   484/2005  reward= -13.632
+  iter   485/2005  reward= -13.867
+  iter   486/2005  reward= -13.908
+  iter   487/2005  reward= -15.499
+  iter   488/2005  reward= -15.035
+  iter   489/2005  reward= -19.859
+  iter   490/2005  reward= -16.920
+
+  ── EVAL @ iter 490 ──
+     Accuracy    : 0.9649  (96.49%)
+     Reward      : +9.192 ± 42.241
+     Ep length   : 191.1 steps
+     Sensors/step: 4.95
+
+  ★ New best: 0.9649
+  iter   491/2005  reward= -16.370
+  iter   492/2005  reward= -13.330
+  iter   493/2005  reward= -12.009
+  iter   494/2005  reward=  -9.515
+  iter   495/2005  reward= -12.550
+  iter   496/2005  reward= -13.851
+  iter   497/2005  reward= -17.019
+  iter   498/2005  reward= -15.462
+  iter   499/2005  reward= -13.074
+  iter   500/2005  reward= -12.022
+
+  ── EVAL @ iter 500 ──
+     Accuracy    : 0.9625  (96.25%)
+     Reward      : +0.484 ± 38.636
+     Ep length   : 158.2 steps
+     Sensors/step: 5.12
+
+  iter   501/2005  reward=  -6.822
+  iter   502/2005  reward=  -4.724
+  iter   503/2005  reward=  +1.448
+  iter   504/2005  reward=  -0.661
+  iter   505/2005  reward=  -0.662
+  iter   506/2005  reward=  -0.060
+  iter   507/2005  reward=  -0.486
+  iter   508/2005  reward=  -3.316
+  iter   509/2005  reward=  -3.454
+  iter   510/2005  reward=  -5.862
+
+  ── EVAL @ iter 510 ──
+     Accuracy    : 0.9623  (96.23%)
+     Reward      : +10.833 ± 51.840
+     Ep length   : 205.5 steps
+     Sensors/step: 4.91
+
+  iter   511/2005  reward=  -6.259
+  iter   512/2005  reward= -11.894
+  iter   513/2005  reward=  -8.777
+  iter   514/2005  reward=  -6.807
+  iter   515/2005  reward=  -8.306
+  iter   516/2005  reward=  -8.681
+  iter   517/2005  reward=  -7.450
+  iter   518/2005  reward= -11.485
+  iter   519/2005  reward=  -9.012
+  iter   520/2005  reward= -10.209
+
+  ── EVAL @ iter 520 ──
+     Accuracy    : 0.9637  (96.37%)
+     Reward      : +19.580 ± 44.480
+     Ep length   : 203.7 steps
+     Sensors/step: 4.69
+
+  iter   521/2005  reward=  -8.153
+  iter   522/2005  reward=  -6.662
+  iter   523/2005  reward=  -5.156
+  iter   524/2005  reward=  -4.089
+  iter   525/2005  reward=  -6.867
+  iter   526/2005  reward=  -6.648
+  iter   527/2005  reward=  -7.694
+  iter   528/2005  reward=  -6.907
+  iter   529/2005  reward=  -6.102
+  iter   530/2005  reward=  -4.567
+
+  ── EVAL @ iter 530 ──
+     Accuracy    : 0.9596  (95.96%)
+     Reward      : +12.870 ± 55.188
+     Ep length   : 200.8 steps
+     Sensors/step: 4.73
+
+  iter   531/2005  reward=  -1.447
+  iter   532/2005  reward=  -1.515
+  iter   533/2005  reward=  +3.254
+  iter   534/2005  reward=  +1.006
+  iter   535/2005  reward=  -2.162
+  iter   536/2005  reward=  -3.380
+  iter   537/2005  reward=  -5.103
+  iter   538/2005  reward=  -3.181
+  iter   539/2005  reward=  -4.836
+  iter   540/2005  reward=  +0.314
+
+  ── EVAL @ iter 540 ──
+     Accuracy    : 0.9618  (96.18%)
+     Reward      : +14.481 ± 43.394
+     Ep length   : 182.1 steps
+     Sensors/step: 4.67
+
+  iter   541/2005  reward=  +1.099
+  iter   542/2005  reward=  -0.137
+  iter   543/2005  reward=  +4.478
+  iter   544/2005  reward=  +6.157
+  iter   545/2005  reward=  +5.255
+  iter   546/2005  reward=  +5.719
+  iter   547/2005  reward=  +6.933
+  iter   548/2005  reward=  +1.817
+  iter   549/2005  reward=  +3.602
+  iter   550/2005  reward=  +5.887
+
+  ── EVAL @ iter 550 ──
+     Accuracy    : 0.9674  (96.74%)
+     Reward      : +20.456 ± 50.628
+     Ep length   : 200.9 steps
+     Sensors/step: 4.70
+
+  ★ New best: 0.9674
+  iter   551/2005  reward=  +6.498
+  iter   552/2005  reward=  +5.494
+  iter   553/2005  reward=  +0.255
+  iter   554/2005  reward=  +0.012
+  iter   555/2005  reward=  -2.062
+  iter   556/2005  reward=  +0.048
+  iter   557/2005  reward=  +2.731
+  iter   558/2005  reward=  +1.728
+  iter   559/2005  reward=  +4.134
+  iter   560/2005  reward=  +3.242
+
+  ── EVAL @ iter 560 ──
+     Accuracy    : 0.9698  (96.98%)
+     Reward      : +17.808 ± 48.392
+     Ep length   : 182.0 steps
+     Sensors/step: 4.78
+
+  ★ New best: 0.9698
+  iter   561/2005  reward=  +4.917
+  iter   562/2005  reward=  +7.360
+  iter   563/2005  reward=  +8.095
+  iter   564/2005  reward= +10.997
+  iter   565/2005  reward= +11.008
+  iter   566/2005  reward= +12.656
+  iter   567/2005  reward= +11.368
+  iter   568/2005  reward= +13.719
+  iter   569/2005  reward= +10.658
+  iter   570/2005  reward= +13.083
+
+  ── EVAL @ iter 570 ──
+     Accuracy    : 0.9668  (96.68%)
+     Reward      : +20.576 ± 59.042
+     Ep length   : 197.7 steps
+     Sensors/step: 4.75
+
+  iter   571/2005  reward= +15.178
+  iter   572/2005  reward= +12.699
+  iter   573/2005  reward= +12.323
+  iter   574/2005  reward= +11.381
+  iter   575/2005  reward=  +9.920
+  iter   576/2005  reward=  +5.467
+  iter   577/2005  reward=  +5.440
+  iter   578/2005  reward=  +2.883
+  iter   579/2005  reward=  +5.455
+  iter   580/2005  reward= +12.698
+
+  ── EVAL @ iter 580 ──
+     Accuracy    : 0.9589  (95.89%)
+     Reward      : +10.390 ± 49.554
+     Ep length   : 186.6 steps
+     Sensors/step: 4.77
+
+  iter   581/2005  reward= +11.070
+  iter   582/2005  reward= +14.510
+  iter   583/2005  reward=  +9.930
+  iter   584/2005  reward=  +0.420
+  iter   585/2005  reward=  +1.622
+  iter   586/2005  reward=  +1.088
+  iter   587/2005  reward=  +1.069
+  iter   588/2005  reward=  +5.735
+  iter   589/2005  reward= +11.478
+  iter   590/2005  reward= +14.409
+
+  ── EVAL @ iter 590 ──
+     Accuracy    : 0.9617  (96.17%)
+     Reward      : +12.584 ± 51.880
+     Ep length   : 168.3 steps
+     Sensors/step: 4.65
+
+  iter   591/2005  reward= +12.495
+  iter   592/2005  reward= +12.322
+  iter   593/2005  reward= +11.921
+  iter   594/2005  reward= +10.958
+  iter   595/2005  reward= +11.744
+  iter   596/2005  reward= +17.836
+  iter   597/2005  reward= +20.473
+  iter   598/2005  reward= +18.436
+  iter   599/2005  reward= +18.434
+  iter   600/2005  reward= +20.078
+
+  ── EVAL @ iter 600 ──
+     Accuracy    : 0.9654  (96.54%)
+     Reward      : +22.129 ± 45.873
+     Ep length   : 196.1 steps
+     Sensors/step: 4.57
+
+  iter   601/2005  reward= +16.791
+  iter   602/2005  reward= +14.705
+  iter   603/2005  reward= +18.982
+  iter   604/2005  reward= +18.446
+  iter   605/2005  reward= +19.125
+  iter   606/2005  reward= +17.503
+  iter   607/2005  reward= +18.888
+  iter   608/2005  reward= +15.477
+  iter   609/2005  reward= +15.534
+  iter   610/2005  reward= +16.215
+
+  ── EVAL @ iter 610 ──
+     Accuracy    : 0.9633  (96.33%)
+     Reward      : +16.403 ± 55.111
+     Ep length   : 214.4 steps
+     Sensors/step: 4.63
+
+  iter   611/2005  reward= +13.054
+  iter   612/2005  reward= +12.844
+  iter   613/2005  reward= +14.069
+  iter   614/2005  reward=  +7.064
+  iter   615/2005  reward=  +9.401
+  iter   616/2005  reward= +13.098
+  iter   617/2005  reward= +17.880
+  iter   618/2005  reward= +18.224
+  iter   619/2005  reward= +23.150
+  iter   620/2005  reward= +26.364
+
+  ── EVAL @ iter 620 ──
+     Accuracy    : 0.9688  (96.88%)
+     Reward      : +22.168 ± 51.873
+     Ep length   : 194.5 steps
+     Sensors/step: 4.67
+
+  iter   621/2005  reward= +29.708
+  iter   622/2005  reward= +28.877
+  iter   623/2005  reward= +26.302
+  iter   624/2005  reward= +25.916
+  iter   625/2005  reward= +24.708
+  iter   626/2005  reward= +18.287
+  iter   627/2005  reward= +22.961
+  iter   628/2005  reward= +25.471
+  iter   629/2005  reward= +25.169
+  iter   630/2005  reward= +27.513
+
+  ── EVAL @ iter 630 ──
+     Accuracy    : 0.9691  (96.91%)
+     Reward      : +27.612 ± 58.338
+     Ep length   : 218.2 steps
+     Sensors/step: 4.66
+
+  iter   631/2005  reward= +23.256
+  iter   632/2005  reward= +17.407
+  iter   633/2005  reward= +19.186
+  iter   634/2005  reward= +21.361
+  iter   635/2005  reward= +21.736
+  iter   636/2005  reward= +23.561
+  iter   637/2005  reward= +20.318
+  iter   638/2005  reward= +21.615
+  iter   639/2005  reward= +23.095
+  iter   640/2005  reward= +19.755
+
+  ── EVAL @ iter 640 ──
+     Accuracy    : 0.9698  (96.98%)
+     Reward      : +21.991 ± 50.893
+     Ep length   : 189.5 steps
+     Sensors/step: 4.75
+
+  iter   641/2005  reward= +23.999
+  iter   642/2005  reward= +26.161
+  iter   643/2005  reward= +24.343
+  iter   644/2005  reward= +20.932
+  iter   645/2005  reward= +23.378
+  iter   646/2005  reward= +22.288
+  iter   647/2005  reward= +17.646
+  iter   648/2005  reward= +16.570
+  iter   649/2005  reward= +20.151
+  iter   650/2005  reward= +21.355
+
+  ── EVAL @ iter 650 ──
+     Accuracy    : 0.9690  (96.90%)
+     Reward      : +26.330 ± 51.993
+     Ep length   : 207.3 steps
+     Sensors/step: 4.62
+
+  iter   651/2005  reward= +24.904
+  iter   652/2005  reward= +26.874
+  iter   653/2005  reward= +27.416
+  iter   654/2005  reward= +23.822
+  iter   655/2005  reward= +25.726
+  iter   656/2005  reward= +16.199
+  iter   657/2005  reward= +11.555
+  iter   658/2005  reward= +10.800
+  iter   659/2005  reward= +16.443
+  iter   660/2005  reward= +17.403
+
+  ── EVAL @ iter 660 ──
+     Accuracy    : 0.9736  (97.36%)
+     Reward      : +24.617 ± 48.471
+     Ep length   : 182.1 steps
+     Sensors/step: 4.58
+
+  ★ New best: 0.9736
+  iter   661/2005  reward= +20.084
+  iter   662/2005  reward= +18.475
+  iter   663/2005  reward= +11.530
+  iter   664/2005  reward= +13.557
+  iter   665/2005  reward= +12.826
+  iter   666/2005  reward= +16.801
+  iter   667/2005  reward= +17.510
+  iter   668/2005  reward= +22.300
+  iter   669/2005  reward= +20.155
+  iter   670/2005  reward= +23.225
+
+  ── EVAL @ iter 670 ──
+     Accuracy    : 0.9739  (97.39%)
+     Reward      : +32.734 ± 56.974
+     Ep length   : 209.5 steps
+     Sensors/step: 4.51
+
+  ★ New best: 0.9739
+  iter   671/2005  reward= +21.229
+  iter   672/2005  reward= +26.013
+  iter   673/2005  reward= +23.332
+  iter   674/2005  reward= +26.710
+  iter   675/2005  reward= +29.557
+  iter   676/2005  reward= +28.523
+  iter   677/2005  reward= +28.093
+  iter   678/2005  reward= +33.039
+  iter   679/2005  reward= +28.466
+  iter   680/2005  reward= +27.384
+
+  ── EVAL @ iter 680 ──
+     Accuracy    : 0.9718  (97.18%)
+     Reward      : +29.847 ± 60.422
+     Ep length   : 203.5 steps
+     Sensors/step: 4.68
+
+  iter   681/2005  reward= +29.498
+  iter   682/2005  reward= +27.258
+  iter   683/2005  reward= +23.314
+  iter   684/2005  reward= +27.189
+  iter   685/2005  reward= +30.895
+  iter   686/2005  reward= +27.150
+  iter   687/2005  reward= +30.107
+  iter   688/2005  reward= +29.048
+  iter   689/2005  reward= +26.890
+  iter   690/2005  reward= +25.090
+
+  ── EVAL @ iter 690 ──
+     Accuracy    : 0.9723  (97.23%)
+     Reward      : +36.566 ± 64.014
+     Ep length   : 218.4 steps
+     Sensors/step: 4.44
+
+  iter   691/2005  reward= +24.862
+  iter   692/2005  reward= +20.004
+  iter   693/2005  reward= +21.210
+  iter   694/2005  reward= +18.125
+  iter   695/2005  reward= +18.622
+  iter   696/2005  reward= +21.743
+  iter   697/2005  reward= +22.429
+  iter   698/2005  reward= +27.249
+  iter   699/2005  reward= +30.548
+  iter   700/2005  reward= +36.216
+
+  ── EVAL @ iter 700 ──
+     Accuracy    : 0.9676  (96.76%)
+     Reward      : +20.058 ± 51.370
+     Ep length   : 165.2 steps
+     Sensors/step: 4.51
+
+  iter   701/2005  reward= +29.572
+  iter   702/2005  reward= +29.249
+  iter   703/2005  reward= +28.092
+  iter   704/2005  reward= +30.533
+  iter   705/2005  reward= +29.852
+  iter   706/2005  reward= +39.261
+  iter   707/2005  reward= +34.985
+  iter   708/2005  reward= +37.407
+  iter   709/2005  reward= +33.158
+  iter   710/2005  reward= +31.168
+
+  ── EVAL @ iter 710 ──
+     Accuracy    : 0.9715  (97.15%)
+     Reward      : +27.745 ± 56.617
+     Ep length   : 187.9 steps
+     Sensors/step: 4.50
+
+  iter   711/2005  reward= +32.612
+  iter   712/2005  reward= +30.128
+  iter   713/2005  reward= +28.618
+  iter   714/2005  reward= +29.116
+  iter   715/2005  reward= +24.036
+  iter   716/2005  reward= +22.232
+  iter   717/2005  reward= +19.831
+  iter   718/2005  reward= +19.174
+  iter   719/2005  reward= +22.001
+  iter   720/2005  reward= +24.015
+
+  ── EVAL @ iter 720 ──
+     Accuracy    : 0.9771  (97.71%)
+     Reward      : +35.437 ± 55.934
+     Ep length   : 205.2 steps
+     Sensors/step: 4.45
+
+  ★ New best: 0.9771
+  iter   721/2005  reward= +20.062
+  iter   722/2005  reward= +26.346
+  iter   723/2005  reward= +28.785
+  iter   724/2005  reward= +22.404
+  iter   725/2005  reward= +24.119
+  iter   726/2005  reward= +28.100
+  iter   727/2005  reward= +22.672
+  iter   728/2005  reward= +25.061
+  iter   729/2005  reward= +28.960
+  iter   730/2005  reward= +31.948
+
+  ── EVAL @ iter 730 ──
+     Accuracy    : 0.9739  (97.39%)
+     Reward      : +42.105 ± 67.896
+     Ep length   : 229.4 steps
+     Sensors/step: 4.41
+
+  iter   731/2005  reward= +32.146
+  iter   732/2005  reward= +33.720
+  iter   733/2005  reward= +29.478
+  iter   734/2005  reward= +23.716
+  iter   735/2005  reward= +27.253
+  iter   736/2005  reward= +27.379
+  iter   737/2005  reward= +28.149
+  iter   738/2005  reward= +28.029
+  iter   739/2005  reward= +26.022
+  iter   740/2005  reward= +29.308
+
+  ── EVAL @ iter 740 ──
+     Accuracy    : 0.9759  (97.59%)
+     Reward      : +29.934 ± 53.170
+     Ep length   : 184.3 steps
+     Sensors/step: 4.53
+
+  iter   741/2005  reward= +27.890
+  iter   742/2005  reward= +33.313
+  iter   743/2005  reward= +37.180
+  iter   744/2005  reward= +38.362
+  iter   745/2005  reward= +39.476
+  iter   746/2005  reward= +37.697
+  iter   747/2005  reward= +27.122
+  iter   748/2005  reward= +25.465
+  iter   749/2005  reward= +30.831
+  iter   750/2005  reward= +30.725
+
+  ── EVAL @ iter 750 ──
+     Accuracy    : 0.9586  (95.86%)
+     Reward      : +24.041 ± 59.520
+     Ep length   : 217.2 steps
+     Sensors/step: 4.47
+
+  iter   751/2005  reward= +27.946
+  iter   752/2005  reward= +29.788
+  iter   753/2005  reward= +30.990
+  iter   754/2005  reward= +29.361
+  iter   755/2005  reward= +25.072
+  iter   756/2005  reward= +29.280
+  iter   757/2005  reward= +31.098
+  iter   758/2005  reward= +29.579
+  iter   759/2005  reward= +31.309
+  iter   760/2005  reward= +31.515
+
+  ── EVAL @ iter 760 ──
+     Accuracy    : 0.9780  (97.80%)
+     Reward      : +38.827 ± 54.798
+     Ep length   : 206.1 steps
+     Sensors/step: 4.35
+
+  ★ New best: 0.9780
+  iter   761/2005  reward= +39.810
+  iter   762/2005  reward= +41.206
+  iter   763/2005  reward= +44.197
+  iter   764/2005  reward= +43.649
+  iter   765/2005  reward= +36.426
+  iter   766/2005  reward= +24.024
+  iter   767/2005  reward= +21.935
+  iter   768/2005  reward= +24.048
+  iter   769/2005  reward= +26.396
+  iter   770/2005  reward= +26.037
+
+  ── EVAL @ iter 770 ──
+     Accuracy    : 0.9737  (97.37%)
+     Reward      : +36.582 ± 56.675
+     Ep length   : 207.6 steps
+     Sensors/step: 4.40
+
+  iter   771/2005  reward= +30.104
+  iter   772/2005  reward= +37.075
+  iter   773/2005  reward= +35.199
+  iter   774/2005  reward= +34.651
+  iter   775/2005  reward= +36.204
+  iter   776/2005  reward= +41.499
+  iter   777/2005  reward= +25.392
+  iter   778/2005  reward= +30.699
+  iter   779/2005  reward= +36.930
+  iter   780/2005  reward= +34.117
+
+  ── EVAL @ iter 780 ──
+     Accuracy    : 0.9769  (97.69%)
+     Reward      : +33.864 ± 54.011
+     Ep length   : 197.8 steps
+     Sensors/step: 4.50
+
+  iter   781/2005  reward= +32.199
+  iter   782/2005  reward= +35.256
+  iter   783/2005  reward= +31.493
+  iter   784/2005  reward= +32.435
+  iter   785/2005  reward= +34.848
+  iter   786/2005  reward= +33.038
+  iter   787/2005  reward= +32.278
+  iter   788/2005  reward= +37.349
+  iter   789/2005  reward= +38.408
+  iter   790/2005  reward= +39.864
+
+  ── EVAL @ iter 790 ──
+     Accuracy    : 0.9772  (97.72%)
+     Reward      : +39.782 ± 63.124
+     Ep length   : 212.1 steps
+     Sensors/step: 4.48
+
+  iter   791/2005  reward= +37.041
+  iter   792/2005  reward= +36.832
+  iter   793/2005  reward= +34.203
+  iter   794/2005  reward= +34.632
+  iter   795/2005  reward= +38.078
+  iter   796/2005  reward= +46.154
+  iter   797/2005  reward= +43.718
+  iter   798/2005  reward= +43.051
+  iter   799/2005  reward= +35.935
+  iter   800/2005  reward= +36.276
+
+  ── EVAL @ iter 800 ──
+     Accuracy    : 0.9783  (97.83%)
+     Reward      : +41.141 ± 65.611
+     Ep length   : 207.1 steps
+     Sensors/step: 4.36
+
+  ★ New best: 0.9783
+  iter   801/2005  reward= +29.962
+  iter   802/2005  reward= +34.450
+  iter   803/2005  reward= +35.825
+  iter   804/2005  reward= +35.494
+  iter   805/2005  reward= +31.358
+  iter   806/2005  reward= +27.975
+  iter   807/2005  reward= +28.294
+  iter   808/2005  reward= +31.467
+  iter   809/2005  reward= +30.928
+  iter   810/2005  reward= +31.369
+
+  ── EVAL @ iter 810 ──
+     Accuracy    : 0.9740  (97.40%)
+     Reward      : +32.466 ± 50.602
+     Ep length   : 190.3 steps
+     Sensors/step: 4.37
+
+  iter   811/2005  reward= +34.840
+  iter   812/2005  reward= +33.496
+  iter   813/2005  reward= +28.732
+  iter   814/2005  reward= +30.786
+  iter   815/2005  reward= +32.138
+  iter   816/2005  reward= +33.207
+  iter   817/2005  reward= +36.450
+  iter   818/2005  reward= +35.561
+  iter   819/2005  reward= +40.079
+  iter   820/2005  reward= +30.906
+
+  ── EVAL @ iter 820 ──
+     Accuracy    : 0.9821  (98.21%)
+     Reward      : +43.542 ± 66.826
+     Ep length   : 197.1 steps
+     Sensors/step: 4.45
+
+  ★ New best: 0.9821
+  iter   821/2005  reward= +35.643
+  iter   822/2005  reward= +32.672
+  iter   823/2005  reward= +37.197
+  iter   824/2005  reward= +40.894
+  iter   825/2005  reward= +42.784
+  iter   826/2005  reward= +43.900
+  iter   827/2005  reward= +45.220
+  iter   828/2005  reward= +42.506
+  iter   829/2005  reward= +37.194
+  iter   830/2005  reward= +40.261
+
+  ── EVAL @ iter 830 ──
+     Accuracy    : 0.9815  (98.15%)
+     Reward      : +41.570 ± 57.132
+     Ep length   : 198.2 steps
+     Sensors/step: 4.45
+
+  iter   831/2005  reward= +40.948
+  iter   832/2005  reward= +42.382
+  iter   833/2005  reward= +41.951
+  iter   834/2005  reward= +47.656
+  iter   835/2005  reward= +38.030
+  iter   836/2005  reward= +35.969
+  iter   837/2005  reward= +33.164
+  iter   838/2005  reward= +33.493
+  iter   839/2005  reward= +30.203
+  iter   840/2005  reward= +35.009
+
+  ── EVAL @ iter 840 ──
+     Accuracy    : 0.9790  (97.90%)
+     Reward      : +41.426 ± 63.085
+     Ep length   : 204.3 steps
+     Sensors/step: 4.45
+
+  iter   841/2005  reward= +31.345
+  iter   842/2005  reward= +32.007
+  iter   843/2005  reward= +32.033
+  iter   844/2005  reward= +38.540
+  iter   845/2005  reward= +41.772
+  iter   846/2005  reward= +40.216
+  iter   847/2005  reward= +40.481
+  iter   848/2005  reward= +41.441
+  iter   849/2005  reward= +41.642
+  iter   850/2005  reward= +34.258
+
+  ── EVAL @ iter 850 ──
+     Accuracy    : 0.9790  (97.90%)
+     Reward      : +39.473 ± 60.950
+     Ep length   : 185.2 steps
+     Sensors/step: 4.30
+
+  iter   851/2005  reward= +32.924
+  iter   852/2005  reward= +32.336
+  iter   853/2005  reward= +29.189
+  iter   854/2005  reward= +31.408
+  iter   855/2005  reward= +31.806
+  iter   856/2005  reward= +32.529
+  iter   857/2005  reward= +31.152
+  iter   858/2005  reward= +28.254
+  iter   859/2005  reward= +32.398
+  iter   860/2005  reward= +36.702
+
+  ── EVAL @ iter 860 ──
+     Accuracy    : 0.9768  (97.68%)
+     Reward      : +31.914 ± 66.590
+     Ep length   : 186.0 steps
+     Sensors/step: 4.55
+
+  iter   861/2005  reward= +37.749
+  iter   862/2005  reward= +38.711
+  iter   863/2005  reward= +41.161
+  iter   864/2005  reward= +42.348
+  iter   865/2005  reward= +37.836
+  iter   866/2005  reward= +41.540
+  iter   867/2005  reward= +44.533
+  iter   868/2005  reward= +43.020
+  iter   869/2005  reward= +40.394
+  iter   870/2005  reward= +43.021
+
+  ── EVAL @ iter 870 ──
+     Accuracy    : 0.9803  (98.03%)
+     Reward      : +36.758 ± 61.860
+     Ep length   : 193.8 steps
+     Sensors/step: 4.45
+
+  iter   871/2005  reward= +46.738
+  iter   872/2005  reward= +48.146
+  iter   873/2005  reward= +41.533
+  iter   874/2005  reward= +45.359
+  iter   875/2005  reward= +40.418
+  iter   876/2005  reward= +34.385
+  iter   877/2005  reward= +35.546
+  iter   878/2005  reward= +38.832
+  iter   879/2005  reward= +38.192
+  iter   880/2005  reward= +39.163
+
+  ── EVAL @ iter 880 ──
+     Accuracy    : 0.9793  (97.93%)
+     Reward      : +38.276 ± 54.541
+     Ep length   : 209.2 steps
+     Sensors/step: 4.55
+
+  iter   881/2005  reward= +36.349
+  iter   882/2005  reward= +40.660
+  iter   883/2005  reward= +39.154
+  iter   884/2005  reward= +44.966
+  iter   885/2005  reward= +39.760
+  iter   886/2005  reward= +45.940
+  iter   887/2005  reward= +40.740
+  iter   888/2005  reward= +37.528
+  iter   889/2005  reward= +35.120
+  iter   890/2005  reward= +38.607
+
+  ── EVAL @ iter 890 ──
+     Accuracy    : 0.9826  (98.26%)
+     Reward      : +41.131 ± 67.997
+     Ep length   : 190.2 steps
+     Sensors/step: 4.35
+
+  ★ New best: 0.9826
+  iter   891/2005  reward= +35.758
+  iter   892/2005  reward= +37.624
+  iter   893/2005  reward= +40.449
+  iter   894/2005  reward= +35.214
+  iter   895/2005  reward= +31.349
+  iter   896/2005  reward= +33.412
+  iter   897/2005  reward= +27.200
+  iter   898/2005  reward= +29.893
+  iter   899/2005  reward= +35.717
+  iter   900/2005  reward= +43.111
+
+  ── EVAL @ iter 900 ──
+     Accuracy    : 0.9830  (98.30%)
+     Reward      : +39.779 ± 64.005
+     Ep length   : 192.7 steps
+     Sensors/step: 4.43
+
+  ★ New best: 0.9830
+  iter   901/2005  reward= +45.968
+  iter   902/2005  reward= +48.331
+  iter   903/2005  reward= +49.186
+  iter   904/2005  reward= +45.256
+  iter   905/2005  reward= +46.487
+  iter   906/2005  reward= +47.529
+  iter   907/2005  reward= +53.123
+  iter   908/2005  reward= +52.083
+  iter   909/2005  reward= +55.249
+  iter   910/2005  reward= +55.057
+
+  ── EVAL @ iter 910 ──
+     Accuracy    : 0.9819  (98.19%)
+     Reward      : +30.298 ± 55.171
+     Ep length   : 155.1 steps
+     Sensors/step: 4.48
+
+  iter   911/2005  reward= +51.562
+  iter   912/2005  reward= +40.866
+  iter   913/2005  reward= +40.465
+  iter   914/2005  reward= +40.598
+  iter   915/2005  reward= +37.622
+  iter   916/2005  reward= +34.869
+  iter   917/2005  reward= +32.720
+  iter   918/2005  reward= +28.768
+  iter   919/2005  reward= +30.666
+  iter   920/2005  reward= +31.422
+
+  ── EVAL @ iter 920 ──
+     Accuracy    : 0.9811  (98.11%)
+     Reward      : +44.082 ± 60.125
+     Ep length   : 213.5 steps
+     Sensors/step: 4.36
+
+  iter   921/2005  reward= +28.332
+  iter   922/2005  reward= +30.117
+  iter   923/2005  reward= +35.408
+  iter   924/2005  reward= +33.256
+  iter   925/2005  reward= +37.662
+  iter   926/2005  reward= +35.474
+  iter   927/2005  reward= +34.842
+  iter   928/2005  reward= +33.472
+  iter   929/2005  reward= +26.849
+  iter   930/2005  reward= +30.441
+
+  ── EVAL @ iter 930 ──
+     Accuracy    : 0.9766  (97.66%)
+     Reward      : +28.815 ± 50.616
+     Ep length   : 175.8 steps
+     Sensors/step: 4.43
+
+  iter   931/2005  reward= +36.339
+  iter   932/2005  reward= +33.639
+  iter   933/2005  reward= +32.993
+  iter   934/2005  reward= +37.726
+  iter   935/2005  reward= +36.971
+  iter   936/2005  reward= +35.389
+  iter   937/2005  reward= +36.462
+  iter   938/2005  reward= +39.214
+  iter   939/2005  reward= +38.582
+  iter   940/2005  reward= +38.837
+
+  ── EVAL @ iter 940 ──
+     Accuracy    : 0.9792  (97.92%)
+     Reward      : +30.938 ± 56.090
+     Ep length   : 173.2 steps
+     Sensors/step: 4.39
+
+  iter   941/2005  reward= +36.358
+  iter   942/2005  reward= +41.270
+  iter   943/2005  reward= +34.947
+  iter   944/2005  reward= +31.030
+  iter   945/2005  reward= +32.477
+  iter   946/2005  reward= +35.600
+  iter   947/2005  reward= +35.345
+  iter   948/2005  reward= +41.375
+  iter   949/2005  reward= +46.430
+  iter   950/2005  reward= +44.376
+
+  ── EVAL @ iter 950 ──
+     Accuracy    : 0.9785  (97.85%)
+     Reward      : +32.738 ± 60.569
+     Ep length   : 174.7 steps
+     Sensors/step: 4.44
+
+  iter   951/2005  reward= +48.201
+  iter   952/2005  reward= +44.580
+  iter   953/2005  reward= +45.348
+  iter   954/2005  reward= +45.217
+  iter   955/2005  reward= +52.158
+  iter   956/2005  reward= +47.863
+  iter   957/2005  reward= +50.968
+  iter   958/2005  reward= +57.463
+  iter   959/2005  reward= +55.915
+  iter   960/2005  reward= +50.972
+
+  ── EVAL @ iter 960 ──
+     Accuracy    : 0.9809  (98.09%)
+     Reward      : +38.731 ± 61.483
+     Ep length   : 190.5 steps
+     Sensors/step: 4.41
+
+  iter   961/2005  reward= +44.402
+  iter   962/2005  reward= +43.142
+  iter   963/2005  reward= +39.777
+  iter   964/2005  reward= +42.297
+  iter   965/2005  reward= +37.724
+  iter   966/2005  reward= +39.250
+  iter   967/2005  reward= +41.071
+  iter   968/2005  reward= +43.591
+  iter   969/2005  reward= +41.364
+  iter   970/2005  reward= +43.977
+
+  ── EVAL @ iter 970 ──
+     Accuracy    : 0.9805  (98.05%)
+     Reward      : +46.494 ± 75.803
+     Ep length   : 221.6 steps
+     Sensors/step: 4.38
+
+  iter   971/2005  reward= +48.073
+  iter   972/2005  reward= +50.056
+  iter   973/2005  reward= +42.073
+  iter   974/2005  reward= +41.087
+  iter   975/2005  reward= +37.764
+  iter   976/2005  reward= +32.590
+  iter   977/2005  reward= +31.513
+  iter   978/2005  reward= +36.054
+  iter   979/2005  reward= +33.854
+  iter   980/2005  reward= +37.357
+
+  ── EVAL @ iter 980 ──
+     Accuracy    : 0.9805  (98.05%)
+     Reward      : +45.034 ± 58.549
+     Ep length   : 207.8 steps
+     Sensors/step: 4.36
+
+  iter   981/2005  reward= +41.119
+  iter   982/2005  reward= +37.884
+  iter   983/2005  reward= +34.701
+  iter   984/2005  reward= +35.433
+  iter   985/2005  reward= +34.279
+  iter   986/2005  reward= +36.355
+  iter   987/2005  reward= +37.883
+  iter   988/2005  reward= +43.753
+  iter   989/2005  reward= +39.497
+  iter   990/2005  reward= +29.743
+
+  ── EVAL @ iter 990 ──
+     Accuracy    : 0.9806  (98.06%)
+     Reward      : +44.572 ± 75.444
+     Ep length   : 198.3 steps
+     Sensors/step: 4.41
+
+  iter   991/2005  reward= +30.400
+  iter   992/2005  reward= +26.819
+  iter   993/2005  reward= +23.715
+  iter   994/2005  reward= +28.337
+  iter   995/2005  reward= +24.901
+  iter   996/2005  reward= +21.273
+  iter   997/2005  reward= +30.208
+  iter   998/2005  reward= +34.415
+  iter   999/2005  reward= +29.730
+  iter  1000/2005  reward= +41.285
+
+  ── EVAL @ iter 1000 ──
+     Accuracy    : 0.9796  (97.96%)
+     Reward      : +39.962 ± 69.119
+     Ep length   : 191.4 steps
+     Sensors/step: 4.36
+
+  iter  1001/2005  reward= +43.616
+  iter  1002/2005  reward= +48.892
+  iter  1003/2005  reward= +48.157
+  iter  1004/2005  reward= +44.910
+  iter  1005/2005  reward= +46.145
+  iter  1006/2005  reward= +33.404
+  iter  1007/2005  reward= +30.740
+  iter  1008/2005  reward= +33.009
+  iter  1009/2005  reward= +39.350
+  iter  1010/2005  reward= +42.378
+
+  ── EVAL @ iter 1010 ──
+     Accuracy    : 0.9763  (97.63%)
+     Reward      : +37.577 ± 56.866
+     Ep length   : 202.0 steps
+     Sensors/step: 4.40
+
+  iter  1011/2005  reward= +42.514
+  iter  1012/2005  reward= +40.240
+  iter  1013/2005  reward= +36.850
+  iter  1014/2005  reward= +39.739
+  iter  1015/2005  reward= +36.804
+  iter  1016/2005  reward= +38.522
+  iter  1017/2005  reward= +39.254
+  iter  1018/2005  reward= +42.381
+  iter  1019/2005  reward= +33.030
+  iter  1020/2005  reward= +33.071
+
+  ── EVAL @ iter 1020 ──
+     Accuracy    : 0.9809  (98.09%)
+     Reward      : +30.201 ± 48.404
+     Ep length   : 161.5 steps
+     Sensors/step: 4.52
+
+  iter  1021/2005  reward= +35.535
+  iter  1022/2005  reward= +37.598
+  iter  1023/2005  reward= +38.205
+  iter  1024/2005  reward= +37.960
+  iter  1025/2005  reward= +38.726
+  iter  1026/2005  reward= +40.382
+  iter  1027/2005  reward= +42.542
+  iter  1028/2005  reward= +41.456
+  iter  1029/2005  reward= +41.496
+  iter  1030/2005  reward= +41.644
+
+  ── EVAL @ iter 1030 ──
+     Accuracy    : 0.9821  (98.21%)
+     Reward      : +35.576 ± 59.366
+     Ep length   : 185.1 steps
+     Sensors/step: 4.49
+
+  iter  1031/2005  reward= +39.289
+  iter  1032/2005  reward= +39.438
+  iter  1033/2005  reward= +40.787
+  iter  1034/2005  reward= +37.752
+  iter  1035/2005  reward= +43.110
+  iter  1036/2005  reward= +47.260
+  iter  1037/2005  reward= +41.502
+  iter  1038/2005  reward= +44.177
+  iter  1039/2005  reward= +50.456
+  iter  1040/2005  reward= +46.567
+
+  ── EVAL @ iter 1040 ──
+     Accuracy    : 0.9813  (98.13%)
+     Reward      : +36.092 ± 63.853
+     Ep length   : 190.9 steps
+     Sensors/step: 4.50
+
+  iter  1041/2005  reward= +40.190
+  iter  1042/2005  reward= +40.930
+  iter  1043/2005  reward= +33.145
+  iter  1044/2005  reward= +32.963
+  iter  1045/2005  reward= +37.869
+  iter  1046/2005  reward= +42.648
+  iter  1047/2005  reward= +44.137
+  iter  1048/2005  reward= +45.474
+  iter  1049/2005  reward= +41.640
+  iter  1050/2005  reward= +47.085
+
+  ── EVAL @ iter 1050 ──
+     Accuracy    : 0.9831  (98.31%)
+     Reward      : +45.206 ± 70.838
+     Ep length   : 199.9 steps
+     Sensors/step: 4.46
+
+  ★ New best: 0.9831
+  iter  1051/2005  reward= +45.989
+  iter  1052/2005  reward= +46.502
+  iter  1053/2005  reward= +42.652
+  iter  1054/2005  reward= +37.043
+  iter  1055/2005  reward= +27.376
+  iter  1056/2005  reward= +27.117
+  iter  1057/2005  reward= +32.522
+  iter  1058/2005  reward= +31.653
+  iter  1059/2005  reward= +38.082
+  iter  1060/2005  reward= +43.483
+
+  ── EVAL @ iter 1060 ──
+     Accuracy    : 0.9789  (97.89%)
+     Reward      : +34.089 ± 61.838
+     Ep length   : 177.2 steps
+     Sensors/step: 4.45
+
+  iter  1061/2005  reward= +45.981
+  iter  1062/2005  reward= +38.746
+  iter  1063/2005  reward= +43.036
+  iter  1064/2005  reward= +36.775
+  iter  1065/2005  reward= +38.172
+  iter  1066/2005  reward= +33.938
+  iter  1067/2005  reward= +43.742
+  iter  1068/2005  reward= +47.009
+  iter  1069/2005  reward= +46.164
+  iter  1070/2005  reward= +42.173
+
+  ── EVAL @ iter 1070 ──
+     Accuracy    : 0.9792  (97.92%)
+     Reward      : +40.068 ± 64.205
+     Ep length   : 199.1 steps
+     Sensors/step: 4.55
+
+  iter  1071/2005  reward= +44.339
+  iter  1072/2005  reward= +34.640
+  iter  1073/2005  reward= +35.445
+  iter  1074/2005  reward= +32.829
+  iter  1075/2005  reward= +29.545
+  iter  1076/2005  reward= +28.166
+  iter  1077/2005  reward= +34.116
+  iter  1078/2005  reward= +31.915
+  iter  1079/2005  reward= +34.787
+  iter  1080/2005  reward= +38.343
+
+  ── EVAL @ iter 1080 ──
+     Accuracy    : 0.9755  (97.55%)
+     Reward      : +29.805 ± 54.624
+     Ep length   : 173.2 steps
+     Sensors/step: 4.42
+
+  iter  1081/2005  reward= +41.638
+  iter  1082/2005  reward= +40.138
+  iter  1083/2005  reward= +44.803
+  iter  1084/2005  reward= +42.693
+  iter  1085/2005  reward= +39.859
+  iter  1086/2005  reward= +40.900
+  iter  1087/2005  reward= +36.311
+  iter  1088/2005  reward= +36.305
+  iter  1089/2005  reward= +41.316
+  iter  1090/2005  reward= +42.903
+
+  ── EVAL @ iter 1090 ──
+     Accuracy    : 0.9795  (97.95%)
+     Reward      : +40.978 ± 58.574
+     Ep length   : 203.6 steps
+     Sensors/step: 4.35
+
+  iter  1091/2005  reward= +46.132
+  iter  1092/2005  reward= +45.358
+  iter  1093/2005  reward= +45.423
+  iter  1094/2005  reward= +40.490
+  iter  1095/2005  reward= +41.231
+  iter  1096/2005  reward= +36.915
+  iter  1097/2005  reward= +40.706
+  iter  1098/2005  reward= +39.410
+  iter  1099/2005  reward= +41.196
+  iter  1100/2005  reward= +37.793
+
+  ── EVAL @ iter 1100 ──
+     Accuracy    : 0.9818  (98.18%)
+     Reward      : +42.824 ± 66.099
+     Ep length   : 202.8 steps
+     Sensors/step: 4.29
+
+  iter  1101/2005  reward= +38.651
+  iter  1102/2005  reward= +31.851
+  iter  1103/2005  reward= +31.827
+  iter  1104/2005  reward= +38.004
+  iter  1105/2005  reward= +35.738
+  iter  1106/2005  reward= +38.500
+  iter  1107/2005  reward= +40.636
+  iter  1108/2005  reward= +41.374
+  iter  1109/2005  reward= +41.310
+  iter  1110/2005  reward= +35.901
+
+  ── EVAL @ iter 1110 ──
+     Accuracy    : 0.9831  (98.31%)
+     Reward      : +55.398 ± 80.683
+     Ep length   : 241.8 steps
+     Sensors/step: 4.38
+
+  iter  1111/2005  reward= +30.857
+  iter  1112/2005  reward= +29.293
+  iter  1113/2005  reward= +28.960
+  iter  1114/2005  reward= +33.103
+  iter  1115/2005  reward= +35.349
+  iter  1116/2005  reward= +37.360
+  iter  1117/2005  reward= +40.256
+  iter  1118/2005  reward= +38.946
+  iter  1119/2005  reward= +38.118
+  iter  1120/2005  reward= +42.753
+
+  ── EVAL @ iter 1120 ──
+     Accuracy    : 0.9873  (98.73%)
+     Reward      : +56.526 ± 78.907
+     Ep length   : 235.6 steps
+     Sensors/step: 4.42
+
+  ★ New best: 0.9873
+  iter  1121/2005  reward= +44.621
+  iter  1122/2005  reward= +41.138
+  iter  1123/2005  reward= +45.357
+  iter  1124/2005  reward= +44.430
+  iter  1125/2005  reward= +44.877
+  iter  1126/2005  reward= +47.319
+  iter  1127/2005  reward= +46.482
+  iter  1128/2005  reward= +43.673
+  iter  1129/2005  reward= +38.298
+  iter  1130/2005  reward= +28.482
+
+  ── EVAL @ iter 1130 ──
+     Accuracy    : 0.9805  (98.05%)
+     Reward      : +35.967 ± 60.325
+     Ep length   : 195.5 steps
+     Sensors/step: 4.52
+
+  iter  1131/2005  reward= +33.256
+  iter  1132/2005  reward= +29.118
+  iter  1133/2005  reward= +35.094
+  iter  1134/2005  reward= +38.014
+  iter  1135/2005  reward= +40.472
+  iter  1136/2005  reward= +41.431
+  iter  1137/2005  reward= +38.576
+  iter  1138/2005  reward= +46.403
+  iter  1139/2005  reward= +47.004
+  iter  1140/2005  reward= +43.213
+
+  ── EVAL @ iter 1140 ──
+     Accuracy    : 0.9822  (98.22%)
+     Reward      : +44.707 ± 68.153
+     Ep length   : 208.5 steps
+     Sensors/step: 4.51
+
+  iter  1141/2005  reward= +45.982
+  iter  1142/2005  reward= +50.457
+  iter  1143/2005  reward= +44.249
+  iter  1144/2005  reward= +41.886
+  iter  1145/2005  reward= +42.001
+  iter  1146/2005  reward= +42.262
+  iter  1147/2005  reward= +42.534
+  iter  1148/2005  reward= +45.966
+  iter  1149/2005  reward= +46.160
+  iter  1150/2005  reward= +47.937
+
+  ── EVAL @ iter 1150 ──
+     Accuracy    : 0.9797  (97.97%)
+     Reward      : +29.910 ± 46.413
+     Ep length   : 171.6 steps
+     Sensors/step: 4.35
+
+  iter  1151/2005  reward= +50.699
+  iter  1152/2005  reward= +50.047
+  iter  1153/2005  reward= +44.311
+  iter  1154/2005  reward= +37.628
+  iter  1155/2005  reward= +31.542
+  iter  1156/2005  reward= +30.230
+  iter  1157/2005  reward= +31.566
+  iter  1158/2005  reward= +30.998
+  iter  1159/2005  reward= +35.441
+  iter  1160/2005  reward= +35.210
+
+  ── EVAL @ iter 1160 ──
+     Accuracy    : 0.9831  (98.31%)
+     Reward      : +43.838 ± 72.919
+     Ep length   : 209.4 steps
+     Sensors/step: 4.43
+
+  iter  1161/2005  reward= +32.381
+  iter  1162/2005  reward= +31.834
+  iter  1163/2005  reward= +34.170
+  iter  1164/2005  reward= +28.300
+  iter  1165/2005  reward= +30.883
+  iter  1166/2005  reward= +35.386
+  iter  1167/2005  reward= +28.532
+  iter  1168/2005  reward= +31.898
+  iter  1169/2005  reward= +36.642
+  iter  1170/2005  reward= +43.273
+
+  ── EVAL @ iter 1170 ──
+     Accuracy    : 0.9841  (98.41%)
+     Reward      : +40.174 ± 63.923
+     Ep length   : 199.4 steps
+     Sensors/step: 4.44
+
+  iter  1171/2005  reward= +46.214
+  iter  1172/2005  reward= +45.461
+  iter  1173/2005  reward= +46.822
+  iter  1174/2005  reward= +52.358
+  iter  1175/2005  reward= +55.902
+  iter  1176/2005  reward= +56.355
+  iter  1177/2005  reward= +50.883
+  iter  1178/2005  reward= +54.602
+  iter  1179/2005  reward= +54.334
+  iter  1180/2005  reward= +49.590
+
+  ── EVAL @ iter 1180 ──
+     Accuracy    : 0.9843  (98.43%)
+     Reward      : +42.250 ± 57.798
+     Ep length   : 199.7 steps
+     Sensors/step: 4.45
+
+  iter  1181/2005  reward= +47.244
+  iter  1182/2005  reward= +42.507
+  iter  1183/2005  reward= +42.507
+  iter  1184/2005  reward= +33.586
+  iter  1185/2005  reward= +37.320
+  iter  1186/2005  reward= +35.843
+  iter  1187/2005  reward= +38.178
+  iter  1188/2005  reward= +40.073
+  iter  1189/2005  reward= +42.565
+  iter  1190/2005  reward= +34.052
+
+  ── EVAL @ iter 1190 ──
+     Accuracy    : 0.9857  (98.57%)
+     Reward      : +42.422 ± 62.512
+     Ep length   : 192.7 steps
+     Sensors/step: 4.39
+
+  iter  1191/2005  reward= +31.482
+  iter  1192/2005  reward= +26.127
+  iter  1193/2005  reward= +26.830
+  iter  1194/2005  reward= +30.640
+  iter  1195/2005  reward= +28.710
+  iter  1196/2005  reward= +33.338
+  iter  1197/2005  reward= +38.907
+  iter  1198/2005  reward= +34.153
+  iter  1199/2005  reward= +37.354
+  iter  1200/2005  reward= +38.702
+
+  ── EVAL @ iter 1200 ──
+     Accuracy    : 0.9843  (98.43%)
+     Reward      : +45.717 ± 64.256
+     Ep length   : 203.9 steps
+     Sensors/step: 4.39
+
+  iter  1201/2005  reward= +37.957
+  iter  1202/2005  reward= +38.130
+  iter  1203/2005  reward= +34.256
+  iter  1204/2005  reward= +37.628
+  iter  1205/2005  reward= +39.464
+  iter  1206/2005  reward= +47.142
+  iter  1207/2005  reward= +45.047
+  iter  1208/2005  reward= +42.000
+  iter  1209/2005  reward= +47.634
+  iter  1210/2005  reward= +52.310
+
+  ── EVAL @ iter 1210 ──
+     Accuracy    : 0.9821  (98.21%)
+     Reward      : +43.658 ± 62.552
+     Ep length   : 212.8 steps
+     Sensors/step: 4.40
+
+  iter  1211/2005  reward= +51.560
+  iter  1212/2005  reward= +43.298
+  iter  1213/2005  reward= +46.276
+  iter  1214/2005  reward= +46.776
+  iter  1215/2005  reward= +39.672
+  iter  1216/2005  reward= +33.488
+  iter  1217/2005  reward= +36.150
+  iter  1218/2005  reward= +31.843
+  iter  1219/2005  reward= +33.420
+  iter  1220/2005  reward= +41.573
+
+  ── EVAL @ iter 1220 ──
+     Accuracy    : 0.9812  (98.12%)
+     Reward      : +33.346 ± 53.547
+     Ep length   : 180.2 steps
+     Sensors/step: 4.41
+
+  iter  1221/2005  reward= +46.706
+  iter  1222/2005  reward= +48.216
+  iter  1223/2005  reward= +48.964
+  iter  1224/2005  reward= +49.282
+  iter  1225/2005  reward= +50.003
+  iter  1226/2005  reward= +48.333
+  iter  1227/2005  reward= +46.145
+  iter  1228/2005  reward= +44.450
+  iter  1229/2005  reward= +40.082
+  iter  1230/2005  reward= +36.266
+
+  ── EVAL @ iter 1230 ──
+     Accuracy    : 0.9820  (98.20%)
+     Reward      : +35.302 ± 65.372
+     Ep length   : 190.5 steps
+     Sensors/step: 4.49
+
+  iter  1231/2005  reward= +36.343
+  iter  1232/2005  reward= +27.794
+  iter  1233/2005  reward= +32.950
+  iter  1234/2005  reward= +40.695
+  iter  1235/2005  reward= +39.439
+  iter  1236/2005  reward= +35.365
+  iter  1237/2005  reward= +39.777
+  iter  1238/2005  reward= +26.568
+  iter  1239/2005  reward= +28.269
+  iter  1240/2005  reward= +34.688
+
+  ── EVAL @ iter 1240 ──
+     Accuracy    : 0.9787  (97.87%)
+     Reward      : +38.594 ± 60.890
+     Ep length   : 219.8 steps
+     Sensors/step: 4.50
+
+  iter  1241/2005  reward= +40.818
+  iter  1242/2005  reward= +47.377
+  iter  1243/2005  reward= +46.903
+  iter  1244/2005  reward= +54.642
+  iter  1245/2005  reward= +61.282
+  iter  1246/2005  reward= +54.594
+  iter  1247/2005  reward= +49.137
+  iter  1248/2005  reward= +46.546
+  iter  1249/2005  reward= +41.963
+  iter  1250/2005  reward= +40.715
+
+  ── EVAL @ iter 1250 ──
+     Accuracy    : 0.9805  (98.05%)
+     Reward      : +31.815 ± 45.214
+     Ep length   : 174.1 steps
+     Sensors/step: 4.43
+
+  iter  1251/2005  reward= +39.052
+  iter  1252/2005  reward= +38.724
+  iter  1253/2005  reward= +41.174
+  iter  1254/2005  reward= +40.200
+  iter  1255/2005  reward= +42.328
+  iter  1256/2005  reward= +43.030
+  iter  1257/2005  reward= +41.662
+  iter  1258/2005  reward= +38.862
+  iter  1259/2005  reward= +39.606
+  iter  1260/2005  reward= +45.200
+
+  ── EVAL @ iter 1260 ──
+     Accuracy    : 0.9856  (98.56%)
+     Reward      : +38.390 ± 57.828
+     Ep length   : 177.5 steps
+     Sensors/step: 4.41
+
+  iter  1261/2005  reward= +46.570
+  iter  1262/2005  reward= +48.499
+  iter  1263/2005  reward= +45.391
+  iter  1264/2005  reward= +47.401
+  iter  1265/2005  reward= +42.055
+  iter  1266/2005  reward= +42.346
+  iter  1267/2005  reward= +38.980
+  iter  1268/2005  reward= +41.770
+  iter  1269/2005  reward= +40.608
+  iter  1270/2005  reward= +42.340
+
+  ── EVAL @ iter 1270 ──
+     Accuracy    : 0.9835  (98.35%)
+     Reward      : +49.822 ± 71.512
+     Ep length   : 227.8 steps
+     Sensors/step: 4.40
+
+  iter  1271/2005  reward= +37.759
+  iter  1272/2005  reward= +35.045
+  iter  1273/2005  reward= +33.706
+  iter  1274/2005  reward= +32.709
+  iter  1275/2005  reward= +34.279
+  iter  1276/2005  reward= +34.865
+  iter  1277/2005  reward= +44.906
+  iter  1278/2005  reward= +43.577
+  iter  1279/2005  reward= +47.363
+  iter  1280/2005  reward= +47.936
+
+  ── EVAL @ iter 1280 ──
+     Accuracy    : 0.9823  (98.23%)
+     Reward      : +41.366 ± 68.727
+     Ep length   : 202.4 steps
+     Sensors/step: 4.44
+
+  iter  1281/2005  reward= +52.701
+  iter  1282/2005  reward= +43.598
+  iter  1283/2005  reward= +46.270
+  iter  1284/2005  reward= +45.900
+  iter  1285/2005  reward= +45.112
+  iter  1286/2005  reward= +38.713
+  iter  1287/2005  reward= +40.483
+  iter  1288/2005  reward= +46.094
+  iter  1289/2005  reward= +35.391
+  iter  1290/2005  reward= +38.572
+
+  ── EVAL @ iter 1290 ──
+     Accuracy    : 0.9817  (98.17%)
+     Reward      : +40.448 ± 58.883
+     Ep length   : 195.3 steps
+     Sensors/step: 4.29
+
+  iter  1291/2005  reward= +40.734
+  iter  1292/2005  reward= +36.395
+  iter  1293/2005  reward= +36.387
+  iter  1294/2005  reward= +36.898
+  iter  1295/2005  reward= +36.560
+  iter  1296/2005  reward= +34.336
+  iter  1297/2005  reward= +36.988
+  iter  1298/2005  reward= +34.720
+  iter  1299/2005  reward= +39.443
+  iter  1300/2005  reward= +41.501
+
+  ── EVAL @ iter 1300 ──
+     Accuracy    : 0.9846  (98.46%)
+     Reward      : +42.833 ± 61.809
+     Ep length   : 194.0 steps
+     Sensors/step: 4.30
+
+  iter  1301/2005  reward= +44.030
+  iter  1302/2005  reward= +45.516
+  iter  1303/2005  reward= +45.514
+  iter  1304/2005  reward= +50.380
+  iter  1305/2005  reward= +43.238
+  iter  1306/2005  reward= +45.645
+  iter  1307/2005  reward= +45.812
+  iter  1308/2005  reward= +38.362
+  iter  1309/2005  reward= +39.897
+  iter  1310/2005  reward= +40.286
+
+  ── EVAL @ iter 1310 ──
+     Accuracy    : 0.9845  (98.45%)
+     Reward      : +53.362 ± 75.895
+     Ep length   : 230.8 steps
+     Sensors/step: 4.34
+
+  iter  1311/2005  reward= +37.360
+  iter  1312/2005  reward= +37.570
+  iter  1313/2005  reward= +43.889
+  iter  1314/2005  reward= +35.576
+  iter  1315/2005  reward= +40.834
+  iter  1316/2005  reward= +39.868
+  iter  1317/2005  reward= +41.641
+  iter  1318/2005  reward= +34.383
+  iter  1319/2005  reward= +37.984
+  iter  1320/2005  reward= +35.855
+
+  ── EVAL @ iter 1320 ──
+     Accuracy    : 0.9835  (98.35%)
+     Reward      : +41.036 ± 65.475
+     Ep length   : 188.1 steps
+     Sensors/step: 4.53
+
+  iter  1321/2005  reward= +33.143
+  iter  1322/2005  reward= +35.239
+  iter  1323/2005  reward= +37.968
+  iter  1324/2005  reward= +37.322
+  iter  1325/2005  reward= +34.465
+  iter  1326/2005  reward= +41.347
+  iter  1327/2005  reward= +38.674
+  iter  1328/2005  reward= +35.454
+  iter  1329/2005  reward= +37.275
+  iter  1330/2005  reward= +33.293
+
+  ── EVAL @ iter 1330 ──
+     Accuracy    : 0.9796  (97.96%)
+     Reward      : +35.204 ± 58.992
+     Ep length   : 186.4 steps
+     Sensors/step: 4.42
+
+  iter  1331/2005  reward= +37.551
+  iter  1332/2005  reward= +38.030
+  iter  1333/2005  reward= +35.478
+  iter  1334/2005  reward= +43.246
+  iter  1335/2005  reward= +42.109
+  iter  1336/2005  reward= +49.177
+  iter  1337/2005  reward= +41.092
+  iter  1338/2005  reward= +45.546
+  iter  1339/2005  reward= +42.438
+  iter  1340/2005  reward= +40.484
+
+  ── EVAL @ iter 1340 ──
+     Accuracy    : 0.9826  (98.26%)
+     Reward      : +44.174 ± 67.264
+     Ep length   : 197.9 steps
+     Sensors/step: 4.26
+
+  iter  1341/2005  reward= +40.658
+  iter  1342/2005  reward= +46.703
+  iter  1343/2005  reward= +43.768
+  iter  1344/2005  reward= +36.469
+  iter  1345/2005  reward= +34.032
+  iter  1346/2005  reward= +31.234
+  iter  1347/2005  reward= +35.382
+  iter  1348/2005  reward= +35.470
+  iter  1349/2005  reward= +28.454
+  iter  1350/2005  reward= +31.882
+
+  ── EVAL @ iter 1350 ──
+     Accuracy    : 0.9849  (98.49%)
+     Reward      : +45.823 ± 66.941
+     Ep length   : 198.4 steps
+     Sensors/step: 4.27
+
+  iter  1351/2005  reward= +32.326
+  iter  1352/2005  reward= +34.297
+  iter  1353/2005  reward= +39.814
+  iter  1354/2005  reward= +45.599
+  iter  1355/2005  reward= +46.988
+  iter  1356/2005  reward= +46.860
+  iter  1357/2005  reward= +39.381
+  iter  1358/2005  reward= +39.031
+  iter  1359/2005  reward= +37.170
+  iter  1360/2005  reward= +34.234
+
+  ── EVAL @ iter 1360 ──
+     Accuracy    : 0.9811  (98.11%)
+     Reward      : +40.603 ± 67.097
+     Ep length   : 195.0 steps
+     Sensors/step: 4.36
+
+  iter  1361/2005  reward= +38.127
+  iter  1362/2005  reward= +41.600
+  iter  1363/2005  reward= +46.963
+  iter  1364/2005  reward= +47.428
+  iter  1365/2005  reward= +56.890
+  iter  1366/2005  reward= +60.543
+  iter  1367/2005  reward= +55.243
+  iter  1368/2005  reward= +55.489
+  iter  1369/2005  reward= +49.688
+  iter  1370/2005  reward= +43.730
+
+  ── EVAL @ iter 1370 ──
+     Accuracy    : 0.9802  (98.02%)
+     Reward      : +40.402 ± 68.762
+     Ep length   : 195.5 steps
+     Sensors/step: 4.35
+
+  iter  1371/2005  reward= +40.076
+  iter  1372/2005  reward= +43.527
+  iter  1373/2005  reward= +41.822
+  iter  1374/2005  reward= +42.421
+  iter  1375/2005  reward= +36.623
+  iter  1376/2005  reward= +36.921
+  iter  1377/2005  reward= +44.045
+  iter  1378/2005  reward= +46.346
+  iter  1379/2005  reward= +49.037
+  iter  1380/2005  reward= +50.879
+
+  ── EVAL @ iter 1380 ──
+     Accuracy    : 0.9810  (98.10%)
+     Reward      : +40.552 ± 61.672
+     Ep length   : 195.2 steps
+     Sensors/step: 4.36
+
+  iter  1381/2005  reward= +57.452
+  iter  1382/2005  reward= +60.266
+  iter  1383/2005  reward= +49.047
+  iter  1384/2005  reward= +38.571
+  iter  1385/2005  reward= +41.913
+  iter  1386/2005  reward= +44.586
+  iter  1387/2005  reward= +51.864
+  iter  1388/2005  reward= +47.446
+  iter  1389/2005  reward= +50.144
+  iter  1390/2005  reward= +54.718
+
+  ── EVAL @ iter 1390 ──
+     Accuracy    : 0.9825  (98.25%)
+     Reward      : +41.932 ± 74.568
+     Ep length   : 194.2 steps
+     Sensors/step: 4.39
+
+  iter  1391/2005  reward= +54.170
+  iter  1392/2005  reward= +47.543
+  iter  1393/2005  reward= +43.752
+  iter  1394/2005  reward= +49.248
+  iter  1395/2005  reward= +62.563
+  iter  1396/2005  reward= +57.322
+  iter  1397/2005  reward= +57.188
+  iter  1398/2005  reward= +49.724
+  iter  1399/2005  reward= +42.811
+  iter  1400/2005  reward= +39.899
+
+  ── EVAL @ iter 1400 ──
+     Accuracy    : 0.9801  (98.01%)
+     Reward      : +45.190 ± 58.961
+     Ep length   : 220.9 steps
+     Sensors/step: 4.28
+
+  iter  1401/2005  reward= +40.985
+  iter  1402/2005  reward= +41.489
+  iter  1403/2005  reward= +40.979
+  iter  1404/2005  reward= +45.730
+  iter  1405/2005  reward= +49.982
+  iter  1406/2005  reward= +51.046
+  iter  1407/2005  reward= +39.480
+  iter  1408/2005  reward= +43.366
+  iter  1409/2005  reward= +39.485
+  iter  1410/2005  reward= +38.050
+
+  ── EVAL @ iter 1410 ──
+     Accuracy    : 0.9828  (98.28%)
+     Reward      : +50.782 ± 65.748
+     Ep length   : 219.1 steps
+     Sensors/step: 4.28
+
+  iter  1411/2005  reward= +39.724
+  iter  1412/2005  reward= +43.714
+  iter  1413/2005  reward= +55.692
+  iter  1414/2005  reward= +52.847
+  iter  1415/2005  reward= +50.053
+  iter  1416/2005  reward= +39.888
+  iter  1417/2005  reward= +29.107
+  iter  1418/2005  reward= +34.493
+  iter  1419/2005  reward= +35.665
+  iter  1420/2005  reward= +27.920
+
+  ── EVAL @ iter 1420 ──
+     Accuracy    : 0.9822  (98.22%)
+     Reward      : +46.286 ± 67.920
+     Ep length   : 204.7 steps
+     Sensors/step: 4.29
+
+  iter  1421/2005  reward= +32.396
+  iter  1422/2005  reward= +42.414
+  iter  1423/2005  reward= +36.981
+  iter  1424/2005  reward= +39.842
+  iter  1425/2005  reward= +40.920
+  iter  1426/2005  reward= +36.472
+  iter  1427/2005  reward= +33.421
+  iter  1428/2005  reward= +36.514
+  iter  1429/2005  reward= +31.223
+  iter  1430/2005  reward= +31.244
+
+  ── EVAL @ iter 1430 ──
+     Accuracy    : 0.9824  (98.24%)
+     Reward      : +38.251 ± 60.842
+     Ep length   : 183.1 steps
+     Sensors/step: 4.32
+
+  iter  1431/2005  reward= +36.128
+  iter  1432/2005  reward= +33.542
+  iter  1433/2005  reward= +39.263
+  iter  1434/2005  reward= +44.469
+  iter  1435/2005  reward= +46.963
+  iter  1436/2005  reward= +45.995
+  iter  1437/2005  reward= +43.693
+  iter  1438/2005  reward= +37.428
+  iter  1439/2005  reward= +39.972
+  iter  1440/2005  reward= +34.292
+
+  ── EVAL @ iter 1440 ──
+     Accuracy    : 0.9844  (98.44%)
+     Reward      : +51.774 ± 77.049
+     Ep length   : 221.1 steps
+     Sensors/step: 4.33
+
+  iter  1441/2005  reward= +39.188
+  iter  1442/2005  reward= +46.017
+  iter  1443/2005  reward= +43.839
+  iter  1444/2005  reward= +45.083
+  iter  1445/2005  reward= +48.869
+  iter  1446/2005  reward= +51.756
+  iter  1447/2005  reward= +40.037
+  iter  1448/2005  reward= +45.332
+  iter  1449/2005  reward= +45.954
+  iter  1450/2005  reward= +49.711
+
+  ── EVAL @ iter 1450 ──
+     Accuracy    : 0.9818  (98.18%)
+     Reward      : +40.438 ± 60.023
+     Ep length   : 192.0 steps
+     Sensors/step: 4.27
+
+  iter  1451/2005  reward= +47.440
+  iter  1452/2005  reward= +46.977
+  iter  1453/2005  reward= +37.968
+  iter  1454/2005  reward= +35.394
+  iter  1455/2005  reward= +33.732
+  iter  1456/2005  reward= +32.609
+  iter  1457/2005  reward= +35.933
+  iter  1458/2005  reward= +30.537
+  iter  1459/2005  reward= +36.816
+  iter  1460/2005  reward= +36.454
+
+  ── EVAL @ iter 1460 ──
+     Accuracy    : 0.9813  (98.13%)
+     Reward      : +36.190 ± 60.445
+     Ep length   : 184.2 steps
+     Sensors/step: 4.36
+
+  iter  1461/2005  reward= +43.361
+  iter  1462/2005  reward= +41.706
+  iter  1463/2005  reward= +45.243
+  iter  1464/2005  reward= +37.344
+  iter  1465/2005  reward= +42.113
+  iter  1466/2005  reward= +40.765
+  iter  1467/2005  reward= +44.511
+  iter  1468/2005  reward= +38.146
+  iter  1469/2005  reward= +34.476
+  iter  1470/2005  reward= +31.336
+
+  ── EVAL @ iter 1470 ──
+     Accuracy    : 0.9852  (98.52%)
+     Reward      : +48.475 ± 69.129
+     Ep length   : 218.3 steps
+     Sensors/step: 4.38
+
+  iter  1471/2005  reward= +30.790
+  iter  1472/2005  reward= +35.198
+  iter  1473/2005  reward= +41.246
+  iter  1474/2005  reward= +37.400
+  iter  1475/2005  reward= +42.334
+  iter  1476/2005  reward= +40.642
+  iter  1477/2005  reward= +38.029
+  iter  1478/2005  reward= +38.312
+  iter  1479/2005  reward= +44.625
+  iter  1480/2005  reward= +46.066
+
+  ── EVAL @ iter 1480 ──
+     Accuracy    : 0.9848  (98.48%)
+     Reward      : +42.738 ± 67.141
+     Ep length   : 191.8 steps
+     Sensors/step: 4.37
+
+  iter  1481/2005  reward= +47.956
+  iter  1482/2005  reward= +50.585
+  iter  1483/2005  reward= +52.943
+  iter  1484/2005  reward= +56.061
+  iter  1485/2005  reward= +57.824
+  iter  1486/2005  reward= +54.552
+  iter  1487/2005  reward= +47.221
+  iter  1488/2005  reward= +41.512
+  iter  1489/2005  reward= +37.606
+  iter  1490/2005  reward= +35.195
+
+  ── EVAL @ iter 1490 ──
+     Accuracy    : 0.9838  (98.38%)
+     Reward      : +38.200 ± 55.801
+     Ep length   : 183.7 steps
+     Sensors/step: 4.40
+
+  iter  1491/2005  reward= +36.358
+  iter  1492/2005  reward= +33.104
+  iter  1493/2005  reward= +36.808
+  iter  1494/2005  reward= +33.323
+  iter  1495/2005  reward= +34.738
+  iter  1496/2005  reward= +39.990
+  iter  1497/2005  reward= +44.289
+  iter  1498/2005  reward= +41.303
+  iter  1499/2005  reward= +45.012
+  iter  1500/2005  reward= +46.227
+
+  ── EVAL @ iter 1500 ──
+     Accuracy    : 0.9797  (97.97%)
+     Reward      : +40.729 ± 59.681
+     Ep length   : 203.3 steps
+     Sensors/step: 4.33
+
+  iter  1501/2005  reward= +47.908
+  iter  1502/2005  reward= +43.697
+  iter  1503/2005  reward= +45.352
+  iter  1504/2005  reward= +50.628
+  iter  1505/2005  reward= +49.184
+  iter  1506/2005  reward= +39.830
+  iter  1507/2005  reward= +44.182
+  iter  1508/2005  reward= +38.968
+  iter  1509/2005  reward= +38.602
+  iter  1510/2005  reward= +39.619
+
+  ── EVAL @ iter 1510 ──
+     Accuracy    : 0.9834  (98.34%)
+     Reward      : +28.875 ± 39.914
+     Ep length   : 152.9 steps
+     Sensors/step: 4.38
+
+  iter  1511/2005  reward= +45.774
+  iter  1512/2005  reward= +42.743
+  iter  1513/2005  reward= +41.823
+  iter  1514/2005  reward= +36.954
+  iter  1515/2005  reward= +41.490
+  iter  1516/2005  reward= +44.458
+  iter  1517/2005  reward= +40.948
+  iter  1518/2005  reward= +46.908
+  iter  1519/2005  reward= +53.345
+  iter  1520/2005  reward= +55.370
+
+  ── EVAL @ iter 1520 ──
+     Accuracy    : 0.9817  (98.17%)
+     Reward      : +40.188 ± 63.159
+     Ep length   : 191.0 steps
+     Sensors/step: 4.44
+
+  iter  1521/2005  reward= +50.487
+  iter  1522/2005  reward= +52.526
+  iter  1523/2005  reward= +39.373
+  iter  1524/2005  reward= +35.544
+  iter  1525/2005  reward= +34.141
+  iter  1526/2005  reward= +37.004
+  iter  1527/2005  reward= +39.733
+  iter  1528/2005  reward= +42.386
+  iter  1529/2005  reward= +42.300
+  iter  1530/2005  reward= +41.250
+
+  ── EVAL @ iter 1530 ──
+     Accuracy    : 0.9837  (98.37%)
+     Reward      : +46.898 ± 73.364
+     Ep length   : 208.0 steps
+     Sensors/step: 4.33
+
+  iter  1531/2005  reward= +35.798
+  iter  1532/2005  reward= +35.964
+  iter  1533/2005  reward= +37.171
+  iter  1534/2005  reward= +43.691
+  iter  1535/2005  reward= +43.946
+  iter  1536/2005  reward= +42.144
+  iter  1537/2005  reward= +41.898
+  iter  1538/2005  reward= +37.864
+  iter  1539/2005  reward= +39.235
+  iter  1540/2005  reward= +43.350
+
+  ── EVAL @ iter 1540 ──
+     Accuracy    : 0.9861  (98.61%)
+     Reward      : +43.022 ± 75.608
+     Ep length   : 178.1 steps
+     Sensors/step: 4.24
+
+  iter  1541/2005  reward= +44.767
+  iter  1542/2005  reward= +48.594
+  iter  1543/2005  reward= +52.588
+  iter  1544/2005  reward= +51.725
+  iter  1545/2005  reward= +42.651
+  iter  1546/2005  reward= +43.694
+  iter  1547/2005  reward= +35.942
+  iter  1548/2005  reward= +43.078
+  iter  1549/2005  reward= +37.778
+  iter  1550/2005  reward= +40.981
+
+  ── EVAL @ iter 1550 ──
+     Accuracy    : 0.9867  (98.67%)
+     Reward      : +44.848 ± 58.373
+     Ep length   : 182.1 steps
+     Sensors/step: 4.18
+
+  iter  1551/2005  reward= +40.723
+  iter  1552/2005  reward= +44.889
+  iter  1553/2005  reward= +39.163
+  iter  1554/2005  reward= +43.394
+  iter  1555/2005  reward= +41.049
+  iter  1556/2005  reward= +42.789
+  iter  1557/2005  reward= +38.559
+  iter  1558/2005  reward= +35.631
+  iter  1559/2005  reward= +30.850
+  iter  1560/2005  reward= +24.996
+
+  ── EVAL @ iter 1560 ──
+     Accuracy    : 0.9912  (99.12%)
+     Reward      : +61.660 ± 80.210
+     Ep length   : 222.1 steps
+     Sensors/step: 4.24
+
+  ★ New best: 0.9912
+  iter  1561/2005  reward= +26.364
+  iter  1562/2005  reward= +29.931
+  iter  1563/2005  reward= +35.768
+  iter  1564/2005  reward= +39.370
+  iter  1565/2005  reward= +41.722
+  iter  1566/2005  reward= +44.813
+  iter  1567/2005  reward= +39.604
+  iter  1568/2005  reward= +34.534
+  iter  1569/2005  reward= +35.681
+  iter  1570/2005  reward= +37.746
+
+  ── EVAL @ iter 1570 ──
+     Accuracy    : 0.9865  (98.65%)
+     Reward      : +48.022 ± 59.920
+     Ep length   : 195.7 steps
+     Sensors/step: 4.30
+
+  iter  1571/2005  reward= +39.276
+  iter  1572/2005  reward= +39.867
+  iter  1573/2005  reward= +43.758
+  iter  1574/2005  reward= +48.247
+  iter  1575/2005  reward= +49.877
+  iter  1576/2005  reward= +53.920
+  iter  1577/2005  reward= +51.362
+  iter  1578/2005  reward= +50.166
+  iter  1579/2005  reward= +47.335
+  iter  1580/2005  reward= +50.906
+
+  ── EVAL @ iter 1580 ──
+     Accuracy    : 0.9910  (99.10%)
+     Reward      : +62.879 ± 78.245
+     Ep length   : 238.2 steps
+     Sensors/step: 4.21
+
+  iter  1581/2005  reward= +48.646
+  iter  1582/2005  reward= +49.394
+  iter  1583/2005  reward= +51.048
+  iter  1584/2005  reward= +47.536
+  iter  1585/2005  reward= +43.195
+  iter  1586/2005  reward= +37.729
+  iter  1587/2005  reward= +35.427
+  iter  1588/2005  reward= +36.130
+  iter  1589/2005  reward= +39.994
+  iter  1590/2005  reward= +45.805
+
+  ── EVAL @ iter 1590 ──
+     Accuracy    : 0.9906  (99.06%)
+     Reward      : +52.312 ± 82.317
+     Ep length   : 200.7 steps
+     Sensors/step: 4.27
+
+  iter  1591/2005  reward= +45.723
+  iter  1592/2005  reward= +47.603
+  iter  1593/2005  reward= +50.633
+  iter  1594/2005  reward= +53.382
+  iter  1595/2005  reward= +50.133
+  iter  1596/2005  reward= +47.429
+  iter  1597/2005  reward= +46.963
+  iter  1598/2005  reward= +40.906
+  iter  1599/2005  reward= +39.852
+  iter  1600/2005  reward= +39.842
+
+  ── EVAL @ iter 1600 ──
+     Accuracy    : 0.9899  (98.99%)
+     Reward      : +46.485 ± 68.696
+     Ep length   : 180.9 steps
+     Sensors/step: 4.30
+
+  iter  1601/2005  reward= +41.772
+  iter  1602/2005  reward= +36.012
+  iter  1603/2005  reward= +41.792
+  iter  1604/2005  reward= +44.368
+  iter  1605/2005  reward= +43.885
+  iter  1606/2005  reward= +47.929
+  iter  1607/2005  reward= +47.886
+  iter  1608/2005  reward= +49.726
+  iter  1609/2005  reward= +46.298
+  iter  1610/2005  reward= +43.730
+
+  ── EVAL @ iter 1610 ──
+     Accuracy    : 0.9846  (98.46%)
+     Reward      : +45.458 ± 69.874
+     Ep length   : 196.6 steps
+     Sensors/step: 4.32
+
+  iter  1611/2005  reward= +45.409
+  iter  1612/2005  reward= +52.359
+  iter  1613/2005  reward= +43.646
+  iter  1614/2005  reward= +43.846
+  iter  1615/2005  reward= +45.797
+  iter  1616/2005  reward= +37.550
+  iter  1617/2005  reward= +41.075
+  iter  1618/2005  reward= +40.815
+  iter  1619/2005  reward= +40.153
+  iter  1620/2005  reward= +43.129
+
+  ── EVAL @ iter 1620 ──
+     Accuracy    : 0.9893  (98.93%)
+     Reward      : +43.776 ± 55.824
+     Ep length   : 175.5 steps
+     Sensors/step: 4.25
+
+  iter  1621/2005  reward= +37.164
+  iter  1622/2005  reward= +39.790
+  iter  1623/2005  reward= +46.112
+  iter  1624/2005  reward= +39.158
+  iter  1625/2005  reward= +42.925
+  iter  1626/2005  reward= +47.716
+  iter  1627/2005  reward= +48.506
+  iter  1628/2005  reward= +56.084
+  iter  1629/2005  reward= +56.941
+  iter  1630/2005  reward= +57.008
+
+  ── EVAL @ iter 1630 ──
+     Accuracy    : 0.9910  (99.10%)
+     Reward      : +56.052 ± 72.474
+     Ep length   : 205.8 steps
+     Sensors/step: 4.27
+
+  iter  1631/2005  reward= +60.324
+  iter  1632/2005  reward= +59.786
+  iter  1633/2005  reward= +50.548
+  iter  1634/2005  reward= +48.273
+  iter  1635/2005  reward= +52.820
+  iter  1636/2005  reward= +59.497
+  iter  1637/2005  reward= +64.785
+  iter  1638/2005  reward= +69.619
+  iter  1639/2005  reward= +58.623
+  iter  1640/2005  reward= +61.875
+
+  ── EVAL @ iter 1640 ──
+     Accuracy    : 0.9898  (98.98%)
+     Reward      : +48.672 ± 64.054
+     Ep length   : 189.3 steps
+     Sensors/step: 4.33
+
+  iter  1641/2005  reward= +43.737
+  iter  1642/2005  reward= +35.133
+  iter  1643/2005  reward= +35.365
+  iter  1644/2005  reward= +43.657
+  iter  1645/2005  reward= +38.494
+  iter  1646/2005  reward= +40.914
+  iter  1647/2005  reward= +42.052
+  iter  1648/2005  reward= +37.646
+  iter  1649/2005  reward= +43.104
+  iter  1650/2005  reward= +43.794
+
+  ── EVAL @ iter 1650 ──
+     Accuracy    : 0.9909  (99.09%)
+     Reward      : +51.103 ± 74.081
+     Ep length   : 194.6 steps
+     Sensors/step: 4.19
+
+  iter  1651/2005  reward= +34.366
+  iter  1652/2005  reward= +36.599
+  iter  1653/2005  reward= +41.002
+  iter  1654/2005  reward= +34.664
+  iter  1655/2005  reward= +37.964
+  iter  1656/2005  reward= +39.023
+  iter  1657/2005  reward= +36.880
+  iter  1658/2005  reward= +41.650
+  iter  1659/2005  reward= +47.584
+  iter  1660/2005  reward= +45.754
+
+  ── EVAL @ iter 1660 ──
+     Accuracy    : 0.9906  (99.06%)
+     Reward      : +49.793 ± 63.040
+     Ep length   : 190.8 steps
+     Sensors/step: 4.21
+
+  iter  1661/2005  reward= +50.956
+  iter  1662/2005  reward= +48.040
+  iter  1663/2005  reward= +43.447
+  iter  1664/2005  reward= +43.200
+  iter  1665/2005  reward= +48.289
+  iter  1666/2005  reward= +49.706
+  iter  1667/2005  reward= +48.268
+  iter  1668/2005  reward= +48.596
+  iter  1669/2005  reward= +51.262
+  iter  1670/2005  reward= +49.625
+
+  ── EVAL @ iter 1670 ──
+     Accuracy    : 0.9846  (98.46%)
+     Reward      : +42.378 ± 56.920
+     Ep length   : 186.9 steps
+     Sensors/step: 4.24
+
+  iter  1671/2005  reward= +44.606
+  iter  1672/2005  reward= +47.064
+  iter  1673/2005  reward= +44.762
+  iter  1674/2005  reward= +52.754
+  iter  1675/2005  reward= +51.457
+  iter  1676/2005  reward= +48.584
+  iter  1677/2005  reward= +51.150
+  iter  1678/2005  reward= +55.239
+  iter  1679/2005  reward= +58.289
+  iter  1680/2005  reward= +52.494
+
+  ── EVAL @ iter 1680 ──
+     Accuracy    : 0.9894  (98.94%)
+     Reward      : +56.014 ± 70.571
+     Ep length   : 207.0 steps
+     Sensors/step: 4.17
+
+  iter  1681/2005  reward= +54.882
+  iter  1682/2005  reward= +53.183
+  iter  1683/2005  reward= +48.216
+  iter  1684/2005  reward= +43.782
+  iter  1685/2005  reward= +44.791
+  iter  1686/2005  reward= +44.224
+  iter  1687/2005  reward= +50.537
+  iter  1688/2005  reward= +53.100
+  iter  1689/2005  reward= +49.741
+  iter  1690/2005  reward= +52.688
+
+  ── EVAL @ iter 1690 ──
+     Accuracy    : 0.9909  (99.09%)
+     Reward      : +57.172 ± 75.635
+     Ep length   : 202.7 steps
+     Sensors/step: 4.18
+
+  iter  1691/2005  reward= +51.334
+  iter  1692/2005  reward= +57.145
+  iter  1693/2005  reward= +52.480
+  iter  1694/2005  reward= +47.888
+  iter  1695/2005  reward= +41.477
+  iter  1696/2005  reward= +37.722
+  iter  1697/2005  reward= +46.215
+  iter  1698/2005  reward= +45.883
+  iter  1699/2005  reward= +51.858
+  iter  1700/2005  reward= +55.508
+
+  ── EVAL @ iter 1700 ──
+     Accuracy    : 0.9846  (98.46%)
+     Reward      : +46.581 ± 73.582
+     Ep length   : 191.0 steps
+     Sensors/step: 4.22
+
+  iter  1701/2005  reward= +60.575
+  iter  1702/2005  reward= +58.830
+  iter  1703/2005  reward= +45.003
+  iter  1704/2005  reward= +47.287
+  iter  1705/2005  reward= +46.204
+  iter  1706/2005  reward= +45.330
+  iter  1707/2005  reward= +50.470
+  iter  1708/2005  reward= +58.884
+  iter  1709/2005  reward= +66.981
+  iter  1710/2005  reward= +62.940
+
+  ── EVAL @ iter 1710 ──
+     Accuracy    : 0.9909  (99.09%)
+     Reward      : +47.960 ± 63.827
+     Ep length   : 182.8 steps
+     Sensors/step: 4.26
+
+  iter  1711/2005  reward= +58.301
+  iter  1712/2005  reward= +60.665
+  iter  1713/2005  reward= +61.250
+  iter  1714/2005  reward= +46.282
+  iter  1715/2005  reward= +42.552
+  iter  1716/2005  reward= +44.955
+  iter  1717/2005  reward= +42.760
+  iter  1718/2005  reward= +38.834
+  iter  1719/2005  reward= +44.248
+  iter  1720/2005  reward= +46.458
+
+  ── EVAL @ iter 1720 ──
+     Accuracy    : 0.9903  (99.03%)
+     Reward      : +44.472 ± 58.865
+     Ep length   : 174.7 steps
+     Sensors/step: 4.22
+
+  iter  1721/2005  reward= +51.088
+  iter  1722/2005  reward= +51.568
+  iter  1723/2005  reward= +50.836
+  iter  1724/2005  reward= +45.215
+  iter  1725/2005  reward= +34.592
+  iter  1726/2005  reward= +33.181
+  iter  1727/2005  reward= +36.418
+  iter  1728/2005  reward= +41.807
+  iter  1729/2005  reward= +42.032
+  iter  1730/2005  reward= +45.246
+
+  ── EVAL @ iter 1730 ──
+     Accuracy    : 0.9915  (99.15%)
+     Reward      : +55.442 ± 72.539
+     Ep length   : 205.9 steps
+     Sensors/step: 4.11
+
+  ★ New best: 0.9915
+  iter  1731/2005  reward= +41.698
+  iter  1732/2005  reward= +35.549
+  iter  1733/2005  reward= +43.802
+  iter  1734/2005  reward= +43.975
+  iter  1735/2005  reward= +43.258
+  iter  1736/2005  reward= +48.621
+  iter  1737/2005  reward= +51.751
+  iter  1738/2005  reward= +49.888
+  iter  1739/2005  reward= +50.278
+  iter  1740/2005  reward= +53.030
+
+  ── EVAL @ iter 1740 ──
+     Accuracy    : 0.9890  (98.90%)
+     Reward      : +58.539 ± 73.631
+     Ep length   : 217.5 steps
+     Sensors/step: 4.15
+
+  iter  1741/2005  reward= +48.717
+  iter  1742/2005  reward= +41.683
+  iter  1743/2005  reward= +44.426
+  iter  1744/2005  reward= +41.640
+  iter  1745/2005  reward= +41.248
+  iter  1746/2005  reward= +41.620
+  iter  1747/2005  reward= +45.169
+  iter  1748/2005  reward= +42.569
+  iter  1749/2005  reward= +41.028
+  iter  1750/2005  reward= +41.897
+
+  ── EVAL @ iter 1750 ──
+     Accuracy    : 0.9900  (99.00%)
+     Reward      : +54.867 ± 78.342
+     Ep length   : 204.3 steps
+     Sensors/step: 4.38
+
+  iter  1751/2005  reward= +50.722
+  iter  1752/2005  reward= +54.474
+  iter  1753/2005  reward= +52.683
+  iter  1754/2005  reward= +53.289
+  iter  1755/2005  reward= +49.864
+  iter  1756/2005  reward= +37.976
+  iter  1757/2005  reward= +41.928
+  iter  1758/2005  reward= +41.820
+  iter  1759/2005  reward= +40.892
+  iter  1760/2005  reward= +44.805
+
+  ── EVAL @ iter 1760 ──
+     Accuracy    : 0.9891  (98.91%)
+     Reward      : +63.462 ± 81.035
+     Ep length   : 229.4 steps
+     Sensors/step: 4.23
+
+  iter  1761/2005  reward= +49.884
+  iter  1762/2005  reward= +50.837
+  iter  1763/2005  reward= +43.668
+  iter  1764/2005  reward= +37.521
+  iter  1765/2005  reward= +35.924
+  iter  1766/2005  reward= +39.206
+  iter  1767/2005  reward= +43.893
+  iter  1768/2005  reward= +50.896
+  iter  1769/2005  reward= +56.803
+  iter  1770/2005  reward= +58.755
+
+  ── EVAL @ iter 1770 ──
+     Accuracy    : 0.9887  (98.87%)
+     Reward      : +49.720 ± 78.246
+     Ep length   : 193.0 steps
+     Sensors/step: 4.21
+
+  iter  1771/2005  reward= +54.124
+  iter  1772/2005  reward= +51.772
+  iter  1773/2005  reward= +48.909
+  iter  1774/2005  reward= +37.633
+  iter  1775/2005  reward= +41.103
+  iter  1776/2005  reward= +38.314
+  iter  1777/2005  reward= +33.552
+  iter  1778/2005  reward= +39.982
+  iter  1779/2005  reward= +41.026
+  iter  1780/2005  reward= +37.864
+
+  ── EVAL @ iter 1780 ──
+     Accuracy    : 0.9866  (98.66%)
+     Reward      : +51.763 ± 72.493
+     Ep length   : 197.5 steps
+     Sensors/step: 4.12
+
+  iter  1781/2005  reward= +43.121
+  iter  1782/2005  reward= +50.471
+  iter  1783/2005  reward= +48.195
+  iter  1784/2005  reward= +55.205
+  iter  1785/2005  reward= +49.416
+  iter  1786/2005  reward= +51.029
+  iter  1787/2005  reward= +44.503
+  iter  1788/2005  reward= +39.943
+  iter  1789/2005  reward= +39.811
+  iter  1790/2005  reward= +41.788
+
+  ── EVAL @ iter 1790 ──
+     Accuracy    : 0.9907  (99.07%)
+     Reward      : +55.870 ± 79.760
+     Ep length   : 201.4 steps
+     Sensors/step: 4.20
+
+  iter  1791/2005  reward= +37.170
+  iter  1792/2005  reward= +39.450
+  iter  1793/2005  reward= +40.561
+  iter  1794/2005  reward= +38.372
+  iter  1795/2005  reward= +39.620
+  iter  1796/2005  reward= +44.978
+  iter  1797/2005  reward= +42.388
+  iter  1798/2005  reward= +45.696
+  iter  1799/2005  reward= +46.486
+  iter  1800/2005  reward= +45.370
+
+  ── EVAL @ iter 1800 ──
+     Accuracy    : 0.9903  (99.03%)
+     Reward      : +59.078 ± 79.368
+     Ep length   : 214.0 steps
+     Sensors/step: 4.23
+
+  iter  1801/2005  reward= +38.987
+  iter  1802/2005  reward= +41.274
+  iter  1803/2005  reward= +39.857
+  iter  1804/2005  reward= +43.538
+  iter  1805/2005  reward= +41.460
+  iter  1806/2005  reward= +41.340
+  iter  1807/2005  reward= +40.342
+  iter  1808/2005  reward= +39.194
+  iter  1809/2005  reward= +44.162
+  iter  1810/2005  reward= +51.228
+
+  ── EVAL @ iter 1810 ──
+     Accuracy    : 0.9903  (99.03%)
+     Reward      : +51.836 ± 66.262
+     Ep length   : 193.6 steps
+     Sensors/step: 4.11
+
+  iter  1811/2005  reward= +54.149
+  iter  1812/2005  reward= +59.456
+  iter  1813/2005  reward= +64.130
+  iter  1814/2005  reward= +58.056
+  iter  1815/2005  reward= +61.021
+  iter  1816/2005  reward= +55.795
+  iter  1817/2005  reward= +49.530
+  iter  1818/2005  reward= +46.086
+  iter  1819/2005  reward= +50.704
+  iter  1820/2005  reward= +54.012
+
+  ── EVAL @ iter 1820 ──
+     Accuracy    : 0.9909  (99.09%)
+     Reward      : +62.455 ± 76.994
+     Ep length   : 222.8 steps
+     Sensors/step: 4.15
+
+  iter  1821/2005  reward= +52.324
+  iter  1822/2005  reward= +48.147
+  iter  1823/2005  reward= +54.856
+  iter  1824/2005  reward= +47.296
+  iter  1825/2005  reward= +41.024
+  iter  1826/2005  reward= +44.756
+  iter  1827/2005  reward= +50.947
+  iter  1828/2005  reward= +51.129
+  iter  1829/2005  reward= +54.715
+  iter  1830/2005  reward= +53.250
+
+  ── EVAL @ iter 1830 ──
+     Accuracy    : 0.9896  (98.96%)
+     Reward      : +49.274 ± 77.622
+     Ep length   : 193.1 steps
+     Sensors/step: 4.28
+
+  iter  1831/2005  reward= +52.360
+  iter  1832/2005  reward= +52.198
+  iter  1833/2005  reward= +51.003
+  iter  1834/2005  reward= +45.572
+  iter  1835/2005  reward= +47.999
+  iter  1836/2005  reward= +44.169
+  iter  1837/2005  reward= +36.986
+  iter  1838/2005  reward= +36.876
+  iter  1839/2005  reward= +38.269
+  iter  1840/2005  reward= +34.850
+
+  ── EVAL @ iter 1840 ──
+     Accuracy    : 0.9873  (98.73%)
+     Reward      : +36.360 ± 59.177
+     Ep length   : 154.2 steps
+     Sensors/step: 4.31
+
+  iter  1841/2005  reward= +40.264
+  iter  1842/2005  reward= +38.874
+  iter  1843/2005  reward= +37.689
+  iter  1844/2005  reward= +37.944
+  iter  1845/2005  reward= +40.669
+  iter  1846/2005  reward= +40.578
+  iter  1847/2005  reward= +39.350
+  iter  1848/2005  reward= +43.283
+  iter  1849/2005  reward= +46.101
+  iter  1850/2005  reward= +47.202
+
+  ── EVAL @ iter 1850 ──
+     Accuracy    : 0.9919  (99.19%)
+     Reward      : +52.685 ± 65.903
+     Ep length   : 187.4 steps
+     Sensors/step: 4.27
+
+  ★ New best: 0.9919
+  iter  1851/2005  reward= +48.088
+  iter  1852/2005  reward= +46.757
+  iter  1853/2005  reward= +48.737
+  iter  1854/2005  reward= +52.882
+  iter  1855/2005  reward= +50.305
+  iter  1856/2005  reward= +49.523
+  iter  1857/2005  reward= +52.592
+  iter  1858/2005  reward= +47.434
+  iter  1859/2005  reward= +42.408
+  iter  1860/2005  reward= +41.506
+
+  ── EVAL @ iter 1860 ──
+     Accuracy    : 0.9905  (99.05%)
+     Reward      : +58.360 ± 71.570
+     Ep length   : 212.7 steps
+     Sensors/step: 4.12
+
+  iter  1861/2005  reward= +34.493
+  iter  1862/2005  reward= +36.858
+  iter  1863/2005  reward= +41.458
+  iter  1864/2005  reward= +39.791
+  iter  1865/2005  reward= +48.020
+  iter  1866/2005  reward= +53.437
+  iter  1867/2005  reward= +52.824
+  iter  1868/2005  reward= +45.501
+  iter  1869/2005  reward= +48.270
+  iter  1870/2005  reward= +42.973
+
+  ── EVAL @ iter 1870 ──
+     Accuracy    : 0.9905  (99.05%)
+     Reward      : +54.798 ± 68.254
+     Ep length   : 205.0 steps
+     Sensors/step: 4.16
+
+  iter  1871/2005  reward= +38.320
+  iter  1872/2005  reward= +38.867
+  iter  1873/2005  reward= +46.105
+  iter  1874/2005  reward= +46.692
+  iter  1875/2005  reward= +52.794
+  iter  1876/2005  reward= +51.620
+  iter  1877/2005  reward= +54.040
+  iter  1878/2005  reward= +50.274
+  iter  1879/2005  reward= +54.236
+  iter  1880/2005  reward= +49.692
+
+  ── EVAL @ iter 1880 ──
+     Accuracy    : 0.9922  (99.22%)
+     Reward      : +62.331 ± 76.145
+     Ep length   : 212.0 steps
+     Sensors/step: 4.08
+
+  ★ New best: 0.9922
+  iter  1881/2005  reward= +54.476
+  iter  1882/2005  reward= +54.068
+  iter  1883/2005  reward= +51.498
+  iter  1884/2005  reward= +56.844
+  iter  1885/2005  reward= +60.790
+  iter  1886/2005  reward= +57.132
+  iter  1887/2005  reward= +56.024
+  iter  1888/2005  reward= +58.666
+  iter  1889/2005  reward= +45.804
+  iter  1890/2005  reward= +43.798
+
+  ── EVAL @ iter 1890 ──
+     Accuracy    : 0.9884  (98.84%)
+     Reward      : +57.984 ± 81.945
+     Ep length   : 217.9 steps
+     Sensors/step: 4.21
+
+  iter  1891/2005  reward= +44.013
+  iter  1892/2005  reward= +48.272
+  iter  1893/2005  reward= +48.737
+  iter  1894/2005  reward= +54.206
+  iter  1895/2005  reward= +56.205
+  iter  1896/2005  reward= +58.880
+  iter  1897/2005  reward= +50.292
+  iter  1898/2005  reward= +50.336
+  iter  1899/2005  reward= +48.376
+  iter  1900/2005  reward= +46.873
+
+  ── EVAL @ iter 1900 ──
+     Accuracy    : 0.9896  (98.96%)
+     Reward      : +52.424 ± 73.036
+     Ep length   : 184.8 steps
+     Sensors/step: 4.12
+
+  iter  1901/2005  reward= +43.690
+  iter  1902/2005  reward= +43.453
+  iter  1903/2005  reward= +48.300
+  iter  1904/2005  reward= +51.753
+  iter  1905/2005  reward= +54.607
+  iter  1906/2005  reward= +60.989
+  iter  1907/2005  reward= +61.506
+  iter  1908/2005  reward= +61.932
+  iter  1909/2005  reward= +51.982
+  iter  1910/2005  reward= +48.879
+
+  ── EVAL @ iter 1910 ──
+     Accuracy    : 0.9885  (98.85%)
+     Reward      : +54.104 ± 64.659
+     Ep length   : 199.3 steps
+     Sensors/step: 4.14
+
+  iter  1911/2005  reward= +48.688
+  iter  1912/2005  reward= +54.278
+  iter  1913/2005  reward= +49.123
+  iter  1914/2005  reward= +47.544
+  iter  1915/2005  reward= +43.656
+  iter  1916/2005  reward= +33.843
+  iter  1917/2005  reward= +36.127
+  iter  1918/2005  reward= +37.204
+  iter  1919/2005  reward= +40.020
+  iter  1920/2005  reward= +43.382
+
+  ── EVAL @ iter 1920 ──
+     Accuracy    : 0.9896  (98.96%)
+     Reward      : +51.992 ± 79.526
+     Ep length   : 194.1 steps
+     Sensors/step: 4.20
+
+  iter  1921/2005  reward= +41.197
+  iter  1922/2005  reward= +44.415
+  iter  1923/2005  reward= +51.519
+  iter  1924/2005  reward= +50.014
+  iter  1925/2005  reward= +44.454
+  iter  1926/2005  reward= +49.648
+  iter  1927/2005  reward= +50.422
+  iter  1928/2005  reward= +42.520
+  iter  1929/2005  reward= +48.323
+  iter  1930/2005  reward= +49.480
+
+  ── EVAL @ iter 1930 ──
+     Accuracy    : 0.9883  (98.83%)
+     Reward      : +54.727 ± 65.176
+     Ep length   : 205.3 steps
+     Sensors/step: 4.10
+
+  iter  1931/2005  reward= +50.429
+  iter  1932/2005  reward= +49.207
+  iter  1933/2005  reward= +48.758
+  iter  1934/2005  reward= +48.644
+  iter  1935/2005  reward= +48.092
+  iter  1936/2005  reward= +50.473
+  iter  1937/2005  reward= +48.413
+  iter  1938/2005  reward= +56.504
+  iter  1939/2005  reward= +55.466
+  iter  1940/2005  reward= +54.397
+
+  ── EVAL @ iter 1940 ──
+     Accuracy    : 0.9896  (98.96%)
+     Reward      : +55.830 ± 76.911
+     Ep length   : 202.3 steps
+     Sensors/step: 4.27
+
+  iter  1941/2005  reward= +54.005
+  iter  1942/2005  reward= +57.249
+  iter  1943/2005  reward= +57.644
+  iter  1944/2005  reward= +56.097
+  iter  1945/2005  reward= +59.558
+  iter  1946/2005  reward= +67.624
+  iter  1947/2005  reward= +68.427
+  iter  1948/2005  reward= +70.874
+  iter  1949/2005  reward= +61.497
+  iter  1950/2005  reward= +51.888
+
+  ── EVAL @ iter 1950 ──
+     Accuracy    : 0.9878  (98.78%)
+     Reward      : +49.832 ± 63.430
+     Ep length   : 185.4 steps
+     Sensors/step: 4.09
+
+  iter  1951/2005  reward= +47.418
+  iter  1952/2005  reward= +46.780
+  iter  1953/2005  reward= +42.005
+  iter  1954/2005  reward= +46.418
+  iter  1955/2005  reward= +46.704
+  iter  1956/2005  reward= +44.306
+  iter  1957/2005  reward= +40.813
+  iter  1958/2005  reward= +42.675
+  iter  1959/2005  reward= +45.947
+  iter  1960/2005  reward= +40.589
+
+  ── EVAL @ iter 1960 ──
+     Accuracy    : 0.9903  (99.03%)
+     Reward      : +63.641 ± 79.471
+     Ep length   : 224.9 steps
+     Sensors/step: 4.15
+
+  iter  1961/2005  reward= +40.586
+  iter  1962/2005  reward= +33.423
+  iter  1963/2005  reward= +37.744
+  iter  1964/2005  reward= +38.870
+  iter  1965/2005  reward= +44.845
+  iter  1966/2005  reward= +47.946
+  iter  1967/2005  reward= +44.959
+  iter  1968/2005  reward= +48.727
+  iter  1969/2005  reward= +50.103
+  iter  1970/2005  reward= +53.446
+
+  ── EVAL @ iter 1970 ──
+     Accuracy    : 0.9886  (98.86%)
+     Reward      : +61.212 ± 74.369
+     Ep length   : 222.4 steps
+     Sensors/step: 4.16
+
+  iter  1971/2005  reward= +56.145
+  iter  1972/2005  reward= +54.333
+  iter  1973/2005  reward= +48.930
+  iter  1974/2005  reward= +49.979
+  iter  1975/2005  reward= +47.233
+  iter  1976/2005  reward= +43.171
+  iter  1977/2005  reward= +47.530
+  iter  1978/2005  reward= +53.100
+  iter  1979/2005  reward= +50.970
+  iter  1980/2005  reward= +48.140
+
+  ── EVAL @ iter 1980 ──
+     Accuracy    : 0.9885  (98.85%)
+     Reward      : +51.913 ± 66.532
+     Ep length   : 194.4 steps
+     Sensors/step: 4.10
+
+  iter  1981/2005  reward= +52.880
+  iter  1982/2005  reward= +50.470
+  iter  1983/2005  reward= +44.249
+  iter  1984/2005  reward= +43.034
+  iter  1985/2005  reward= +44.355
+  iter  1986/2005  reward= +40.294
+  iter  1987/2005  reward= +46.187
+  iter  1988/2005  reward= +53.876
+  iter  1989/2005  reward= +49.331
+  iter  1990/2005  reward= +45.106
+
+  ── EVAL @ iter 1990 ──
+     Accuracy    : 0.9895  (98.95%)
+     Reward      : +51.452 ± 65.648
+     Ep length   : 192.8 steps
+     Sensors/step: 4.16
+
+  iter  1991/2005  reward= +41.790
+  iter  1992/2005  reward= +37.025
+  iter  1993/2005  reward= +35.154
+  iter  1994/2005  reward= +43.352
+  iter  1995/2005  reward= +43.210
+  iter  1996/2005  reward= +44.331
+  iter  1997/2005  reward= +47.104
+  iter  1998/2005  reward= +48.308
+  iter  1999/2005  reward= +46.836
+  iter  2000/2005  reward= +45.299
+
+  ── EVAL @ iter 2000 ──
+     Accuracy    : 0.9908  (99.08%)
+     Reward      : +61.081 ± 76.221
+     Ep length   : 217.2 steps
+     Sensors/step: 4.13
+
+  iter  2001/2005  reward= +39.043
+  iter  2002/2005  reward= +43.356
+  iter  2003/2005  reward= +39.025
+  iter  2004/2005  reward= +41.395
+  iter  2005/2005  reward= +43.984
+
+  ── EVAL @ iter 2005 ──
+     Accuracy    : 0.9894  (98.94%)
+     Reward      : +46.819 ± 64.552
+     Ep length   : 181.8 steps
+     Sensors/step: 4.15
+
+
+  Best accuracy: 0.9922 (99.22%)

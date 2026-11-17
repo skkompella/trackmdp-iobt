@@ -18,6 +18,8 @@ Matrix specs used by the training scripts (``parse_matrix_spec``):
   "C"      equal probability over stay + every neighbour
   "R<i>"   random matrix i, drawn with seed ``matrix_seed + i``
   "A","B"  the hand-designed grid drift matrices (grid only)
+  "O<i>"   original Track-MDP movement, drawn with seed ``matrix_seed + i``
+           (grid only; 3x3 Moore neighbourhood, so diagonal moves too)
 """
 from __future__ import annotations
 
@@ -61,6 +63,30 @@ def random_matrix(neigh: dict[int, list[int]], seed: int,
     return T
 
 
+TRACKMDP_CUM_PROB = (0.2817, 0.5633, 0.845, 0.995)   # num_trans=4, stay-run 0.15, exit 0.005
+
+
+def original_matrix(nrows: int, ncols: int, seed: int,
+                    cum_prob=TRACKMDP_CUM_PROB) -> np.ndarray:
+    """
+    The original Track-MDP movement model (environment.object_transition_
+    matrix_random_3x3) as a transition matrix: each cell draws len(cum_prob)
+    destinations, with replacement, from its in-grid 3x3 neighbourhood (stay
+    included); slot i gets the gap cum_prob[i] - cum_prob[i-1]. The exit mass
+    (1 - cum_prob[-1]) is left to the environment, so rows are renormalised.
+    """
+    from .grid_transition_matrices import moore_neighbours
+    rng = np.random.default_rng(seed)
+    gaps = np.diff(np.concatenate([[0.0], cum_prob]))
+    n = nrows * ncols
+    T = np.zeros((n, n))
+    for cell in range(n):
+        nbhd = [cell] + moore_neighbours(cell, nrows, ncols)
+        for g, j in zip(gaps, rng.integers(len(nbhd), size=len(gaps))):
+            T[cell, nbhd[j]] += g
+    return T / T.sum(axis=1, keepdims=True)
+
+
 def parse_matrix_spec(spec: str, env: str, matrix_seed: int,
                       concentration: float = DEFAULT_CONCENTRATION,
                       nrows: int = 5, ncols: int = 5):
@@ -78,6 +104,8 @@ def parse_matrix_spec(spec: str, env: str, matrix_seed: int,
             mats.append(make_matrix_A(nrows, ncols))
         elif env == "grid" and tok == "B":
             mats.append(make_matrix_B(nrows, ncols))
+        elif env == "grid" and tok.startswith("O") and tok[1:].isdigit():
+            mats.append(original_matrix(nrows, ncols, matrix_seed + int(tok[1:])))
         else:
             raise ValueError(f"unknown matrix token {tok!r} for env {env!r}")
         names.append(tok)
@@ -93,5 +121,5 @@ def describe_random(T: np.ndarray, name: str = "") -> str:
 
 
 __all__ = ["grid_neighbourhoods", "iobt_neighbourhoods", "equal_matrix",
-           "random_matrix", "parse_matrix_spec", "describe_random",
+           "random_matrix", "original_matrix", "parse_matrix_spec", "describe_random",
            "DEFAULT_CONCENTRATION"]

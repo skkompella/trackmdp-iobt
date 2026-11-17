@@ -337,9 +337,26 @@ class grid_env_rect:
     missing_state, time_limit — same as original grid_env
     """
 
+    MOVEMENTS = ("4conn", "moore", "original")
+    SENSOR_BUDGETS = ("none", "env")
+
     def __init__(self, nrows, ncols, num_trans, state_trans_cum_prob,
                  max_sensors, max_sensors_null, missing_state, time_limit,
-                 no_moore_constraint=False):
+                 no_moore_constraint=False, movement="4conn", seed=None,
+                 sensor_budget="none"):
+        if sensor_budget not in self.SENSOR_BUDGETS:
+            raise ValueError(f"sensor_budget must be one of {self.SENSOR_BUDGETS}")
+        # "none": max_sensors is never applied (upstream Track-MDP).
+        # "env":  at most max_sensors tracking sensors per step, enforced here,
+        #         i.e. identically in training and evaluation (apply_budget()).
+        self.sensor_budget = sensor_budget
+        if movement not in self.MOVEMENTS:
+            raise ValueError(f"movement must be one of {self.MOVEMENTS}, got {movement!r}")
+        self.movement = movement
+        # Own generator for target movement and resets. seed=None draws fresh
+        # entropy, so runs are not reproducible unless a seed is given.
+        self._move_rng = np.random.default_rng(seed)
+        self._budget_rng = np.random.default_rng(None if seed is None else seed + 1)
         self.nrows = nrows
         self.ncols = ncols
         self.N     = ncols          # gym_wrapper reads self.N for obs-space size
@@ -353,10 +370,12 @@ class grid_env_rect:
         self.max_sensors    = max_sensors
         self.max_sensors_null = max_sensors_null
 
+        if movement == "original":
+            self._orig_dests = self._draw_original_dests()
         self.obj_trans_matrix = self._build_transition_matrix()
         # Per-cell equal-probability tables for object_move()
         self._cell_dests, self._cell_cum_probs = self._build_equal_prob_tables()
-        self.object_pos = rnd.randrange(self.n_cells)
+        self.object_pos = int(self._move_rng.integers(self.n_cells))
 
         self.combination_dict      = {}
         self.cum_comb_dict         = {}
@@ -405,13 +424,70 @@ class grid_env_rect:
         """
         matrix = []
         for cell in range(self.n_cells):
-            dests = self._4connected_dests(cell)
+            dests = self._dests(cell)
             row   = list(dests)
             while len(row) < self.num_trans:
                 row.append(cell)          # pad with stay-in-place
             matrix.append(row[:self.num_trans])
         matrix.append([self.n_cells] * self.num_trans)   # terminal row
         return matrix
+
+    def _draw_original_dests(self):
+        """
+        Original Track-MDP movement (environment.object_transition_matrix_random_3x3):
+        for every cell draw num_trans destinations, with replacement, from the
+        in-bounds 3x3 neighbourhood (stay included). object_move() then picks
+        slot i with the gaps of state_trans_cum_prob (e.g. 28/28/28/15%) and
+        exits above the last threshold. Drawn once per environment.
+        """
+        dests = {}
+        for cell in range(self.n_cells):
+            nbhd = self._moore_dests(cell)
+            dests[cell] = [int(nbhd[i]) for i in
+                           self._move_rng.integers(len(nbhd), size=self.num_trans)]
+        return dests
+
+    def _dests(self, cell):
+        """Destinations for the configured movement model."""
+        if self.movement == "original":
+            return list(self._orig_dests[cell])
+        if self.movement == "moore":
+            return self._moore_dests(cell)
+        return self._4connected_dests(cell)
+
+    def _moore_dests(self, cell):
+        """Stay + all 8 neighbours (diagonals included), filtered to grid bounds."""
+        col, row = cell % self.ncols, cell // self.ncols
+        dests = [cell]
+        for dr in (-1, 0, 1):
+            for dc in (-1, 0, 1):
+                if (dr or dc) and 0 <= row + dr < self.nrows and 0 <= col + dc < self.ncols:
+                    dests.append((row + dr) * self.ncols + (col + dc))
+        return dests
+
+    def reseed(self, seed=None):
+        """Replace the movement and budget generators (seed=None -> fresh entropy)."""
+        self._move_rng = np.random.default_rng(seed)
+        self._budget_rng = np.random.default_rng(None if seed is None else seed + 1)
+
+    def apply_budget(self, action_sensors):
+        """
+        Enforce the sensor budget on a tracking-state action (sensor_budget="env").
+        If more than max_sensors cells are on, keep max_sensors of them chosen
+        uniformly at random; the others are off (and not billed). Random rather
+        than by index, so no cell position is systematically favoured. The
+        missing-state rescan is not budgeted (all cells, as in Track-MDP).
+        """
+        action_sensors = np.asarray(action_sensors, dtype=int)
+        # getattr: environments pickled before the budget existed have no attribute
+        if (getattr(self, "sensor_budget", "none") != "env"
+                or action_sensors.sum() <= self.max_sensors):
+            return action_sensors
+        on = np.flatnonzero(action_sensors)
+        keep = self._budget_rng.choice(on, size=self.max_sensors, replace=False)
+        clipped = np.zeros_like(action_sensors)
+        clipped[keep] = 1
+        return clipped
 
     def _4connected_dests(self, cell):
         """Return [stay, up, down, left, right] filtered to grid bounds."""
@@ -441,7 +517,7 @@ class grid_env_rect:
         cell_dests     = {}
         cell_cum_probs = {}
         for cell in range(self.n_cells):
-            dests  = self._4connected_dests(cell)
+            dests  = self._dests(cell)
             n      = len(dests)
             p_each = (1.0 - TERMINAL_PROB) / n
             cum    = np.array([p_each * (i + 1) for i in range(n)])
@@ -467,13 +543,20 @@ class grid_env_rect:
         if pos == self.n_cells:          # already terminal — absorbing
             return 0
 
+        if self.movement == "original":
+            u    = self._move_rng.uniform(0, 1)
+            slot = int(np.sum(self.prob_list_cum <= u))
+            self.object_pos = (self._orig_dests[pos][slot] if slot < self.num_trans
+                               else self.n_cells)
+            return 0
+
         if pos not in self._cell_cum_probs:   # defensive guard
             self.object_pos = self.n_cells
             return 0
 
         cum   = self._cell_cum_probs[pos]
         dests = self._cell_dests[pos]
-        u     = np.random.uniform(0, 1)
+        u     = self._move_rng.uniform(0, 1)
         slot  = int(np.sum(cum <= u))
 
         if slot < len(dests):
@@ -484,7 +567,7 @@ class grid_env_rect:
         return 0
 
     def reset_object_state(self):
-        self.object_pos = rnd.randrange(self.n_cells)
+        self.object_pos = int(self._move_rng.integers(self.n_cells))
 
     # -----------------------------------------------------------------------
     # Sensor validity
@@ -568,6 +651,7 @@ class grid_env_rect:
                 obj_rel_pos, obj_in_grid = self.realign_obj(
                     self.object_pos, current_state, time_delay
                 )
+            action_sensors = self.apply_budget(action_sensors)
         else:
             obj_rel_pos, obj_in_grid = 0, 1
             action_sensors = [1] * (self.n_cells if self.no_moore_constraint
@@ -615,7 +699,8 @@ class learning_grid_sarsa_0:
 
     def __init__(self, run_number, nrows, ncols, num_trans, state_trans_cum_prob,
                  max_sensors, max_sensors_null, time_limit, time_limit_max,
-                 no_moore_constraint=False):
+                 no_moore_constraint=False, movement="4conn", seed=None,
+                 sensor_budget="none"):
         self.run_number     = run_number
         self.nrows          = nrows
         self.ncols          = ncols
@@ -630,7 +715,8 @@ class learning_grid_sarsa_0:
         self.grid_env = grid_env_rect(
             nrows, ncols, num_trans, state_trans_cum_prob,
             max_sensors, max_sensors_null, self.missing_state, time_limit,
-            no_moore_constraint=no_moore_constraint,
+            no_moore_constraint=no_moore_constraint, movement=movement, seed=seed,
+            sensor_budget=sensor_budget,
         )
 
         self.exploration_epsilon = 0.15

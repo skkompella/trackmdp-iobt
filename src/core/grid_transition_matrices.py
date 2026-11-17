@@ -152,8 +152,17 @@ def expected_displacement(T: np.ndarray, nrows: int, ncols: int
     return dxs / n, dys / n
 
 
-def validate_transition_matrix(T, nrows: int, ncols: int):
-    """Check shape, row-stochasticity, and that no mass leaves the neighbourhood."""
+def moore_neighbours(cell: int, nrows: int, ncols: int) -> list[int]:
+    """The up-to-8 in-grid neighbours of ``cell``, diagonals included."""
+    r, c = divmod(cell, ncols)
+    return [(r + dr) * ncols + (c + dc)
+            for dr in (-1, 0, 1) for dc in (-1, 0, 1)
+            if (dr or dc) and 0 <= r + dr < nrows and 0 <= c + dc < ncols]
+
+
+def validate_transition_matrix(T, nrows: int, ncols: int, moore: bool = False):
+    """Check shape, row-stochasticity, and that no mass leaves the neighbourhood
+    (4-connected, or the 3x3 Moore neighbourhood when ``moore``)."""
     T = np.asarray(T, dtype=np.float64)
     n = nrows * ncols
     if T.shape != (n, n):
@@ -164,11 +173,12 @@ def validate_transition_matrix(T, nrows: int, ncols: int):
         bad = int(np.argmax(np.abs(T.sum(axis=1) - 1.0)))
         return False, f"row {bad} sums to {T[bad].sum():.6f}, not 1"
     for cell in range(n):
-        allowed = set(neighbours(cell, nrows, ncols)) | {cell}
+        allowed = set(moore_neighbours(cell, nrows, ncols) if moore
+                      else neighbours(cell, nrows, ncols)) | {cell}
         for dest in np.flatnonzero(T[cell]):
             if int(dest) not in allowed:
                 return False, (f"row {cell} puts mass on {dest}, outside its "
-                               f"4-connected neighbourhood")
+                               f"{'Moore' if moore else '4-connected'} neighbourhood")
     return True, "OK"
 
 

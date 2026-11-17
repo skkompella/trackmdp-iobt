@@ -21,6 +21,9 @@ Usage
 
 import os
 import sys
+import csv
+import json
+import shutil
 import argparse
 import numpy as np
 
@@ -43,8 +46,8 @@ DEFAULTS = {
     "nrows":               2,       # M — rows
     "ncols":               3,       # N — columns
     "num_trans":           4,
-    "max_sensors":         6,
-    "max_sensors_null":    6,
+    "max_sensors":         9,
+    "max_sensors_null":    9,
     "time_limit":          1,
     "time_limit_max":      1,
     "training_iterations": 5,
@@ -52,6 +55,11 @@ DEFAULTS = {
     "eval_episodes":       100,
     "num_workers":         4,
     "lr":                  1e-4,
+    "max_ep_steps":        100,       # training episode cap; 0 = none (ends on target exit)
+    "movement":            "moore",   # target movement: stay + 8 neighbours ("4conn": stay + 4)
+    "seed":                None,      # None = unseeded; an int makes runs reproducible
+    "sensor_budget":       "none",    # "none" = upstream (k unused); "env" = enforce k in env
+    "init_checkpoint":     None,      # start from this checkpoint (branch a run)
 }
 
 
@@ -84,6 +92,7 @@ def evaluate_policy(algo, env, cfg, num_episodes):
 
     total_rewards, ep_lengths, sensors_ep = [], [], []
     total_steps = total_found = 0
+    ep_upstream_acc = []     # per-episode accuracy, upstream Track-MDP definition
 
     for _ in range(num_episodes):
         env.reset_object_state()
@@ -91,6 +100,7 @@ def evaluate_policy(algo, env, cfg, num_episodes):
         time_delay    = 0
         actions_list  = []
         ep_reward = ep_steps = ep_sensors = 0
+        ep_found_upstream = 0
 
         while ep_steps < 1000: #was 1000
             num_sensors = (2 * time_delay + 3) ** 2
@@ -122,13 +132,16 @@ def evaluate_policy(algo, env, cfg, num_episodes):
                 action_sensors = np.ones(num_sensors, dtype=int)
                 obj_rel_pos, obj_in_window = 0, 1
 
-            if action_sensors.sum() > max_sensors:
-                active = np.where(action_sensors == 1)[0][:max_sensors]
-                action_sensors = np.zeros(num_sensors, dtype=int)
-                action_sensors[active] = 1
+            if not was_missing:
+                # The environment's own budget rule (standard.md): no-op for
+                # sensor_budget="none", random keep-k for "env". The same rule
+                # applies in training, so evaluation matches what was learned.
+                action_sensors = env.apply_budget(action_sensors)
 
             obj_detected = int(obj_in_window == 1 and
                                action_sensors[int(obj_rel_pos)] == 1)
+            # Upstream Track-MDP counts a missing-state (full rescan) step as found.
+            ep_found_upstream += 1 if was_missing else obj_detected
             if not was_missing and obj_detected:
                 total_found += 1
 
@@ -154,10 +167,14 @@ def evaluate_policy(algo, env, cfg, num_episodes):
         total_rewards.append(ep_reward)
         ep_lengths.append(ep_steps)
         sensors_ep.append(ep_sensors / max(ep_steps, 1))
+        ep_upstream_acc.append(ep_found_upstream / max(ep_steps, 1))
         total_steps += ep_steps
 
     return {
-        "tracking_accuracy": total_found / max(total_steps, 1),
+        # standard.md: the upstream metric is THE accuracy
+        "accuracy":          float(np.mean(ep_upstream_acc)),
+        # port metric: hits only while tracking, pooled over all steps
+        "tracked_accuracy":  total_found / max(total_steps, 1),
         "mean_reward":       float(np.mean(total_rewards)),
         "std_reward":        float(np.std(total_rewards)),
         "mean_length":       float(np.mean(ep_lengths)),
@@ -188,6 +205,9 @@ def find_latest_checkpoint(run_number, save_dir=None):
             continue
         if _is_rllib_checkpoint(directory):
             return directory, directory
+        current = os.path.join(directory, "current")
+        if _is_rllib_checkpoint(current):
+            return current, directory
         checkpoints = []
         for item in os.listdir(directory):
             full = os.path.join(directory, item)
@@ -227,6 +247,9 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
 
     print(f"\n  Grid       : {nrows} rows × {ncols} cols  ({n_cells} cells)")
     print(f"  num_trans  : {cfg['num_trans']}")
+    print(f"  movement   : {cfg['movement']}   max_sensors (k): {cfg['max_sensors']}   "
+          f"seed: {cfg['seed']}   train ep cap: {cfg['max_ep_steps'] or 'none'}   "
+          f"sensor budget: {cfg['sensor_budget']}")
     print(f"  missing_state = {missing_state}")
     print(f"  cum_probs  : {[round(x, 4) for x in state_trans_cum_prob]}")
 
@@ -235,12 +258,16 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
         run_number, nrows, ncols, cfg["num_trans"], state_trans_cum_prob,
         cfg["max_sensors"], cfg["max_sensors_null"],
         time_limit, time_limit_max,
+        movement=cfg["movement"], seed=cfg["seed"],
+        sensor_budget=cfg["sensor_budget"],
     )
 
     env_config = {
         "qobj":                qobj,
         "time_limit_schedule": [2000],
         "time_limit_max":      time_limit_max,
+        "seed":                cfg["seed"],
+        "max_ep_steps":        cfg["max_ep_steps"],
     }
 
     if not ray.is_initialized():
@@ -291,6 +318,14 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
             algo.restore(ckpt)
         else:
             print("No checkpoint found to resume — training from scratch.")
+    elif cfg.get("init_checkpoint"):
+        # Branch from another run's checkpoint (weights + optimizer state) into
+        # this run's environment, e.g. a new movement model. Restoring before
+        # any sampling is safe: no worker is mid-episode.
+        ckpt = os.path.abspath(cfg["init_checkpoint"])
+        print(f"Starting from checkpoint: {ckpt}")
+        algo.restore(ckpt)
+        algo.env_runner_group.sync_weights()
     else:
         print("Training from scratch (use --resume to continue from a checkpoint).")
 
@@ -298,7 +333,21 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
     print(f"\nTraining for {cfg['training_iterations']} iterations "
           f"(eval every {cfg['eval_interval']}) ...\n")
 
-    best_accuracy = 0.0
+    # Every eval: save the current checkpoint to <save_dir>/current, copy it to
+    # <save_dir>/best when accuracy improves, and append to the metric history
+    # (metrics_history.json / .csv). The best is reported at the end.
+    current_dir = os.path.join(save_dir, "current")
+    best_dir    = os.path.join(save_dir, "best")
+    history     = []
+    best        = None
+    if cfg.get("init_checkpoint"):
+        # Iteration 0: the branched policy on the new environment, before any
+        # training -- the accuracy right after the change.
+        metrics = evaluate_policy(algo, qobj.grid_env, cfg, cfg["eval_episodes"])
+        _print_metrics("EVAL @ iter 0 (before training)", metrics)
+        history.append({"iteration": 0, "train_reward_mean": float("nan"), **metrics})
+        os.makedirs(save_dir, exist_ok=True)
+        _write_history(save_dir, history, None, cfg)
     for i in range(1, cfg["training_iterations"] + 1):
         result      = algo.train()
         reward_mean = (result.get("episode_reward_mean") or
@@ -307,20 +356,44 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
         print(f"  iter {i:5d}/{cfg['training_iterations']}  reward={reward_mean:+8.3f}")
 
         if i % cfg["eval_interval"] == 0 or i == cfg["training_iterations"]:
-            algo.save(save_dir)
+            algo.save(os.path.abspath(current_dir))
             metrics = evaluate_policy(algo, qobj.grid_env, cfg, cfg["eval_episodes"])
             _print_metrics(f"EVAL @ iter {i}", metrics)
-            if metrics["tracking_accuracy"] > best_accuracy:
-                best_accuracy = metrics["tracking_accuracy"]
-                print(f"  ★ New best: {best_accuracy:.4f}")
+            row = {"iteration": i, "train_reward_mean": reward_mean, **metrics}
+            history.append(row)
+            if best is None or metrics["accuracy"] > best["accuracy"]:
+                best = row
+                shutil.rmtree(best_dir, ignore_errors=True)
+                shutil.copytree(current_dir, best_dir)
+                print(f"  ★ New best: {best['accuracy']:.4f} (saved to {best_dir})")
+            _write_history(save_dir, history, best, cfg)
 
-    print(f"\n  Best accuracy: {best_accuracy:.4f} ({best_accuracy*100:.2f}%)")
+    if best is not None:
+        print(f"\n  Best accuracy: {best['accuracy']:.4f} ({best['accuracy']*100:.2f}%) "
+              f"at iteration {best['iteration']}  "
+              f"[tracked {best['tracked_accuracy']*100:.2f}%, "
+              f"{best['mean_sensors_used']:.2f} sensors/step]")
+        print(f"  Best checkpoint   : {best_dir}")
+        print(f"  Current checkpoint: {current_dir}")
+        print(f"  Metric history    : {os.path.join(save_dir, 'metrics_history.csv')}")
     algo.stop()
+
+
+def _write_history(save_dir, history, best, cfg):
+    """Metric history as JSON (with run config and best) and CSV, rewritten each eval."""
+    with open(os.path.join(save_dir, "metrics_history.json"), "w") as fh:
+        json.dump({"config": {k: v for k, v in cfg.items()},
+                   "best": best, "history": history}, fh, indent=1, default=str)
+    with open(os.path.join(save_dir, "metrics_history.csv"), "w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(history[0].keys()))
+        w.writeheader()
+        w.writerows(history)
 
 
 def _print_metrics(label, m):
     print(f"\n  ── {label} ──")
-    print(f"     Accuracy    : {m['tracking_accuracy']:.4f}  ({m['tracking_accuracy']*100:.2f}%)")
+    print(f"     Accuracy    : {m['accuracy']:.4f}  ({m['accuracy']*100:.2f}%)  "
+          f"[upstream metric; tracked-only {m['tracked_accuracy']*100:.2f}%]")
     print(f"     Reward      : {m['mean_reward']:+.3f} ± {m['std_reward']:.3f}")
     print(f"     Ep length   : {m['mean_length']:.1f} steps")
     print(f"     Sensors/step: {m['mean_sensors_used']:.2f}\n")
@@ -356,6 +429,27 @@ Examples
     parser.add_argument("--eval-episodes", type=int, default=DEFAULTS["eval_episodes"])
     parser.add_argument("--workers",    type=int,   default=DEFAULTS["num_workers"])
     parser.add_argument("--lr",         type=float, default=DEFAULTS["lr"])
+    parser.add_argument("--max-sensors", type=int, default=DEFAULTS["max_sensors"],
+                        help="Sensor budget k (default: %(default)s)")
+    parser.add_argument("--max-ep-steps", type=int, default=DEFAULTS["max_ep_steps"],
+                        help="Training episode cap in steps; 0 = no cap, episodes "
+                             "end only when the target exits (default: %(default)s)")
+    parser.add_argument("--movement",   choices=["moore", "4conn", "original"],
+                        default=DEFAULTS["movement"],
+                        help="Target movement: moore = stay + 8 neighbours, "
+                             "4conn = stay + 4, original = Track-MDP's 4 random "
+                             "3x3 destinations per cell (default: %(default)s)")
+    parser.add_argument("--sensor-budget", choices=["none", "env"],
+                        default=DEFAULTS["sensor_budget"],
+                        help="none = upstream, k never applied; env = at most k "
+                             "tracking sensors per step, enforced in the environment "
+                             "in training and evaluation (default: %(default)s)")
+    parser.add_argument("--seed",       type=int,   default=DEFAULTS["seed"],
+                        help="Seed the target-movement RNG (default: unseeded)")
+    parser.add_argument("--init-checkpoint", type=str, default=None,
+                        help="Start training from this checkpoint (weights + optimizer), "
+                             "e.g. to branch a run onto a new movement model; also "
+                             "evaluates at iteration 0, before any training")
     parser.add_argument("--eval-only",  action="store_true")
     parser.add_argument("--resume",     action="store_true",
                         help="Resume training from the latest checkpoint in save_dir.")
@@ -374,6 +468,13 @@ Examples
     cfg["eval_episodes"]       = args.eval_episodes
     cfg["num_workers"]         = args.workers
     cfg["lr"]                  = args.lr
+    cfg["max_sensors"]         = args.max_sensors
+    cfg["max_sensors_null"]    = args.max_sensors
+    cfg["movement"]            = args.movement
+    cfg["max_ep_steps"]        = args.max_ep_steps
+    cfg["sensor_budget"]       = args.sensor_budget
+    cfg["init_checkpoint"]     = args.init_checkpoint
+    cfg["seed"]                = args.seed
 
     print("=" * 60)
     print("  TRACK-MDP  —  RECTANGULAR GRID TRAINING")

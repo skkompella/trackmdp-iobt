@@ -14,9 +14,6 @@ import numpy as np
 import random as rnd
 from gymnasium.utils import seeding
 
-SEED = 1
-rnd.seed(SEED)
-np.random.seed(SEED)
 
 
 class grid_environment_rect(gym.Env):
@@ -77,7 +74,19 @@ class grid_environment_rect(gym.Env):
         self.done       = False
         self._ep_step   = 0
 
-        self.seed(SEED)
+        # Seed toggle: env_config["seed"] = None (default) gives every worker
+        # fresh entropy; an int makes runs reproducible, offset by the worker
+        # and vector index so workers do not replay identical trajectories.
+        base_seed = env_config.get("seed")
+        if base_seed is None:
+            env_seed = None
+        else:
+            env_seed = (int(base_seed)
+                        + 1000 * getattr(env_config, "worker_index", 0)
+                        + getattr(env_config, "vector_index", 0))
+        self.seed(env_seed)
+        if hasattr(self.qobj.grid_env, "reseed"):
+            self.qobj.grid_env.reseed(env_seed)
         self.reset()
 
     # -----------------------------------------------------------------------
@@ -136,7 +145,8 @@ class grid_environment_rect(gym.Env):
             self.state = self.current_state
 
         self._ep_step           += 1
-        truncated                = (self._ep_step >= self._max_ep_steps)
+        truncated                = bool(self._max_ep_steps) and \
+                                   self._ep_step >= self._max_ep_steps   # None/0 = no cap
         self.reward              = reward
         self.tuple_augment_state = self.to_tuple_augment_state(self.state, self.actions_list)
         return [self.tuple_augment_state, self.reward, self.done, truncated, self.info]
@@ -152,4 +162,6 @@ class grid_environment_rect(gym.Env):
         pass
 
     def reset_object_state(self):
-        self.qobj.grid_env.object_pos = rnd.randrange(self.n_cells)
+        rng = getattr(self.qobj.grid_env, "_move_rng", None)
+        self.qobj.grid_env.object_pos = (int(rng.integers(self.n_cells)) if rng is not None
+                                         else rnd.randrange(self.n_cells))

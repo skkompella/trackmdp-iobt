@@ -36,20 +36,21 @@ from src.core.switching_grid_env import SwitchingTransitionGridEnv  # noqa: E402
 TL = 1
 
 
-def make_env(env, T, k, cost, seed, nrows=5, ncols=5):
+def make_env(env, T, k, cost, seed, nrows=5, ncols=5, moore_moves=False):
     if env == "grid":
         n = nrows * ncols
         e = SwitchingTransitionGridEnv(nrows, ncols, k, k, n * (TL + 1) + 1, TL,
                                        [T], seed=seed, no_moore_constraint=True,
-                                       sensor_rew=-cost)
+                                       sensor_rew=-cost, moore_moves=moore_moves)
         return e, n, n
     e = MatrixIoBTEnv(k, k, 16 * (TL + 1) + 1, TL, [T], seed=seed,
                       reward_preset="grid", sensor_rew=-cost)
     return e, 10, 16          # 10 real nodes, 16-wide action vector
 
 
-def run_oracle(env, T, k, cost, m, episodes, seed, nrows=5, ncols=5):
-    e, n, width = make_env(env, T, k, cost, seed, nrows, ncols)
+def run_oracle(env, T, k, cost, m, episodes, seed, nrows=5, ncols=5,
+               moore_moves=False):
+    e, n, width = make_env(env, T, k, cost, seed, nrows, ncols, moore_moves)
     e.force_matrix(0)
     miss = e.missing_state
     T2 = T @ T
@@ -84,6 +85,9 @@ def main():
     p.add_argument("--ks", default="4,5")
     p.add_argument("--nrows", type=int, default=5)
     p.add_argument("--ncols", type=int, default=5)
+    p.add_argument("--moore-moves", action="store_true",
+                   help="Matrices move diagonally (O<i> tokens)")
+    p.add_argument("--costs", default="0.16,0.04")
     p.add_argument("--out", required=True)
     args = p.parse_args()
 
@@ -95,9 +99,9 @@ def main():
                                         nrows=args.nrows, ncols=args.ncols)
         for name, T in zip(names, mats):
             for k in (int(x) for x in args.ks.split(",")):
-                for cost in (0.16, 0.04):
+                for cost in (float(c) for c in args.costs.split(",")):
                     rows = [run_oracle(env, T, k, cost, m, args.episodes, 3,
-                                       args.nrows, args.ncols)
+                                       args.nrows, args.ncols, args.moore_moves)
                             for m in range(1, k + 1)]
                     best = max(rows, key=lambda r: r["reward_per_step"])
                     full = rows[-1]

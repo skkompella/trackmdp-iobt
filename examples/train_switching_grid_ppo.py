@@ -70,10 +70,77 @@ from examples.finetune_deterministic import evaluate_policy    # noqa: E402
 
 MATRIX_MAKERS = {"A": make_matrix_A, "B": make_matrix_B, "C": make_matrix_C}
 
-PPO_HPARAMS = dict(lr=5e-4, train_batch_size=512, num_sgd_iter=20,
-                   sgd_minibatch_size=128, clip_param=0.3, entropy_coeff=0.001,
-                   vf_loss_coeff=1.0, grad_clip=10.0, num_workers=2,
-                   rollout_fragment_length=64)
+PPO_PRESETS = {
+    # the switching experiments so far
+    "switching": dict(lr=5e-4, train_batch_size=512, num_sgd_iter=20,
+                      sgd_minibatch_size=128, clip_param=0.3, entropy_coeff=0.001,
+                      vf_loss_coeff=1.0, grad_clip=10.0, num_workers=2,
+                      rollout_fragment_length=64),
+    # examples/training_grid_rect.py (the RLlib port): RLlib defaults except
+    # lr 1e-4, grad_clip 30, 4 workers
+    "port": dict(lr=1e-4, train_batch_size=4000, num_sgd_iter=30,
+                 sgd_minibatch_size=128, clip_param=0.3, entropy_coeff=0.0,
+                 vf_loss_coeff=1.0, grad_clip=30.0, num_workers=4,
+                 rollout_fragment_length="auto"),
+}
+PPO_HPARAMS = PPO_PRESETS["switching"]   # replaced in main() by --ppo-preset
+
+
+# Arguments that may differ between an original run and its --resume.
+_RESUME_FREE_ARGS = {"resume", "checkpoint_dir", "checkpoint_every", "stop_after"}
+
+
+def save_resume_state(ckpt_dir, algo, args, state):
+    """
+    Write algo checkpoint + loop state to a fresh step directory, then point
+    LATEST at it with an atomic rename, so a kill mid-save never leaves a
+    half-written checkpoint as the latest one.  Older step directories go.
+    """
+    import pickle
+    import shutil
+    os.makedirs(ckpt_dir, exist_ok=True)
+    step_dir = os.path.join(ckpt_dir, f"step_{state['it']:06d}")
+    if os.path.isdir(step_dir):
+        shutil.rmtree(step_dir)
+    algo.save(os.path.join(step_dir, "algo"))
+    state = dict(state, args={k: v for k, v in vars(args).items()
+                              if k not in _RESUME_FREE_ARGS})
+    with open(os.path.join(step_dir, "state.pkl"), "wb") as fh:
+        pickle.dump(state, fh)
+    tmp = os.path.join(ckpt_dir, "LATEST.tmp")
+    with open(tmp, "w") as fh:
+        fh.write(os.path.basename(step_dir))
+    os.replace(tmp, os.path.join(ckpt_dir, "LATEST"))
+    for d in os.listdir(ckpt_dir):
+        if d.startswith("step_") and d != os.path.basename(step_dir):
+            shutil.rmtree(os.path.join(ckpt_dir, d), ignore_errors=True)
+
+
+def load_resume_state(ckpt_dir, args):
+    import pickle
+    latest = os.path.join(ckpt_dir, "LATEST")
+    if not os.path.exists(latest):
+        raise SystemExit(f"--resume: no checkpoint in {ckpt_dir}")
+    step_dir = os.path.join(ckpt_dir, open(latest).read().strip())
+    with open(os.path.join(step_dir, "state.pkl"), "rb") as fh:
+        state = pickle.load(fh)
+    now = {k: v for k, v in vars(args).items() if k not in _RESUME_FREE_ARGS}
+    diff = {k: (state["args"].get(k), v) for k, v in now.items()
+            if state["args"].get(k) != v}
+    if diff:
+        raise SystemExit(f"--resume: arguments differ from the original run: {diff}")
+    state["algo_path"] = os.path.join(step_dir, "algo")
+    return state
+
+
+def load_policy_weights(checkpoint_dir):
+    """Weights of an RLlib checkpoint's default policy, for set_weights()."""
+    from ray.rllib.policy.policy import Policy
+    pol = Policy.from_checkpoint(
+        os.path.join(checkpoint_dir, "policies", "default_policy"))
+    weights = {"default_policy": pol.get_weights()}
+    del pol
+    return weights
 
 
 def build_algo(args, cfg, matrices):
@@ -91,13 +158,14 @@ def build_algo(args, cfg, matrices):
             max_sensors=args.max_sensors, max_sensors_null=args.max_sensors,
             time_limit=cfg["time_limit"], time_limit_max=cfg["time_limit"],
             matrices=matrices, seed=args.train_seed, no_moore_constraint=not args.moore,
-            sensor_rew=args.sensor_rew)
+            sensor_rew=args.sensor_rew, moore_moves=args.moore_moves,
+            exit_prob=args.exit_prob)
         wrapper = grid_environment_rect
 
     env_config = {"qobj": qobj,
                   "time_limit_schedule": [2000],
                   "time_limit_max": cfg["time_limit"],
-                  "max_ep_steps": cfg["max_ep_steps"],
+                  "max_ep_steps": args.max_ep_steps,    # 0 = no cap
                   "no_moore_constraint": not args.moore}
 
     def _pick(pairs):
@@ -191,8 +259,41 @@ def main():
     p.add_argument("--new-run", type=int, default=830)
     p.add_argument("--save-checkpoint", type=str, default=None)
     p.add_argument("--out-dir", type=str, default=None)
+    p.add_argument("--ppo-preset", choices=sorted(PPO_PRESETS), default="switching",
+                   help="PPO hyperparameters: 'switching' (these experiments) or "
+                        "'port' (examples/training_grid_rect.py)")
+    p.add_argument("--init-checkpoint", type=str, default=None,
+                   help="Start from this checkpoint's policy weights instead of scratch")
+    p.add_argument("--moore-moves", action="store_true",
+                   help="Matrices may move diagonally (needed for O<i> matrices)")
+    p.add_argument("--exit-prob", type=float, default=0.0,
+                   help="Per-step chance the target exits, ending the episode "
+                        "(original Track-MDP: 0.005)")
+    p.add_argument("--checkpoint-every", type=int, default=25,
+                   help="Save a resumable checkpoint every N iterations and at every "
+                        "segment end (0 = only at segment ends)")
+    p.add_argument("--checkpoint-dir", type=str, default=None,
+                   help="Where resumable checkpoints go (default: <out-dir>/resume_ckpt)")
+    p.add_argument("--stop-after", type=int, default=0,
+                   help="Checkpoint and exit once this many total iterations are done "
+                        "(0 = run to the end); continue later with --resume")
+    p.add_argument("--resume", action="store_true",
+                   help="Continue from the latest checkpoint in --checkpoint-dir; pass "
+                        "the same arguments as the original run")
+    p.add_argument("--save-stream", type=str, default=None,
+                   help="Save the per-iteration eval hit/miss stream the detector "
+                        "would see (.npz), for offline delta tuning")
+    p.add_argument("--oracle-restart", action="store_true",
+                   help="Warm-restart exactly at the true switches (no detector); "
+                        "records the stream a perfect detector would leave behind")
     args = p.parse_args()
+    global PPO_HPARAMS
+    PPO_HPARAMS = PPO_PRESETS[args.ppo_preset]
 
+    if args.oracle_restart and not (args.no_detector and args.prior_checkpoint
+                                    and args.restart_strategy == "warm"):
+        raise SystemExit("--oracle-restart needs --no-detector, --restart-strategy "
+                         "warm and --prior-checkpoint")
     if args.restart_strategy == "warm" and not args.no_detector \
             and not args.prior_checkpoint:
         raise SystemExit("--restart-strategy warm requires --prior-checkpoint")
@@ -205,7 +306,8 @@ def main():
     tl = args.time_limit
     cfg = {"time_limit": tl, "time_limit_max": tl,
            "missing_state": n_cells * (tl + 1) + 1,
-           "max_ep_steps": args.max_ep_steps, "max_sensors": args.max_sensors,
+           # eval episodes need a finite cap; with exits on, 1000 like the port
+           "max_ep_steps": args.max_ep_steps or 1000, "max_sensors": args.max_sensors,
            "max_sensors_null": args.max_sensors,
            "n_cells": n_cells, "no_moore_constraint": not args.moore,
            "clip_mode": "random", "clip_seed": args.eval_seed,
@@ -216,7 +318,22 @@ def main():
                  runtime_env={"env_vars": {"PYTHONPATH": project_root}},
                  _node_ip_address="127.0.0.2")
 
+    out_dir = args.out_dir or os.path.join(
+        project_root, "experiments", "switching_grid", f"run{args.new_run}")
+    os.makedirs(out_dir, exist_ok=True)
+    # absolute: RLlib's restore() treats a relative path as a URI and fails
+    ckpt_dir = os.path.abspath(args.checkpoint_dir or os.path.join(out_dir, "resume_ckpt"))
+    resume_state = load_resume_state(ckpt_dir, args) if args.resume else None
+
     algo = build_algo(args, cfg, matrices)
+    if resume_state is not None:
+        # Restoring before any sampling is safe (no worker is mid-episode);
+        # restores weights AND optimizer state.
+        algo.restore(resume_state["algo_path"])
+        algo.env_runner_group.sync_weights()
+    elif args.init_checkpoint:
+        algo.set_weights(load_policy_weights(args.init_checkpoint))
+        algo.env_runner_group.sync_weights()
 
     prior_weights = None
     if args.restart_strategy == "warm" and args.prior_checkpoint:
@@ -236,14 +353,11 @@ def main():
         eval_env = SwitchingTransitionGridEnv(
             args.nrows, args.ncols, args.max_sensors, args.max_sensors,
             cfg["missing_state"], tl, matrices, seed=args.eval_seed,
-            no_moore_constraint=not args.moore, sensor_rew=args.sensor_rew)
+            no_moore_constraint=not args.moore, sensor_rew=args.sensor_rew,
+        moore_moves=args.moore_moves, exit_prob=args.exit_prob)
 
     detector = None if args.no_detector else GLRChangeDetector(
         delta=args.delta, min_samples=args.min_samples)
-
-    out_dir = args.out_dir or os.path.join(
-        project_root, "experiments", "switching_grid", f"run{args.new_run}")
-    os.makedirs(out_dir, exist_ok=True)
 
     print("=" * 76)
     print("  TRACK-MDP — PPO ON A SWITCHING 5x5 GRID")
@@ -261,76 +375,122 @@ def main():
 
     history, segments = [], []
     fired_iters, switch_iters = [], []
+    stream = []                     # one array of eval hits per iteration
     it = 0
     suppress_until = 0
     n_restarts = 0
+    seg_acc, seg_sens, seg_cells = [], [], []
+    start_seg, start_inner = 0, 0
+    if resume_state is not None:
+        st = resume_state
+        (history, segments, fired_iters, switch_iters, stream, it, suppress_until,
+         n_restarts, seg_acc, seg_sens, seg_cells, start_seg, start_inner) = (
+            st[k] for k in ("history", "segments", "fired_iters", "switch_iters",
+                            "stream", "it", "suppress_until", "n_restarts",
+                            "seg_acc", "seg_sens", "seg_cells", "seg_idx", "inner"))
+        if st["detector"] is not None:
+            detector = st["detector"]
+        eval_env = st["eval_env"]
+        print(f"  Resumed at iteration {it} (segment {start_seg}, "
+              f"iteration {start_inner} of it) from {resume_state['algo_path']}\n")
+
+    def checkpoint(seg_idx, inner):
+        save_resume_state(ckpt_dir, algo, args, dict(
+            history=history, segments=segments, fired_iters=fired_iters,
+            switch_iters=switch_iters, stream=stream, it=it,
+            suppress_until=suppress_until, n_restarts=n_restarts,
+            seg_acc=seg_acc, seg_sens=seg_sens, seg_cells=seg_cells,
+            seg_idx=seg_idx, inner=inner, detector=detector, eval_env=eval_env))
 
     print(f"  {'pass':>4}  {'mat':>4}  {'acc':>7}  {'sensors':>8}  "
           f"{'latency':>8}  {'restarts':>8}")
     print(f"  {'-'*4}  {'-'*4}  {'-'*7}  {'-'*8}  {'-'*8}  {'-'*8}")
 
-    for pass_idx in range(args.passes):
-        for m_idx, m_name in enumerate(names):
-            push_matrix(algo, m_idx)
-            eval_env.force_matrix(m_idx)
+    schedule = [(p_i, m_i, m_n) for p_i in range(args.passes)
+                for m_i, m_n in enumerate(names)]
+    for seg_idx in range(start_seg, len(schedule)):
+        pass_idx, m_idx, m_name = schedule[seg_idx]
+        mid_segment = seg_idx == start_seg and start_inner > 0
+        push_matrix(algo, m_idx)          # always: resumed workers start fresh
+        eval_env.force_matrix(m_idx)
+        if not mid_segment:
             if it > 0:
                 switch_iters.append(it)
-
+                if args.oracle_restart:
+                    algo.set_weights(prior_weights)
+                    algo.env_runner_group.sync_weights()
+                    n_restarts += 1
             seg_acc, seg_sens, seg_cells = [], [], []
-            for _ in range(args.iterations_per_segment):
-                algo.train()
-                m = evaluate_policy(algo, eval_env, cfg, return_detections=True)
-                seg_acc.append(m["tracking_accuracy"])
-                seg_sens.append(m["mean_sensors_used"])
-                if m["active_tracked"]:
-                    seg_cells.append(float(np.mean(m["active_tracked"])))
-                history.append({"iteration": it, "pass": pass_idx,
-                                "matrix": m_name,
-                                "accuracy": m["tracking_accuracy"],
-                                "sensors": m["mean_sensors_used"],
-                                "reward": m["mean_reward"]})
+        for inner in range(start_inner if mid_segment else 0,
+                           args.iterations_per_segment):
+            algo.train()
+            m = evaluate_policy(algo, eval_env, cfg, return_detections=True)
+            stream.append(np.asarray(m["detections"], dtype=np.int8))
+            seg_acc.append(m["tracking_accuracy"])
+            seg_sens.append(m["mean_sensors_used"])
+            if m["active_tracked"]:
+                seg_cells.append(float(np.mean(m["active_tracked"])))
+            history.append({"iteration": it, "pass": pass_idx,
+                            "matrix": m_name,
+                            "accuracy": m["tracking_accuracy"],
+                            "sensors": m["mean_sensors_used"],
+                            "reward": m["mean_reward"]})
 
-                quiet = (it < args.detector_warmup_iters or it < suppress_until)
-                if detector is not None and not quiet:
-                    for d in m["detections"]:
-                        if detector.update(d):
-                            fired_iters.append(it)
-                            n_restarts += 1
-                            if args.restart_strategy == "cold":
-                                algo.stop()
-                                algo = build_algo(args, cfg, matrices)
-                            else:
-                                # Set the base model's WEIGHTS in place rather
-                                # than algo.restore(): restore swaps the policy
-                                # objects under workers that are mid-episode,
-                                # and their half-built batches then mismatch
-                                # (measured: "operands could not be broadcast
-                                # together with shapes (64,) (63,)" in GAE).
-                                algo.set_weights(prior_weights)
-                                algo.env_runner_group.sync_weights()
-                            push_matrix(algo, m_idx)
-                            suppress_until = (it + 1
-                                              + args.detector_cooldown_iters)
-                            break
-                elif detector is not None:
-                    detector.reset()
-                it += 1
+            quiet = (it < args.detector_warmup_iters or it < suppress_until)
+            if detector is not None and not quiet:
+                for d in m["detections"]:
+                    if detector.update(d):
+                        fired_iters.append(it)
+                        n_restarts += 1
+                        if args.restart_strategy == "cold":
+                            algo.stop()
+                            algo = build_algo(args, cfg, matrices)
+                        else:
+                            # Set the base model's WEIGHTS in place rather
+                            # than algo.restore(): restore swaps the policy
+                            # objects under workers that are mid-episode,
+                            # and their half-built batches then mismatch
+                            # (measured: "operands could not be broadcast
+                            # together with shapes (64,) (63,)" in GAE).
+                            algo.set_weights(prior_weights)
+                            algo.env_runner_group.sync_weights()
+                        push_matrix(algo, m_idx)
+                        suppress_until = (it + 1
+                                          + args.detector_cooldown_iters)
+                        break
+            elif detector is not None:
+                detector.reset()
+            it += 1
+            if args.stop_after and it >= args.stop_after \
+                    and inner + 1 < args.iterations_per_segment:
+                checkpoint(seg_idx, inner + 1)
+                algo.stop()
+                print(f"\n  Stopped after iteration {it}; continue with --resume")
+                return
+            if (args.checkpoint_every and (inner + 1) % args.checkpoint_every == 0
+                    and inner + 1 < args.iterations_per_segment):
+                checkpoint(seg_idx, inner + 1)
 
-            lat = adaptation_latency(seg_acc, args.latency_epsilon)
-            segments.append({
-                "pass": pass_idx, "matrix": m_name,
-                "start_iteration": it - args.iterations_per_segment,
-                "mean_accuracy": float(np.mean(seg_acc)),
-                "final_accuracy": float(np.mean(seg_acc[-20:])),
-                "mean_sensors": float(np.mean(seg_sens)),
-                "final_sensors": float(np.mean(seg_sens[-20:])),
-                # cells switched on per TRACKED step (missing-state rescans excluded)
-                "final_cells_per_tracked_step": (
-                    float(np.mean(seg_cells[-20:])) if seg_cells else None),
-                "adaptation_latency": lat})
-            print(f"  {pass_idx:>4}  {m_name:>4}  {np.mean(seg_acc)*100:6.2f}%  "
-                  f"{np.mean(seg_sens):8.2f}  "
-                  f"{('n/a' if lat is None else lat):>8}  {n_restarts:>8}")
+        lat = adaptation_latency(seg_acc, args.latency_epsilon)
+        segments.append({
+            "pass": pass_idx, "matrix": m_name,
+            "start_iteration": it - args.iterations_per_segment,
+            "mean_accuracy": float(np.mean(seg_acc)),
+            "final_accuracy": float(np.mean(seg_acc[-20:])),
+            "mean_sensors": float(np.mean(seg_sens)),
+            "final_sensors": float(np.mean(seg_sens[-20:])),
+            # cells switched on per TRACKED step (missing-state rescans excluded)
+            "final_cells_per_tracked_step": (
+                float(np.mean(seg_cells[-20:])) if seg_cells else None),
+            "adaptation_latency": lat})
+        print(f"  {pass_idx:>4}  {m_name:>4}  {np.mean(seg_acc)*100:6.2f}%  "
+              f"{np.mean(seg_sens):8.2f}  "
+              f"{('n/a' if lat is None else lat):>8}  {n_restarts:>8}")
+        checkpoint(seg_idx + 1, 0)
+        if args.stop_after and it >= args.stop_after and seg_idx + 1 < len(schedule):
+            algo.stop()
+            print(f"\n  Stopped after iteration {it}; continue with --resume")
+            return
 
     lats = [s["adaptation_latency"] for s in segments
             if s["adaptation_latency"] is not None]
@@ -365,7 +525,9 @@ def main():
                                               if s["pass"] == 0]),
         "mean_latency_later_passes": _mean_lat([s for s in segments
                                                 if s["pass"] > 0]),
-        "ceiling": (args.max_ep_steps - 1) / args.max_ep_steps,
+        "ceiling": (cfg["max_ep_steps"] - 1) / cfg["max_ep_steps"],
+        "ppo_preset": args.ppo_preset, "init_checkpoint": args.init_checkpoint,
+        "moore_moves": args.moore_moves, "exit_prob": args.exit_prob,
         "detection_resolution": "one PPO batch (512 env steps)",
     }
     if detector is not None:
@@ -398,6 +560,15 @@ def main():
         w = csv.DictWriter(fh, fieldnames=list(history[0].keys()))
         w.writeheader()
         w.writerows(history)
+    if args.save_stream:
+        np.savez_compressed(
+            args.save_stream,
+            hits=np.concatenate(stream),
+            iter_len=np.array([len(x) for x in stream]),
+            switch_iters=np.array(switch_iters),
+            oracle_restart=args.oracle_restart,
+            iterations_per_segment=args.iterations_per_segment)
+        print(f"  Stream saved         : {args.save_stream}")
     if args.save_checkpoint:
         os.makedirs(args.save_checkpoint, exist_ok=True)
         algo.save(args.save_checkpoint)

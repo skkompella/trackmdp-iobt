@@ -1,0 +1,59 @@
+2026-11-15 14:08:28,358	INFO worker.py:2013 -- Started a local Ray instance.
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/_private/worker.py:2052: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+2026-11-15 14:08:31,531	WARNING train_switching_grid_ppo.py:196 -- DeprecationWarning: `build` has been deprecated. Use `AlgorithmConfig.build_algo` instead. This will raise an error in the future!
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/rllib/algorithms/algorithm.py:527: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+`UnifiedLogger` will be removed in Ray 2.7.
+  return UnifiedLogger(config, logdir, loggers=None)
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `JsonLogger interface is deprecated in favor of the `ray.tune.json.JsonLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `CSVLogger interface is deprecated in favor of the `ray.tune.csv.CSVLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `TBXLogger interface is deprecated in favor of the `ray.tune.tensorboardx.TBXLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+[2026-11-15 14:08:31,593 E 1359721 1359721] core_worker.cc:2232: Actor with class name: 'RolloutWorker' and ID: 'c89af1e23521adec5f6303e801000000' has constructor arguments in the object store and max_restarts > 0. If the arguments in the object store go out of scope or are lost, the actor restart will fail. See https://github.com/ray-project/ray/issues/53727 for more details.
+2026-11-15 14:08:40,372	WARNING util.py:62 -- Install gputil for GPU system monitoring.
+============================================================================
+  TRACK-MDP — PPO ON A SWITCHING 5x5 GRID
+============================================================================
+    O0: mean top move prob 0.46, mean stay prob 0.12
+    O1: mean top move prob 0.47, mean stay prob 0.13
+    O2: mean top move prob 0.46, mean stay prob 0.26
+    O3: mean top move prob 0.47, mean stay prob 0.15
+
+  Grid              : 5x5 = 25 cells
+  max_sensors       : 9 of 25
+  sensor_rew        : -0.16
+  Detector          : DISABLED
+  Restart strategy  : cold
+  Schedule          : 3 passes x 4 matrices x 300 iterations
+
+  pass   mat      acc   sensors   latency  restarts
+  ----  ----  -------  --------  --------  --------
+2026-11-15 14:08:45,856	WARNING train_ops.py:114 -- DeprecationWarning: `ray.rllib.execution.train_ops.multi_gpu_train_one_step` has been deprecated. This will raise an error in the future!
+2026-11-15 14:08:56,741	WARNING finetune_deterministic.py:1232 -- DeprecationWarning: `compute_single_action` has been deprecated. `Algorithm.compute_single_action` should no longer be used. Get the RLModule instance through `Algorithm.get_module([module ID])`, then compute actions through `RLModule.forward_inference({'obs': [obs batch]})`. This will raise an error in the future!
+     0    O0   93.48%      6.64        39         0
+     0    O1   84.49%      6.23         0         0
+     0    O2   85.89%      5.66        49         0
+     0    O3   64.73%      5.46         3         0
+     1    O0   93.65%      5.94         0         0
+     1    O1   79.92%      6.01        23         0
+     1    O2   87.91%      5.41         6         0
+     1    O3   71.45%      5.22         5         0
+     2    O0   92.06%      5.65         0         0
+     2    O1   73.59%      5.76         2         0
+     2    O2   87.59%      5.12        20         0
+     2    O3   70.53%      5.03         5         0
+
+============================================================================
+  SUMMARY
+============================================================================
+  Mean accuracy        : 82.11%  (final-20 84.68%)
+  Mean sensors/step    : 5.68  (final-20 5.55; cells per tracked step 5.43)
+  Adaptation latency   : mean 12.7 iterations (pass 0 22.75, later 7.625)
+  Restarts             : 0
+
+  Wrote experiments/port_switching/run1622/online_summary.json and online_history.csv

@@ -1206,6 +1206,7 @@ def evaluate_policy(algo, env, cfg, return_detections=False):
     detections: list[int] = []
     active_tracked: list[int] = []   # cells switched on, per tracked step
     total_steps = total_found = 0
+    ep_upstream_acc: list[float] = []   # upstream Track-MDP accuracy, per episode
 
     for _ in range(cfg["eval_episodes"]):
         env.reset_object_state()
@@ -1213,6 +1214,7 @@ def evaluate_policy(algo, env, cfg, return_detections=False):
         time_delay    = 0
         actions_list  = []
         ep_reward = ep_steps = ep_sensors = 0
+        ep_found_upstream = 0
 
         while ep_steps < cfg["max_ep_steps"]:
             num_sensors = n_cells if no_moore else (2 * time_delay + 3) ** 2
@@ -1261,6 +1263,8 @@ def evaluate_policy(algo, env, cfg, return_detections=False):
             obj_detected = int(obj_in_window == 1 and
                                action_sensors[int(obj_rel_pos)] == 1)
             detections.append(int(not was_missing and obj_detected))
+            # Upstream Track-MDP counts a missing-state (full rescan) step as found.
+            ep_found_upstream += 1 if was_missing else obj_detected
             if not was_missing:
                 active_tracked.append(int(action_sensors.sum()))
             if not was_missing and obj_detected:
@@ -1289,9 +1293,11 @@ def evaluate_policy(algo, env, cfg, return_detections=False):
         total_rewards.append(ep_reward)
         ep_lengths.append(ep_steps)
         sensors_ep.append(ep_sensors / max(ep_steps, 1))
+        ep_upstream_acc.append(ep_found_upstream / max(ep_steps, 1))
 
     out = {
         "tracking_accuracy": total_found / max(total_steps, 1),
+        "upstream_accuracy": float(np.mean(ep_upstream_acc)),   # standard.md
         "mean_reward":       float(np.mean(total_rewards)),
         "std_reward":        float(np.std(total_rewards)),
         "mean_length":       float(np.mean(ep_lengths)),

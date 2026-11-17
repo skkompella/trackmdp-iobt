@@ -43,7 +43,12 @@ class SwitchingTransitionGridEnv(grid_env_rect):
     def __init__(self, nrows, ncols, max_sensors, max_sensors_null,
                  missing_state, time_limit, matrices, seed=None,
                  no_moore_constraint=True, sensor_rew=None,
-                 num_trans=4, state_trans_cum_prob=None):
+                 num_trans=4, state_trans_cum_prob=None,
+                 moore_moves=False, exit_prob=0.0):
+        # moore_moves: matrices may move diagonally (original Track-MDP).
+        # exit_prob: per-step chance the target leaves the grid, ending the
+        # episode (original Track-MDP uses 0.005); 0 keeps it circulating.
+        self.exit_prob = float(exit_prob)
         matrices = list(matrices) if matrices is not None else []
         if not matrices:
             raise ValueError("matrices must be a non-empty list")
@@ -55,7 +60,7 @@ class SwitchingTransitionGridEnv(grid_env_rect):
             if T.shape != (n_cells, n_cells):
                 raise ValueError(
                     f"matrix {i} has shape {T.shape}, expected {(n_cells, n_cells)}")
-            ok, msg = validate_transition_matrix(T, nrows, ncols)
+            ok, msg = validate_transition_matrix(T, nrows, ncols, moore=moore_moves)
             if not ok:
                 raise ValueError(f"matrix {i} is invalid: {msg}")
             checked.append(T)
@@ -112,7 +117,12 @@ class SwitchingTransitionGridEnv(grid_env_rect):
         self.object_pos = int(self._rng.integers(self.n_cells))
 
     def object_move(self):
-        """Sample the next cell from the active matrix. Never terminates."""
+        """Sample the next cell from the active matrix (or exit, if exit_prob)."""
+        if self.object_pos == self.n_cells:          # exited: absorbing
+            return 0
+        if self.exit_prob and self._rng.random() < self.exit_prob:
+            self.object_pos = self.n_cells
+            return 0
         row = self._matrices[self._matrix_idx][self.object_pos]
         self.object_pos = int(self._rng.choice(self.n_cells, p=row))
         return 0
@@ -128,9 +138,9 @@ class SwitchingTransitionGridEnv(grid_env_rect):
         have no terminal row, so that can never fire — the clamp is belt and
         braces, and documents the intent.
         """
-        reward, next_state, _terminal, delay = super().get_reward_next_state(
+        reward, next_state, terminal, delay = super().get_reward_next_state(
             current_state, current_action, time_delay)
-        return reward, next_state, 0, delay
+        return reward, next_state, (terminal if self.exit_prob else 0), delay
 
 
 class SwitchingGridLearner:
@@ -138,7 +148,8 @@ class SwitchingGridLearner:
 
     def __init__(self, run_number, nrows, ncols, max_sensors, max_sensors_null,
                  time_limit, time_limit_max, matrices, seed=None,
-                 no_moore_constraint=True, sensor_rew=None, num_trans=4):
+                 no_moore_constraint=True, sensor_rew=None, num_trans=4,
+                 moore_moves=False, exit_prob=0.0):
         self.run_number     = run_number
         self.nrows          = nrows
         self.ncols          = ncols
@@ -153,7 +164,7 @@ class SwitchingGridLearner:
             nrows, ncols, max_sensors, max_sensors_null, self.missing_state,
             time_limit, matrices, seed=seed,
             no_moore_constraint=no_moore_constraint, sensor_rew=sensor_rew,
-            num_trans=num_trans)
+            num_trans=num_trans, moore_moves=moore_moves, exit_prob=exit_prob)
 
         self.exploration_epsilon = 0.15
         self.total_actions       = self.grid_env.action_space_size
