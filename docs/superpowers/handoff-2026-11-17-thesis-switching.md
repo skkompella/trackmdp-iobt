@@ -29,19 +29,16 @@ streams on 5×5). All via `examples/training_grid_rect.py` (`--matrices`,
 |---|---|---|
 | 1551 | 5×5, seeds 1–4, switches 150/300/450, no restart | **done** |
 | 1560 | 5×5 general base (equal-prob Moore, plateau rule) | **done**: plateaued ~70% (best 71.5% @260) |
-| 1552 | 5×5 warm restart to 1560 best | **running** at power-off (~iter 590 of ≥600; 96.5% last eval, 3 alarms) |
-| 1553 | 5×5 cold restart | **running** at power-off (~iter 600; 87.6% last eval, 3 alarms) |
-| 1570 | 10×10, seeds 1–4, 700-iteration segments (switches 700/1400/2100, ≥2800), no restart | **queued** (`experiments/thesis_10x10/queue.sh`, waits on PIDs of 1552/1553) |
-| 1580 | 10×10 general base, launched **only if** warm 1552 beats cold 1553 on mean accuracy | **queued** (same script; decision written to `experiments/thesis_10x10/warm_vs_cold.txt`) |
+| 1552 | 5×5 warm restart to 1560 best | **done** (601 iterations) |
+| 1553 | 5×5 cold restart | **done** (601 iterations) |
+| 1570 | 10×10, seeds 1–4, 700-iteration segments (switches 700/1400/2100, ≥2800), no restart | **launched 21:48, killed by power-off** — relaunch (ask first) |
+| 1580 | 10×10 general base (warm beat cold, so the condition is met) | **launched by the queue after the 10×10 oracle; killed by power-off** — relaunch (ask first) |
 
-Powering off kills all of these. Runs 1552/1553 may or may not have finished
-(they were ~10 minutes from the end). After power-on:
-1. Check `experiments/thesis_5x5/run1552.log` / `run1553.log` for "Best accuracy"
-   (finished) — if not finished, they must be rerun (`cmd_warm_restart_s1.sh`,
-   `cmd_cold_restart_s1.sh`); `training_grid_rect.py` has no mid-run resume.
-2. The queue (`experiments/thesis_10x10/queue.sh <pid1552> <pid1553>`) died with
-   the machine; relaunch it (with any dead PIDs it proceeds immediately). The user
-   said they will say when to pause/resume runs — ask before relaunching.
+After power-on: 1570 and 1580 must be relaunched from scratch
+(`training_grid_rect.py` has no mid-run resume). Relaunching
+`experiments/thesis_10x10/queue.sh` with no PIDs runs both immediately (1580
+only if `warm_vs_cold.txt` / the comparison still says warm beat cold — it does).
+The user said they will say when to pause/resume runs — ask before relaunching.
 
 ## Results so far (5×5, upstream accuracy metric)
 
@@ -60,6 +57,15 @@ every model.
   at 630) → 700-iteration segments (user's choice).
 - **Sensor budget test (1530 vs 1531):** enforcing k=6 in the env slowed early
   learning but converged to the same place → decided: no hard budget.
+- **Main result, 5×5, 3 switches (seeds 1–4), mean accuracy over the run:**
+  no restart 1551 = 80.7%; cold restart 1553 = 82.0%; **warm restart 1552 = 87.6%**.
+  Segment-end accuracy no restart 100/92.3/86.6/79.2, cold 95.7/91.3/96.5/89.2,
+  warm 95.4/97.9/92.9/97.8; end sensors 6.67 / 5.67 / 4.38. Detector: all 3
+  switches caught exactly 1 iteration after each switch (alarms 151, 301, 451) in
+  both restart runs, zero false alarms. Warm restart wins even though the base
+  (1560) only reaches ~70% on its own — my prediction that it would not help was
+  wrong; untested explanation: the base is a broad, still-exploring start that PPO
+  specialises from quickly.
 - **General base problem:** equal-probability walk needs all ~9 candidates watched;
   oracle shows full coverage is reward-optimal (100%), but PPO plateaus ~70% (1560)
   — a PPO training failure, not a limit. Domain randomisation would NOT fix it (a
@@ -68,7 +74,7 @@ every model.
 
 ## Open questions for the user
 
-- Results of 1552 vs 1553 (warm vs cold) — not yet reported.
+- 10×10 relaunch timing (1570, 1580).
 - Better general base candidates — user said "later".
 - README.md says Camp Buckner for the 10-node data; per memory the 10-node data is
   Graces Quarters — README needs that fix.
