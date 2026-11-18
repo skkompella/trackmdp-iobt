@@ -344,7 +344,12 @@ sensors/step and the oracle for that model.
 
 ### 10×10 grid
 
-The same design on 10×10. General base: run 1510 reached only 57% after 1,000
+The same design on 10×10, with **700-iteration segments**: `(P0, 0) → (P1, 700)
+→ (P2, 1400) → (P3, 2100)`, ≥ 2,800 iterations then finish open episodes;
+P0–P3 = seeds 1–4 (`--matrices O0,O1,O2,O3 --matrix-seed 1 --switch-at
+700,1400,2100`). Longer than 5×5 because cold PPO learns 10×10 far more slowly
+(run 1500: 90% at ~250, 96% at 630, ~99% only near 1,600–1,900). Run 1 (no
+restart) = run 1570 (`experiments/thesis_10x10/queue.sh`). General base: run 1510 reached only 57% after 1,000
 iterations — below what the learner reaches alone — so it needs more training
 before it is a useful restart target.
 
