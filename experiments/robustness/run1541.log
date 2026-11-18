@@ -1,0 +1,249 @@
+============================================================
+  TRACK-MDP  —  RECTANGULAR GRID TRAINING
+============================================================
+  Run number  : 1541
+  Grid        : 5 rows × 5 cols (25 cells)
+  Iterations  : 500
+  Eval every  : 10
+  Mode        : train + eval (from scratch)
+
+  Grid       : 5 rows × 5 cols  (25 cells)
+  num_trans  : 4
+  movement   : original   max_sensors (k): 6   seed: 2   train ep cap: none   sensor budget: none
+  missing_state = 51
+  cum_probs  : [0.2817, 0.5633, 0.845, 0.995]
+2026-11-16 21:53:30,347	INFO worker.py:2013 -- Started a local Ray instance.
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/_private/worker.py:2052: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+2026-11-16 21:53:33,198	WARNING training_grid_rect.py:311 -- DeprecationWarning: `build` has been deprecated. Use `AlgorithmConfig.build_algo` instead. This will raise an error in the future!
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/rllib/algorithms/algorithm.py:527: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+`UnifiedLogger` will be removed in Ray 2.7.
+  return UnifiedLogger(config, logdir, loggers=None)
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `JsonLogger interface is deprecated in favor of the `ray.tune.json.JsonLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `CSVLogger interface is deprecated in favor of the `ray.tune.csv.CSVLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `TBXLogger interface is deprecated in favor of the `ray.tune.tensorboardx.TBXLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+[2026-11-16 21:53:33,253 E 2679085 2679085] core_worker.cc:2232: Actor with class name: 'RolloutWorker' and ID: 'cb4bcb0e7bd1835f8a777dc601000000' has constructor arguments in the object store and max_restarts > 0. If the arguments in the object store go out of scope or are lost, the actor restart will fail. See https://github.com/ray-project/ray/issues/53727 for more details.
+2026-11-16 21:53:39,631	WARNING util.py:62 -- Install gputil for GPU system monitoring.
+Training from scratch (use --resume to continue from a checkpoint).
+
+Training for 500 iterations (eval every 10) ...
+
+2026-11-16 21:53:42,568	WARNING train_ops.py:114 -- DeprecationWarning: `ray.rllib.execution.train_ops.multi_gpu_train_one_step` has been deprecated. This will raise an error in the future!
+  iter     1/500  reward=-124.656
+  iter     2/500  reward=-159.269
+  iter     3/500  reward=-163.232
+  iter     4/500  reward=-150.621
+  iter     5/500  reward=-150.719
+  iter     6/500  reward=-151.646
+  iter     7/500  reward=-154.763
+  iter     8/500  reward=-147.282
+  iter     9/500  reward=-154.054
+  iter    10/500  reward=-162.265
+2026-11-16 21:55:44,261	WARNING training_grid_rect.py:120 -- DeprecationWarning: `compute_single_action` has been deprecated. `Algorithm.compute_single_action` should no longer be used. Get the RLModule instance through `Algorithm.get_module([module ID])`, then compute actions through `RLModule.forward_inference({'obs': [obs batch]})`. This will raise an error in the future!
+
+  ── EVAL @ iter 10 ──
+     Accuracy    : 0.6714  (67.14%)  [upstream metric; tracked-only 54.87%]
+     Reward      : -103.084 ± 102.119
+     Ep length   : 198.3 steps
+     Sensors/step: 8.78
+
+  ★ New best: 0.6714 (saved to ./agent_run1541_ppo/best)
+  iter    11/500  reward=-154.817
+  iter    12/500  reward=-145.450
+  iter    13/500  reward=-125.662
+  iter    14/500  reward=-119.515
+  iter    15/500  reward=-117.416
+  iter    16/500  reward=-124.656
+  iter    17/500  reward=-134.761
+  iter    18/500  reward=-136.896
+  iter    19/500  reward=-132.829
+  iter    20/500  reward=-151.629
+
+  ── EVAL @ iter 20 ──
+     Accuracy    : 0.6951  (69.51%)  [upstream metric; tracked-only 59.02%]
+     Reward      : -81.161 ± 84.858
+     Ep length   : 205.0 steps
+     Sensors/step: 7.98
+
+  ★ New best: 0.6951 (saved to ./agent_run1541_ppo/best)
+  iter    21/500  reward=-139.338
+  iter    22/500  reward=-145.170
+  iter    23/500  reward=-149.260
+  iter    24/500  reward=-159.552
+  iter    25/500  reward=-158.452
+  iter    26/500  reward=-167.402
+  iter    27/500  reward=-172.028
+  iter    28/500  reward=-170.682
+  iter    29/500  reward=-174.139
+  iter    30/500  reward=-166.988
+
+  ── EVAL @ iter 30 ──
+     Accuracy    : 0.7290  (72.90%)  [upstream metric; tracked-only 63.44%]
+     Reward      : -72.836 ± 72.067
+     Ep length   : 198.1 steps
+     Sensors/step: 8.14
+
+  ★ New best: 0.7290 (saved to ./agent_run1541_ppo/best)
+  iter    31/500  reward=-165.459
+  iter    32/500  reward=-151.326
+  iter    33/500  reward=-146.057
+  iter    34/500  reward=-125.333
+  iter    35/500  reward=-126.488
+  iter    36/500  reward=-106.964
+  iter    37/500  reward=-102.886
+  iter    38/500  reward=-108.425
+  iter    39/500  reward=-107.474
+  iter    40/500  reward=-108.105
+
+  ── EVAL @ iter 40 ──
+     Accuracy    : 0.8527  (85.27%)  [upstream metric; tracked-only 81.58%]
+     Reward      : -16.302 ± 20.658
+     Ep length   : 202.8 steps
+     Sensors/step: 6.14
+
+  ★ New best: 0.8527 (saved to ./agent_run1541_ppo/best)
+  iter    41/500  reward=-102.845
+  iter    42/500  reward=-114.354
+  iter    43/500  reward=-103.717
+  iter    44/500  reward= -92.806
+  iter    45/500  reward= -96.161
+  iter    46/500  reward= -90.554
+  iter    47/500  reward= -83.218
+  iter    48/500  reward= -87.901
+  iter    49/500  reward= -89.810
+  iter    50/500  reward= -95.778
+
+  ── EVAL @ iter 50 ──
+     Accuracy    : 0.8622  (86.22%)  [upstream metric; tracked-only 81.37%]
+     Reward      : -3.126 ± 16.936
+     Ep length   : 210.1 steps
+     Sensors/step: 5.75
+
+  ★ New best: 0.8622 (saved to ./agent_run1541_ppo/best)
+  iter    51/500  reward= -96.735
+  iter    52/500  reward= -94.858
+  iter    53/500  reward= -92.889
+  iter    54/500  reward= -87.817
+  iter    55/500  reward= -73.593
+  iter    56/500  reward= -73.010
+  iter    57/500  reward= -80.434
+  iter    58/500  reward= -73.750
+  iter    59/500  reward= -74.335
+  iter    60/500  reward= -72.918
+
+  ── EVAL @ iter 60 ──
+     Accuracy    : 0.9289  (92.89%)  [upstream metric; tracked-only 90.84%]
+     Reward      : +29.494 ± 32.498
+     Ep length   : 223.4 steps
+     Sensors/step: 5.21
+
+  ★ New best: 0.9289 (saved to ./agent_run1541_ppo/best)
+  iter    61/500  reward= -74.108
+  iter    62/500  reward= -76.118
+  iter    63/500  reward= -80.609
+  iter    64/500  reward= -84.929
+  iter    65/500  reward= -85.122
+  iter    66/500  reward= -86.078
+  iter    67/500  reward= -85.341
+  iter    68/500  reward= -81.650
+  iter    69/500  reward= -80.872
+  iter    70/500  reward= -77.537
+
+  ── EVAL @ iter 70 ──
+     Accuracy    : 0.9285  (92.85%)  [upstream metric; tracked-only 90.65%]
+     Reward      : +31.925 ± 37.004
+     Ep length   : 213.3 steps
+     Sensors/step: 5.04
+
+  iter    71/500  reward= -77.218
+  iter    72/500  reward= -72.012
+  iter    73/500  reward= -67.241
+  iter    74/500  reward= -65.721
+  iter    75/500  reward= -66.050
+  iter    76/500  reward= -63.735
+  iter    77/500  reward= -64.245
+  iter    78/500  reward= -58.638
+  iter    79/500  reward= -58.587
+  iter    80/500  reward= -57.894
+
+  ── EVAL @ iter 80 ──
+     Accuracy    : 0.9518  (95.18%)  [upstream metric; tracked-only 93.48%]
+     Reward      : +33.163 ± 43.436
+     Ep length   : 183.6 steps
+     Sensors/step: 5.03
+
+  ★ New best: 0.9518 (saved to ./agent_run1541_ppo/best)
+  iter    81/500  reward= -55.360
+  iter    82/500  reward= -55.061
+  iter    83/500  reward= -54.789
+  iter    84/500  reward= -48.955
+  iter    85/500  reward= -48.669
+  iter    86/500  reward= -46.864
+  iter    87/500  reward= -47.680
+  iter    88/500  reward= -43.267
+  iter    89/500  reward= -44.752
+  iter    90/500  reward= -44.692
+
+  ── EVAL @ iter 90 ──
+     Accuracy    : 0.9478  (94.78%)  [upstream metric; tracked-only 93.45%]
+     Reward      : +31.157 ± 37.923
+     Ep length   : 158.2 steps
+     Sensors/step: 4.77
+
+  iter    91/500  reward= -42.904
+  iter    92/500  reward= -37.092
+  iter    93/500  reward= -37.316
+  iter    94/500  reward= -39.847
+  iter    95/500  reward= -33.011
+  iter    96/500  reward= -27.838
+  iter    97/500  reward= -18.714
+  iter    98/500  reward= -16.894
+  iter    99/500  reward= -13.207
+  iter   100/500  reward= -13.424
+
+  ── EVAL @ iter 100 ──
+     Accuracy    : 0.9489  (94.89%)  [upstream metric; tracked-only 93.33%]
+     Reward      : +38.724 ± 40.223
+     Ep length   : 185.0 steps
+     Sensors/step: 4.72
+
+  iter   101/500  reward= -15.618
+  iter   102/500  reward= -17.363
+  iter   103/500  reward= -17.523
+  iter   104/500  reward= -19.210
+  iter   105/500  reward= -18.764
+  iter   106/500  reward= -15.060
+  iter   107/500  reward= -12.752
+  iter   108/500  reward= -12.670
+  iter   109/500  reward= -11.106
+  iter   110/500  reward=  -9.454
+
+  ── EVAL @ iter 110 ──
+     Accuracy    : 0.9717  (97.17%)  [upstream metric; tracked-only 96.19%]
+     Reward      : +61.309 ± 65.264
+     Ep length   : 230.2 steps
+     Sensors/step: 4.48
+
+  ★ New best: 0.9717 (saved to ./agent_run1541_ppo/best)
+  iter   111/500  reward=  -9.111
+  iter   112/500  reward= -11.648
+  iter   113/500  reward= -10.440
+  iter   114/500  reward=  -7.120
+*** SIGTERM received at time=1794889489 on cpu 4 ***
+PC: @     0x74c7a039852a  (unknown)  (unknown)
+    @     0x74c7a0245cb0  1797455728  (unknown)
+    @     0x7ffdd052f2f8  (unknown)  (unknown)
+    @     0x74c6b6d1fc00  (unknown)  (unknown)
+    @ 0x800000033807848d  (unknown)  (unknown)
+[2026-11-16 22:24:49,122 E 2679085 2679085] logging.cc:474: *** SIGTERM received at time=1794889489 on cpu 4 ***
+[2026-11-16 22:24:49,125 E 2679085 2679085] logging.cc:474: PC: @     0x74c7a039852a  (unknown)  (unknown)
+[2026-11-16 22:24:49,125 E 2679085 2679085] logging.cc:474:     @     0x74c7a0245cb0  1797455728  (unknown)
+[2026-11-16 22:24:49,128 E 2679085 2679085] logging.cc:474:     @     0x7ffdd052f2f8  (unknown)  (unknown)
+[2026-11-16 22:24:49,142 E 2679085 2679085] logging.cc:474:     @     0x74c6b6d1fc00  (unknown)  (unknown)
+[2026-11-16 22:24:49,145 E 2679085 2679085] logging.cc:474:     @ 0x800000033807848d  (unknown)  (unknown)

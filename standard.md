@@ -21,6 +21,11 @@ the target leaves the grid, which happens with probability **0.005 at every step
 - Training: no truncation. `--max-ep-steps 0` in both
   `examples/training_grid_rect.py` and `examples/train_switching_grid_ppo.py`
   (the latter also needs `--exit-prob 0.005`).
+- Training length: `--iterations N` is a **minimum**. With `--finish-episodes`
+  (`training_grid_rect.py`), training continues after iteration N until every
+  episode that was in progress at that point has ended (checked per rollout
+  worker; usually 1–2 extra iterations, capped at 50), so the run never cuts an
+  episode off. Use it for all runs under this standard.
 - Evaluation: also runs until the target exits. The 1,000-step cap in the
   evaluators is only a safety net and is almost never reached.
 - Do **not** use the old 100-step cap (`max_ep_steps=100`, the RLlib-port
@@ -97,7 +102,8 @@ walk (`--movement moore`) is used deliberately for *general base models*
 (runs 1510, 1520); that is a stated deviation for that purpose only.
 
 **Reproducibility.** Every movement model must come from a recorded seed (see
-§4). The original seeds the global RNG with 1, but other code also draws from it
+§4). Multi-model experiments use seeds 1, 2, 3, 4, … for P0, P1, P2, P3, …
+(§7). The original seeds the global RNG with 1, but other code also draws from it
 first, so run 198's exact table is not reproducible from the seed alone (it
 exists only in `runs/agent_run198_ppo/env_s1.pt`). Bit-exact reproduction of
 upstream tables is not required; reproducing *our own* runs is.
@@ -220,8 +226,11 @@ best/current checkpoints and metric history).
 ### Common design (both grids)
 
 - **Movement models:** 4 models P0–P3, each a seeded 9-candidate/4-slot table
-  (§2). Generated once (`O<i>` tokens, recorded `--matrix-seed`) and **reused
-  unchanged by every run** of that grid.
+  (§2), **reused unchanged by every run** of that grid. **Seeds: P0, P1, P2, P3
+  use seeds 1, 2, 3, 4** (continue 5, 6, … if more models are needed). With
+  `O<i>` tokens (`O<i>` = seed `matrix_seed + i`) that is
+  `--matrices O0,O1,O2,O3 --matrix-seed 1`. Exception: run 1550 (schedule v1)
+  was launched before this rule with `--matrix-seed 20261117`.
 - **Switch schedule:** `(P0, 0) → (P1, T0) → (P2, T1) → (P3, T2)`: P0 from
   iteration 0, then the target switches to P1 at T0, P2 at T1, P3 at T2 (3
   switches). The times may be arbitrary (segments need not be equal), but they
@@ -233,8 +242,8 @@ best/current checkpoints and metric history).
 
 | Run | Policy at start | On a detected change |
 |---|---|---|
-| 1. No restart | general base | nothing; PPO keeps training through every switch |
-| 2. Warm restart | general base | GLR change detector fires → reload the general base's weights, keep training |
+| 1. No restart | cold (random initial policy) | nothing; PPO keeps training through every switch |
+| 2. Warm restart | cold, as run 1 (to confirm) | change detector fires → reload the general base's weights, keep training |
 
 - **General base:** a PPO policy trained on the equal-probability Moore walk
   (`--movement moore`). This is not arbitrary: averaged over the random slot
@@ -273,13 +282,35 @@ best/current checkpoints and metric history).
     likely), so it false-alarms: replayed in order it fired about every 3,700
     steps, shuffled never. Do not use it for new runs.
 - **Report:** accuracy (upstream metric) per segment and overall, sensors/step,
-  recovery time after each switch, restarts, and the oracle reference
-  (`examples/random_matrix_oracle.py`, a tracker that knows the active model).
+  recovery time after each switch, restarts, and the oracle reference.
+- **Oracle:** `examples/random_matrix_oracle.py --standard` — a tracker that
+  knows the active model, run under this standard (infinite horizon, upstream
+  and tracked metrics). It decides **per cell**: switch on every cell whose
+  predicted probability is ≥ θ (one step ahead at delay 0, two steps at delay
+  1), with θ swept to find the reward-optimal policy; θ = 0 watches every
+  possible next cell. On the 4-slot models the reward-optimal oracle is full
+  coverage: **100% (upstream) / 99.47% (tracked) at about 3 cells per step**
+  (1550's O0–O3: 2.85–3.26 cells; 1530's table: 3.26). Compare PPO with this,
+  not with the older uniform-m oracle (same m at every cell, 100-step episodes,
+  tracked metric only), which understated what is achievable.
 
 ### 5×5 grid
 
-As above on 5×5. General base: run 1520 (equal-probability Moore walk,
-1,000 iterations).
+As above on 5×5. **General base: none yet.** Run 1520 (equal-probability Moore
+walk, 1,000 iterations, 2026-11-14) is **no longer recognised as the general
+base**: it predates this standard and was evaluated differently (tracked-only
+accuracy, evaluation clipped to k = 9 by lowest cell index, unseeded, one
+overwritten checkpoint, history only in the log). Its checkpoint is kept
+(`experiments/port_switching/general_base_5x5/agent_run1520_ppo`; paused run 1623
+depends on it) but must not be used as a base for new runs. The 5×5 general base
+under this standard is **run 1560** (`experiments/thesis_5x5/general_base/`):
+equal-probability Moore walk, seed 1.
+
+**General-base training length:** max(300 iterations, 40 iterations after
+accuracy has plateaued), then finish open episodes (§1). Plateau = no rise of
+≥ 0.5 points in the rolling mean of the last 3 evaluations (evaluations every 10
+iterations). `training_grid_rect.py --iterations 300 --plateau-patience 40
+--plateau-min-delta 0.005 --max-iterations 2000 --finish-episodes`.
 
 **Schedule v1 (3 switches, equal intervals):**
 
@@ -289,9 +320,16 @@ As above on 5×5. General base: run 1520 (equal-probability Moore walk,
 | 2 | P1 = `O1` | T0 = 150 |
 | 3 | P2 = `O2` | T1 = 300 |
 | 4 | P3 = `O3` | T2 = 450 |
-| end | | 600 |
+| end | | ≥ 600 (then until open episodes end) |
 
-`--matrices O0,O1,O2,O3 --matrix-seed 20261117`. Equal intervals: the policy
+`--matrices O0,O1,O2,O3 --matrix-seed 20261117 --switch-at 150,300,450`
+(`examples/training_grid_rect.py`, which switches every worker env and the
+evaluation env after the listed iterations and evaluates right before and
+right after each switch). Run 1 (no restart) = run 1550, **cold start** (random
+initial policy), `--finish-episodes`,
+`experiments/thesis_5x5/cmd_no_restart.sh`. Oracle (`--standard`,
+`experiments/thesis_5x5/oracle_standard.json`): 100% / 99.47% tracked on every
+model at 2.85–3.26 cells per step. Equal intervals: the policy
 cannot anticipate the switches either way, and equal segments make the
 per-segment numbers directly comparable. 150 iterations ≈ 3,000 episodes ≈
 600k steps per model; for scale, run 1530 (one model, from scratch) reached 90%

@@ -1,0 +1,76 @@
+============================================================
+  TRACK-MDP  —  RECTANGULAR GRID TRAINING
+============================================================
+  Run number  : 1550
+  Grid        : 5 rows × 5 cols (25 cells)
+  Iterations  : 600
+  Eval every  : 10
+  Mode        : train + eval (from scratch)
+
+  Grid       : 5 rows × 5 cols  (25 cells)
+  num_trans  : 4
+  movement   : moore   max_sensors (k): 9   seed: 1   train ep cap: none   sensor budget: none
+  missing_state = 51
+  cum_probs  : [0.2817, 0.5633, 0.845, 0.995]
+2026-11-16 22:27:27,672	INFO worker.py:2013 -- Started a local Ray instance.
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/_private/worker.py:2052: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+2026-11-16 22:27:30,584	WARNING training_grid_rect.py:315 -- DeprecationWarning: `build` has been deprecated. Use `AlgorithmConfig.build_algo` instead. This will raise an error in the future!
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/rllib/algorithms/algorithm.py:527: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+`UnifiedLogger` will be removed in Ray 2.7.
+  return UnifiedLogger(config, logdir, loggers=None)
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `JsonLogger interface is deprecated in favor of the `ray.tune.json.JsonLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `CSVLogger interface is deprecated in favor of the `ray.tune.csv.CSVLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `TBXLogger interface is deprecated in favor of the `ray.tune.tensorboardx.TBXLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+[2026-11-16 22:27:30,634 E 2862602 2862602] core_worker.cc:2232: Actor with class name: 'RolloutWorker' and ID: '84a046ba3706eebd1912f0b601000000' has constructor arguments in the object store and max_restarts > 0. If the arguments in the object store go out of scope or are lost, the actor restart will fail. See https://github.com/ray-project/ray/issues/53727 for more details.
+2026-11-16 22:27:36,645	WARNING util.py:62 -- Install gputil for GPU system monitoring.
+Starting from checkpoint: /home/hari/Documents/Projects/trackmdp-iobt/experiments/port_switching/general_base_5x5/agent_run1520_ppo
+2026-11-16 22:27:36,670	INFO trainable.py:578 -- Restored on 173.230.17.41 from checkpoint: Checkpoint(filesystem=local, path=/home/hari/Documents/Projects/trackmdp-iobt/experiments/port_switching/general_base_5x5/agent_run1520_ppo)
+
+Training for 600 iterations (eval every 10) ...
+
+
+  >>> movement model O0 (model 0) active in 5 worker envs + eval env
+
+2026-11-16 22:27:36,682	WARNING training_grid_rect.py:124 -- DeprecationWarning: `compute_single_action` has been deprecated. `Algorithm.compute_single_action` should no longer be used. Get the RLModule instance through `Algorithm.get_module([module ID])`, then compute actions through `RLModule.forward_inference({'obs': [obs batch]})`. This will raise an error in the future!
+
+  ── EVAL @ iter 0 (before training) ──
+     Accuracy    : 0.7813  (78.13%)  [upstream metric; tracked-only 75.59%]
+     Reward      : -47.247 ± 46.725
+     Ep length   : 190.8 steps
+     Sensors/step: 6.84
+
+2026-11-16 22:28:14,620	WARNING train_ops.py:114 -- DeprecationWarning: `ray.rllib.execution.train_ops.multi_gpu_train_one_step` has been deprecated. This will raise an error in the future!
+  iter     1/600  reward= -50.455
+  iter     2/600  reward= -60.429
+  iter     3/600  reward= -63.905
+  iter     4/600  reward= -67.760
+  iter     5/600  reward= -61.333
+  iter     6/600  reward= -60.061
+  iter     7/600  reward= -61.391
+  iter     8/600  reward= -54.877
+  iter     9/600  reward= -53.404
+  iter    10/600  reward= -51.842
+
+  ── EVAL @ iter 10 ──
+     Accuracy    : 0.8181  (81.81%)  [upstream metric; tracked-only 80.57%]
+     Reward      : -37.973 ± 30.551
+     Ep length   : 180.9 steps
+     Sensors/step: 6.61
+
+  ★ New best: 0.8181 (saved to ./agent_run1550_ppo/best)
+  iter    11/600  reward= -54.450
+*** SIGTERM received at time=1794889880 on cpu 16 ***
+PC: @     0x7801c2a319bb  (unknown)  mkl_blas_avx2_sgemm_kernel_nocopy_TN_b1
+    @     0x7802a2445cb0  (unknown)  (unknown)
+    @ 0x3f5f7a1e3f36b6b0  (unknown)  (unknown)
+[2026-11-16 22:31:20,268 E 2862602 2862602] logging.cc:474: *** SIGTERM received at time=1794889880 on cpu 16 ***
+[2026-11-16 22:31:20,268 E 2862602 2862602] logging.cc:474: PC: @     0x7801c2a319bb  (unknown)  mkl_blas_avx2_sgemm_kernel_nocopy_TN_b1
+[2026-11-16 22:31:20,271 E 2862602 2862602] logging.cc:474:     @     0x7802a2445cb0  (unknown)  (unknown)
+[2026-11-16 22:31:20,274 E 2862602 2862602] logging.cc:474:     @ 0x3f5f7a1e3f36b6b0  (unknown)  (unknown)

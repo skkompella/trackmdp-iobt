@@ -35,6 +35,7 @@ from ray.rllib.algorithms.ppo import PPOConfig, PPO
 
 from src.core.grid_env_rect  import learning_grid_sarsa_0
 from src.core.grid_wrapper_rect import grid_environment_rect
+from src.core.random_transition_matrices import parse_matrix_spec
 
 
 # ===========================================================================
@@ -60,6 +61,17 @@ DEFAULTS = {
     "seed":                None,      # None = unseeded; an int makes runs reproducible
     "sensor_budget":       "none",    # "none" = upstream (k unused); "env" = enforce k in env
     "init_checkpoint":     None,      # start from this checkpoint (branch a run)
+    "matrices":            None,      # e.g. "O0,O1,O2,O3": scheduled movement models
+    "matrix_seed":         None,
+    "switch_at":           None,      # iterations at which to move to the next model
+    "finish_episodes":     False,     # --iterations is a minimum; then finish open episodes
+    "detector":            None,      # "transition": transition-stream detector (standard.md 7)
+    "delta_f":             0.01,
+    "restart_checkpoint":  None,      # warm restart: reload this policy on every alarm
+    "restart":             None,      # "warm" (restart_checkpoint) | "cold" (initial random policy)
+    "plateau_patience":    None,      # also require this many iterations on a plateau
+    "plateau_min_delta":   0.005,
+    "max_iterations":      None,
 }
 
 
@@ -268,6 +280,8 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
         "time_limit_max":      time_limit_max,
         "seed":                cfg["seed"],
         "max_ep_steps":        cfg["max_ep_steps"],
+        # tau=0 records for the change detector (rollout workers only)
+        "record_tau0":         bool(cfg.get("detector")),
     }
 
     if not ray.is_initialized():
@@ -309,6 +323,9 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
     # Always search within this script's own save_dir to avoid accidentally
     # loading incompatible checkpoints from other scripts (e.g. in runs/).
     algo = ppo_cfg.build()
+    # The freshly initialised (random) policy, before any restore or training:
+    # the reset target for --restart cold.
+    initial_weights = algo.get_weights()
     if resume:
         ckpt, _ = find_latest_checkpoint(
             run_number, save_dir=save_dir_override or save_dir
@@ -340,27 +357,157 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
     best_dir    = os.path.join(save_dir, "best")
     history     = []
     best        = None
-    if cfg.get("init_checkpoint"):
-        # Iteration 0: the branched policy on the new environment, before any
-        # training -- the accuracy right after the change.
+
+    # Scheduled movement-model switches (--matrices/--switch-at): model 0 from
+    # the start, then the next model after each listed iteration. Applied to
+    # every rollout worker's env and to the evaluation env.
+    names, mats, switch_at, model = None, None, [], 0
+    if cfg.get("matrices"):
+        names, mats = parse_matrix_spec(cfg["matrices"], "grid", cfg["matrix_seed"] or 0,
+                                        nrows=nrows, ncols=ncols)
+        switch_at = [int(x) for x in (cfg.get("switch_at") or "").split(",") if x.strip()]
+        if len(switch_at) != len(names) - 1 or switch_at != sorted(switch_at):
+            raise SystemExit(f"--switch-at needs {len(names) - 1} increasing iterations "
+                             f"for {len(names)} models, got {switch_at}")
+
+    def set_model(idx):
+        T = mats[idx]
+        qobj.grid_env.load_movement_matrix(T)
+        seen = algo.env_runner_group.foreach_env(
+            lambda e: (e.qobj.grid_env.load_movement_matrix(T), e.qobj.grid_env.movement)[1])
+        flat = [v for sub in seen for v in (sub if isinstance(sub, list) else [sub])]
+        if not flat or any(v != "matrix" for v in flat):
+            raise RuntimeError(f"movement switch did not reach every worker env: {seen}")
+        print(f"\n  >>> movement model {names[idx]} (model {idx}) active "
+              f"in {len(flat)} worker envs + eval env\n")
+
+    # Change detection (standard.md 7): the monitor drains every rollout
+    # worker's tau=0 records after each iteration; on an alarm it clears the
+    # detector, and with --restart-checkpoint the policy is reset to the base.
+    monitor, base_weights, n_restarts = None, None, 0
+    if cfg.get("detector") == "transition":
+        from src.core.ppo_transition import TransitionMonitor
+        from src.core.transition_detector import row_supports
+        monitor = TransitionMonitor(row_supports("grid_moore", nrows, ncols),
+                                    delta_F=cfg["delta_f"], min_samples=30,
+                                    max_window=2000)
+        if cfg.get("restart") == "cold":
+            base_weights = initial_weights
+        elif cfg.get("restart_checkpoint"):
+            from ray.rllib.policy.policy import Policy
+            ck = os.path.abspath(cfg["restart_checkpoint"])
+            pol = Policy.from_checkpoint(os.path.join(ck, "policies", "default_policy"))
+            base_weights = {"default_policy": pol.get_weights()}
+            del pol
+        print(f"  Detector: transition streams ({monitor.detector.n_streams}), "
+              f"delta_F {cfg['delta_f']}, "
+              + ("cold restart (initial random policy)" if cfg.get("restart") == "cold"
+                 else "warm restart to " + cfg["restart_checkpoint"] if base_weights
+                 else "monitor only"))
+
+    def eval_row(i, label, reward_mean=float("nan")):
         metrics = evaluate_policy(algo, qobj.grid_env, cfg, cfg["eval_episodes"])
-        _print_metrics("EVAL @ iter 0 (before training)", metrics)
-        history.append({"iteration": 0, "train_reward_mean": float("nan"), **metrics})
-        os.makedirs(save_dir, exist_ok=True)
+        _print_metrics(label, metrics)
+        row = {"iteration": i, "train_reward_mean": reward_mean, **metrics}
+        if names:
+            row["model"] = names[model]
+        if monitor is not None:
+            row["alarms"] = len(monitor.alarms)
+            row["restarts"] = n_restarts
+        history.append(row)
+        return row
+
+    os.makedirs(save_dir, exist_ok=True)
+    if names:
+        set_model(0)
+    if cfg.get("init_checkpoint") or names:
+        # Iteration 0: the starting policy on the (first) environment, before
+        # any training.
+        eval_row(0, "EVAL @ iter 0 (before training)")
         _write_history(save_dir, history, None, cfg)
-    for i in range(1, cfg["training_iterations"] + 1):
+    def episode_marks():
+        """(completed episodes, steps into the current one) for every worker env."""
+        seen = algo.env_runner_group.foreach_env(
+            lambda e: (getattr(e, "episodes_completed", 0), getattr(e, "_ep_step", 0)))
+        return [v for sub in seen for v in (sub if isinstance(sub, list) else [sub])]
+
+    min_iters, open_marks, i = cfg["training_iterations"], None, 0
+    patience, min_delta = cfg.get("plateau_patience"), cfg.get("plateau_min_delta", 0.005)
+    max_iters, finish_from = cfg.get("max_iterations") or 10**9, None
+
+    def plateau_since(i):
+        """Iterations since the rolling-3 mean of evaluation accuracy last rose
+        by >= min_delta (current movement model only); 0 if too few evals."""
+        rows = [r for r in history if not names or r.get("model") == names[model]]
+        acc = [r["accuracy"] for r in rows]
+        its = [r["iteration"] for r in rows]
+        if len(acc) < 3:
+            return 0
+        best, last_up = -1.0, its[2]
+        for k in range(2, len(acc)):
+            m = (acc[k - 2] + acc[k - 1] + acc[k]) / 3
+            if m >= best + min_delta:
+                best, last_up = m, its[k]
+        return i - last_up
+
+    while True:
+        i += 1
         result      = algo.train()
         reward_mean = (result.get("episode_reward_mean") or
                        result.get("env_runners", {}).get("episode_reward_mean",
                                                          float("nan")))
-        print(f"  iter {i:5d}/{cfg['training_iterations']}  reward={reward_mean:+8.3f}")
+        print(f"  iter {i:5d}/{min_iters}  reward={reward_mean:+8.3f}")
 
-        if i % cfg["eval_interval"] == 0 or i == cfg["training_iterations"]:
+        if monitor is not None:
+            alarm = monitor.update(algo, i, env_steps=i * 4000)
+            if alarm is not None:
+                msg = f"  !!! ALARM at iteration {i} (model {names[model] if names else '-'})"
+                if base_weights is not None:
+                    algo.set_weights(base_weights)      # in place: no worker is mid-batch
+                    algo.env_runner_group.sync_weights()
+                    n_restarts += 1
+                    msg += f" -> {cfg.get('restart')} restart #{n_restarts}"
+                print(msg)
+
+        # Stop rule: at least min_iters; with --plateau-patience P, also wait
+        # until accuracy has been on a plateau for P iterations (no rolling-3
+        # improvement >= --plateau-min-delta since then). With --finish-episodes
+        # (infinite horizon), then let every episode in progress at that point end.
+        last = False
+        if open_marks is None:
+            since = plateau_since(i)
+            ready = i >= min_iters and (patience is None or since >= patience)
+            if i >= max_iters and not ready:
+                print(f"  WARNING: reached --max-iterations {max_iters} before the plateau rule")
+                ready = True
+            if ready:
+                why = (f"{min_iters} iterations" + (f" and {since} iterations on a "
+                       f"plateau" if patience is not None else ""))
+                if cfg.get("finish_episodes"):
+                    open_marks = [(c, s) for c, s in episode_marks()]
+                    finish_from = i
+                    n_open = sum(1 for c, s in open_marks if s > 0)
+                    print(f"  Stop rule met at iteration {i} ({why}); "
+                          f"finishing {n_open} open episode(s)")
+                    last = n_open == 0
+                else:
+                    print(f"  Stop rule met at iteration {i} ({why})")
+                    last = True
+        else:
+            now = episode_marks()
+            pending = [k for k, (c, s) in enumerate(open_marks)
+                       if s > 0 and now[k][0] <= c]
+            if pending and i >= finish_from + 50:
+                print(f"  WARNING: stopping with {len(pending)} episode(s) "
+                      f"still open after 50 extra iterations")
+            last = not pending or i >= finish_from + 50
+            if last:
+                print(f"  All open episodes finished; stopping at iteration {i}")
+
+        if i % cfg["eval_interval"] == 0 or last:
             algo.save(os.path.abspath(current_dir))
-            metrics = evaluate_policy(algo, qobj.grid_env, cfg, cfg["eval_episodes"])
-            _print_metrics(f"EVAL @ iter {i}", metrics)
-            row = {"iteration": i, "train_reward_mean": reward_mean, **metrics}
-            history.append(row)
+            row = eval_row(i, f"EVAL @ iter {i}", reward_mean)
+            metrics = row
             if best is None or metrics["accuracy"] > best["accuracy"]:
                 best = row
                 shutil.rmtree(best_dir, ignore_errors=True)
@@ -368,6 +515,20 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
                 print(f"  ★ New best: {best['accuracy']:.4f} (saved to {best_dir})")
             _write_history(save_dir, history, best, cfg)
 
+        if names and model + 1 < len(names) and i == switch_at[model]:
+            model += 1
+            set_model(model)
+            # Same iteration, new model, no training yet: the drop at the switch.
+            eval_row(i, f"EVAL @ iter {i} (right after switch to {names[model]})", reward_mean)
+            _write_history(save_dir, history, best, cfg)
+
+        if last:
+            break
+
+    if monitor is not None:
+        monitor.save(os.path.join(save_dir, "detector"))
+        print(f"  Detector: {len(monitor.alarms)} alarm(s), {n_restarts} restart(s); "
+              f"log in {os.path.join(save_dir, 'detector')}")
     if best is not None:
         print(f"\n  Best accuracy: {best['accuracy']:.4f} ({best['accuracy']*100:.2f}%) "
               f"at iteration {best['iteration']}  "
@@ -450,6 +611,43 @@ Examples
                         help="Start training from this checkpoint (weights + optimizer), "
                              "e.g. to branch a run onto a new movement model; also "
                              "evaluates at iteration 0, before any training")
+    parser.add_argument("--matrices", type=str, default=None,
+                        help="Movement models to switch through, e.g. O0,O1,O2,O3 "
+                             "(random_transition_matrices tokens; O<i> = original "
+                             "Track-MDP scheme). Overrides --movement")
+    parser.add_argument("--matrix-seed", type=int, default=None,
+                        help="Seed for --matrices (O<i> uses seed + i)")
+    parser.add_argument("--switch-at", type=str, default=None,
+                        help="Comma-separated iterations at which the target switches "
+                             "to the next model in --matrices, e.g. 150,300,450")
+    parser.add_argument("--finish-episodes", action="store_true",
+                        help="Infinite horizon: treat --iterations as a minimum, then keep "
+                             "training until every episode in progress at that point "
+                             "has ended, so no episode is cut off by the end of the run")
+    parser.add_argument("--detector", choices=["transition"], default=None,
+                        help="Run the transition-stream change detector on the rollout "
+                             "workers' tau=0 observations (standard.md section 7)")
+    parser.add_argument("--delta-f", type=float, default=DEFAULTS["delta_f"],
+                        help="Detector family-wise false-alarm level (default: %(default)s)")
+    parser.add_argument("--restart", choices=["warm", "cold"], default=None,
+                        help="On every detector alarm: warm = reload --restart-checkpoint "
+                             "(the general base); cold = reset to this run's initial random "
+                             "policy. Only weights are reset in both cases. Without it the "
+                             "detector only logs alarms (monitor mode)")
+    parser.add_argument("--restart-checkpoint", type=str, default=None,
+                        help="Warm restart: on every alarm, reload this checkpoint's policy "
+                             "weights (the general base) and keep training. Without it the "
+                             "detector only logs alarms (monitor mode)")
+    parser.add_argument("--plateau-patience", type=int, default=None,
+                        help="Stop only once accuracy has been on a plateau for this many "
+                             "iterations (and --iterations is reached): plateau = no rise "
+                             ">= --plateau-min-delta in the rolling 3-evaluation mean")
+    parser.add_argument("--plateau-min-delta", type=float,
+                        default=DEFAULTS["plateau_min_delta"],
+                        help="Smallest rise that counts as improvement (default: "
+                             "%(default)s = 0.5 points)")
+    parser.add_argument("--max-iterations", type=int, default=None,
+                        help="Hard cap for the plateau rule (default: none)")
     parser.add_argument("--eval-only",  action="store_true")
     parser.add_argument("--resume",     action="store_true",
                         help="Resume training from the latest checkpoint in save_dir.")
@@ -474,6 +672,23 @@ Examples
     cfg["max_ep_steps"]        = args.max_ep_steps
     cfg["sensor_budget"]       = args.sensor_budget
     cfg["init_checkpoint"]     = args.init_checkpoint
+    cfg["matrices"]            = args.matrices
+    cfg["matrix_seed"]         = args.matrix_seed
+    cfg["switch_at"]           = args.switch_at
+    cfg["finish_episodes"]     = args.finish_episodes
+    cfg["detector"]            = args.detector
+    cfg["delta_f"]             = args.delta_f
+    cfg["restart_checkpoint"]  = args.restart_checkpoint
+    cfg["plateau_patience"]    = args.plateau_patience
+    cfg["plateau_min_delta"]   = args.plateau_min_delta
+    cfg["max_iterations"]      = args.max_iterations
+    cfg["restart"]             = args.restart
+    if args.restart and not args.detector:
+        parser.error("--restart needs --detector")
+    if args.restart_checkpoint and args.restart is None:
+        cfg["restart"] = "warm"          # backward compatible: checkpoint implies warm
+    if cfg["restart"] == "warm" and not args.restart_checkpoint:
+        parser.error("--restart warm needs --restart-checkpoint")
     cfg["seed"]                = args.seed
 
     print("=" * 60)

@@ -465,6 +465,20 @@ class grid_env_rect:
                     dests.append((row + dr) * self.ncols + (col + dc))
         return dests
 
+    def load_movement_matrix(self, T):
+        """
+        Switch the target's movement to transition matrix T (n_cells x n_cells,
+        rows sum to 1), keeping the per-step exit probability TERMINAL_PROB.
+        Used for scheduled movement-model switches (e.g. O<i> tables from
+        random_transition_matrices.original_matrix). Takes effect on the next
+        move, so a switch can land mid-episode.
+        """
+        T = np.asarray(T, dtype=np.float64)
+        if T.shape != (self.n_cells, self.n_cells) or not np.allclose(T.sum(axis=1), 1.0):
+            raise ValueError(f"T must be a {self.n_cells}x{self.n_cells} stochastic matrix")
+        self._move_matrix = T
+        self.movement = "matrix"
+
     def reseed(self, seed=None):
         """Replace the movement and budget generators (seed=None -> fresh entropy)."""
         self._move_rng = np.random.default_rng(seed)
@@ -541,6 +555,14 @@ class grid_env_rect:
         pos = self.object_pos
 
         if pos == self.n_cells:          # already terminal — absorbing
+            return 0
+
+        if self.movement == "matrix":
+            if self._move_rng.uniform(0, 1) < TERMINAL_PROB:
+                self.object_pos = self.n_cells
+            else:
+                self.object_pos = int(self._move_rng.choice(
+                    self.n_cells, p=self._move_matrix[pos]))
             return 0
 
         if self.movement == "original":

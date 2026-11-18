@@ -77,6 +77,7 @@ class grid_environment_rect(gym.Env):
         self.reward     = 0
         self.done       = False
         self._ep_step   = 0
+        self.episodes_completed = 0   # finished episodes (exit or cap), for end-of-run checks
 
         # Seed toggle: env_config["seed"] = None (default) gives every worker
         # fresh entropy; an int makes runs reproducible, offset by the worker
@@ -155,6 +156,8 @@ class grid_environment_rect(gym.Env):
         self._ep_step           += 1
         truncated                = bool(self._max_ep_steps) and \
                                    self._ep_step >= self._max_ep_steps   # None/0 = no cap
+        if self.done or truncated:
+            self.episodes_completed += 1
         self.reward              = reward
         self.tuple_augment_state = self.to_tuple_augment_state(self.state, self.actions_list)
         return [self.tuple_augment_state, self.reward, self.done, truncated, self.info]

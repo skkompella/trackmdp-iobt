@@ -75,6 +75,82 @@ def run_oracle(env, T, k, cost, m, episodes, seed, nrows=5, ncols=5,
             "cells_per_tracked_step": cells / max(tracked, 1)}
 
 
+def run_oracle_standard(T, nrows, ncols, cost, theta, episodes, seed,
+                        exit_prob=0.005, eval_cap=1000):
+    """
+    Oracle under standard.md: infinite horizon (exit 0.005, episodes run until
+    the target exits), scored with BOTH the upstream metric (rescan steps count
+    as found; mean of per-episode ratios) and the tracked-only metric.
+
+    Per-cell decision: knowing T, it switches on every cell whose predicted
+    probability is >= theta (one step ahead from the last-seen cell at delay 0,
+    two steps at delay 1), so the number of sensors varies cell by cell.
+    theta -> 0 watches every possible next cell (full coverage); sweeping theta
+    finds the reward-optimal threshold.
+    """
+    from src.core.grid_env_rect import learning_grid_sarsa_0
+    q = learning_grid_sarsa_0(0, nrows, ncols, 4, [0.2817, 0.5633, 0.845, 0.995],
+                              nrows * ncols, nrows * ncols, TL, TL,
+                              no_moore_constraint=True, seed=seed)
+    e = q.grid_env
+    e.load_movement_matrix(T)
+    e.sensor_rew = -cost
+    n, miss = nrows * ncols, q.missing_state
+    T2 = T @ T
+    ep_acc, found_trk, steps_all, cells, tracked, reward = [], 0, 0, 0, 0, 0.0
+    for _ in range(episodes):
+        e.reset_object_state()
+        s, d, ep_found, ep_steps = miss, 0, 0, 0
+        while ep_steps < eval_cap:
+            was_missing = s == miss
+            a = np.zeros(n, dtype=np.int64)
+            if not was_missing:
+                p = (T if d == 0 else T2)[s // (TL + 1)]
+                a[p >= max(theta, 1e-12)] = 1
+                cells += int(a.sum()); tracked += 1
+            r, s_next, term, d = e.get_reward_next_state(s, a, d)
+            hit = (not was_missing) and d == 0
+            found_trk += int(hit)
+            ep_found += 1 if was_missing else int(hit)
+            ep_steps += 1; steps_all += 1; reward += r
+            if term:
+                break
+            s = s_next
+        ep_acc.append(ep_found / max(ep_steps, 1))
+    return {"theta": theta, "accuracy": float(np.mean(ep_acc)),
+            "tracked_accuracy": found_trk / max(steps_all, 1),
+            "cells_per_tracked_step": cells / max(tracked, 1),
+            "reward_per_step": reward / max(steps_all, 1)}
+
+
+THETAS = (0.0, 0.05, 0.1, 0.13, 0.16, 0.2, 0.25, 0.3, 0.4, 0.5)
+
+
+def main_standard(args):
+    results = []
+    print(f"{'mat':>4} | {'reward-optimal: theta':>21} {'acc':>7} {'tracked':>8} "
+          f"{'cells':>5} {'rew/step':>8} | {'full coverage: acc':>18} {'tracked':>8} {'cells':>5}")
+    names, mats = parse_matrix_spec(args.matrices, "grid", args.matrix_seed,
+                                    nrows=args.nrows, ncols=args.ncols)
+    for name, T in zip(names, mats):
+        for cost in (float(c) for c in args.costs.split(",")):
+            rows = [run_oracle_standard(T, args.nrows, args.ncols, cost, th,
+                                        args.episodes, 3) for th in THETAS]
+            best, full = max(rows, key=lambda r: r["reward_per_step"]), rows[0]
+            results.append({"matrix": name, "cost": -cost, "best_reward": best,
+                            "full_coverage": full, "all": rows})
+            print(f"{name:>4} | {best['theta']:>21} {best['accuracy']*100:6.2f}% "
+                  f"{best['tracked_accuracy']*100:7.2f}% {best['cells_per_tracked_step']:5.2f} "
+                  f"{best['reward_per_step']:8.3f} | {full['accuracy']*100:17.2f}% "
+                  f"{full['tracked_accuracy']*100:7.2f}% {full['cells_per_tracked_step']:5.2f}")
+    os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+    with open(args.out, "w") as fh:
+        json.dump({"standard": True, "nrows": args.nrows, "ncols": args.ncols,
+                   "matrices": args.matrices, "matrix_seed": args.matrix_seed,
+                   "results": results}, fh, indent=1)
+    print(f"\nWrote {args.out}")
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -88,8 +164,13 @@ def main():
     p.add_argument("--moore-moves", action="store_true",
                    help="Matrices move diagonally (O<i> tokens)")
     p.add_argument("--costs", default="0.16,0.04")
+    p.add_argument("--standard", action="store_true",
+                   help="standard.md oracle: infinite horizon, per-cell threshold "
+                        "decisions, upstream + tracked metrics (grid only)")
     p.add_argument("--out", required=True)
     args = p.parse_args()
+    if args.standard:
+        return main_standard(args)
 
     results = []
     print(f"{'env':>4} {'mat':>3} {'k':>2} {'cost':>5} | {'best-reward m':>13} "
