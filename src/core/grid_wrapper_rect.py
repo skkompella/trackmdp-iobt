@@ -31,6 +31,10 @@ class grid_environment_rect(gym.Env):
         self._max_ep_steps      = env_config.get("max_ep_steps", 100)
         self._ep_step           = 0
         self.no_moore_constraint = env_config.get("no_moore_constraint", False)
+        # Opt-in tau=0 record buffer for the transition-stream detector
+        # (src/core/ppo_transition.py drains it after every training iteration).
+        self._record_tau0 = bool(env_config.get("record_tau0", False))
+        self.tau0_records = []
 
         # Action space: full grid when no_moore_constraint, else (2t+3)² window
         if self.no_moore_constraint:
@@ -131,6 +135,10 @@ class grid_environment_rect(gym.Env):
             self.qobj.grid_env.get_reward_next_state(
                 self.current_state, action_bool, self.time_delay
             )
+        if self._record_tau0:
+            rec = getattr(self.qobj.grid_env, "last_tau0", None)
+            if rec is not None:
+                self.tau0_records.append(rec)
 
         if self.time_delay == 0:
             self.actions_list = []
@@ -150,6 +158,11 @@ class grid_environment_rect(gym.Env):
         self.reward              = reward
         self.tuple_augment_state = self.to_tuple_augment_state(self.state, self.actions_list)
         return [self.tuple_augment_state, self.reward, self.done, truncated, self.info]
+
+    def drain_tau0(self):
+        """Return the buffered tau=0 records and clear the buffer."""
+        out, self.tau0_records = self.tau0_records, []
+        return out
 
     def render(self, mode="human"):
         print(f"position: {self.state:2d}  reward: {self.reward:+.3f}  info: {self.info}")

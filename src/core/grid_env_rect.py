@@ -671,6 +671,22 @@ class grid_env_rect:
             else:
                 next_state = self.missing_state
 
+        # tau=0 record for the transition-stream detector: the target was seen
+        # at state_cell on the previous step and has moved once since; the
+        # sensors below were fixed before that move was revealed.
+        self.last_tau0 = None
+        if current_state != self.missing_state and time_delay == 0:
+            state_cell = current_state // (self.time_limit + 1)
+            on = np.flatnonzero(np.asarray(action_sensors))
+            if self.no_moore_constraint:
+                active = tuple(int(c) for c in on)
+            else:
+                s_col, s_row = self.val_to_grid(state_cell)
+                active = tuple(sorted(int((s_row + w // 3 - 1) * self.ncols
+                                          + s_col + w % 3 - 1) for w in on))
+            self.last_tau0 = (int(state_cell), active,
+                              int(obj_position) if obj_found else None)
+
         self.object_move()
         no_sensor_on = np.sum(action_sensors)
 

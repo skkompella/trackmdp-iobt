@@ -32,10 +32,19 @@ def row_supports(kind: str, nrows: int | None = None,
         if nrows is None or ncols is None:
             raise ValueError("grid supports need nrows and ncols")
         neigh = grid_neighbourhoods(nrows, ncols)
+    elif kind == "grid_moore":
+        # 3x3 block (diagonals included): the candidates of the original
+        # Track-MDP 9-candidate/4-slot movement.  Topology only.
+        if nrows is None or ncols is None:
+            raise ValueError("grid supports need nrows and ncols")
+        return {r * ncols + c: tuple(rr * ncols + cc
+                                     for rr in range(max(r - 1, 0), min(r + 2, nrows))
+                                     for cc in range(max(c - 1, 0), min(c + 2, ncols)))
+                for r in range(nrows) for c in range(ncols)}
     elif kind == "iobt":
         neigh = iobt_neighbourhoods()
     else:
-        raise ValueError(f"kind must be 'grid' or 'iobt', got {kind!r}")
+        raise ValueError(f"kind must be 'grid', 'grid_moore' or 'iobt', got {kind!r}")
     return {i: tuple(sorted({i, *nb})) for i, nb in neigh.items()}
 
 
