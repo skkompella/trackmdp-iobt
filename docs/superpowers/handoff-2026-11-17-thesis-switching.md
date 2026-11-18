@@ -31,14 +31,12 @@ streams on 5×5). All via `examples/training_grid_rect.py` (`--matrices`,
 | 1560 | 5×5 general base (equal-prob Moore, plateau rule) | **done**: plateaued ~70% (best 71.5% @260) |
 | 1552 | 5×5 warm restart to 1560 best | **done** (601 iterations) |
 | 1553 | 5×5 cold restart | **done** (601 iterations) |
-| 1570 | 10×10, seeds 1–4, 700-iteration segments (switches 700/1400/2100, ≥2800), no restart | **launched 21:48, killed by power-off** — relaunch (ask first) |
-| 1580 | 10×10 general base (warm beat cold, so the condition is met) | **launched by the queue after the 10×10 oracle; killed by power-off** — relaunch (ask first) |
+| 1570 | 10×10, seeds 1–4, 700-iteration segments (switches 700/1400/2100, ≥2800), no restart | **stopped at iteration 2730** on the user's request (70 short of 2800, inside the P3 segment); history to 2730 saved. Segment ends P0 97.5 / P1 94.3 / P2 93.7 / P3 96.7% (P3 at 2730); mean 89.7% |
+| 1580 | 10×10 general base (equal-prob Moore, plateau rule) | **done** at 301: plateaued ~68–70% (best 69.8% @200, 10.3 sensors/step) |
 
-After power-on: 1570 and 1580 must be relaunched from scratch
-(`training_grid_rect.py` has no mid-run resume). Relaunching
-`experiments/thesis_10x10/queue.sh` with no PIDs runs both immediately (1580
-only if `warm_vs_cold.txt` / the comparison still says warm beat cold — it does).
-The user said they will say when to pause/resume runs — ask before relaunching.
+After power-on: nothing is running. Next steps the user may ask for: 10×10 warm and
+cold restart runs (restart target 1580 best), more seeds per 5×5 arm for error bars,
+better general bases. Ask before launching anything.
 
 ## Results so far (5×5, upstream accuracy metric)
 

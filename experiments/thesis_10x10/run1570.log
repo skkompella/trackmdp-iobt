@@ -1,0 +1,4823 @@
+============================================================
+  TRACK-MDP  —  RECTANGULAR GRID TRAINING
+============================================================
+  Run number  : 1570
+  Grid        : 10 rows × 10 cols (100 cells)
+  Iterations  : 2800
+  Eval every  : 10
+  Mode        : train + eval (from scratch)
+
+  Grid       : 10 rows × 10 cols  (100 cells)
+  num_trans  : 4
+  movement   : moore   max_sensors (k): 9   seed: 1   train ep cap: none   sensor budget: none
+  missing_state = 201
+  cum_probs  : [0.2817, 0.5633, 0.845, 0.995]
+2026-11-17 21:48:05,211	INFO worker.py:2013 -- Started a local Ray instance.
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/_private/worker.py:2052: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+2026-11-17 21:48:08,044	WARNING training_grid_rect.py:325 -- DeprecationWarning: `build` has been deprecated. Use `AlgorithmConfig.build_algo` instead. This will raise an error in the future!
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/rllib/algorithms/algorithm.py:527: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+`UnifiedLogger` will be removed in Ray 2.7.
+  return UnifiedLogger(config, logdir, loggers=None)
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `JsonLogger interface is deprecated in favor of the `ray.tune.json.JsonLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `CSVLogger interface is deprecated in favor of the `ray.tune.csv.CSVLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `TBXLogger interface is deprecated in favor of the `ray.tune.tensorboardx.TBXLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+[2026-11-17 21:48:08,100 E 2153634 2153634] core_worker.cc:2232: Actor with class name: 'RolloutWorker' and ID: '60c14469f872948de50900c601000000' has constructor arguments in the object store and max_restarts > 0. If the arguments in the object store go out of scope or are lost, the actor restart will fail. See https://github.com/ray-project/ray/issues/53727 for more details.
+2026-11-17 21:48:13,967	WARNING util.py:62 -- Install gputil for GPU system monitoring.
+Training from scratch (use --resume to continue from a checkpoint).
+
+Training for 2800 iterations (eval every 10) ...
+
+
+  >>> movement model O0 (model 0) active in 5 worker envs + eval env
+
+2026-11-17 21:48:13,974	WARNING training_grid_rect.py:132 -- DeprecationWarning: `compute_single_action` has been deprecated. `Algorithm.compute_single_action` should no longer be used. Get the RLModule instance through `Algorithm.get_module([module ID])`, then compute actions through `RLModule.forward_inference({'obs': [obs batch]})`. This will raise an error in the future!
+
+  ── EVAL @ iter 0 (before training) ──
+     Accuracy    : 0.5103  (51.03%)  [upstream metric; tracked-only 33.92%]
+     Reward      : -567.165 ± 686.385
+     Ep length   : 190.8 steps
+     Sensors/step: 11.91
+
+2026-11-17 21:48:51,324	WARNING train_ops.py:114 -- DeprecationWarning: `ray.rllib.execution.train_ops.multi_gpu_train_one_step` has been deprecated. This will raise an error in the future!
+  iter     1/2800  reward=-507.525
+  iter     2/2800  reward=-621.444
+  iter     3/2800  reward=-656.327
+  iter     4/2800  reward=-690.427
+  iter     5/2800  reward=-624.721
+  iter     6/2800  reward=-611.952
+  iter     7/2800  reward=-636.413
+  iter     8/2800  reward=-563.413
+  iter     9/2800  reward=-545.950
+  iter    10/2800  reward=-514.702
+
+  ── EVAL @ iter 10 ──
+     Accuracy    : 0.6928  (69.28%)  [upstream metric; tracked-only 59.91%]
+     Reward      : -340.081 ± 314.999
+     Ep length   : 180.9 steps
+     Sensors/step: 10.31
+
+  ★ New best: 0.6928 (saved to ./agent_run1570_ppo/best)
+  iter    11/2800  reward=-539.650
+  iter    12/2800  reward=-473.626
+  iter    13/2800  reward=-440.734
+  iter    14/2800  reward=-453.610
+  iter    15/2800  reward=-474.288
+  iter    16/2800  reward=-426.258
+  iter    17/2800  reward=-415.697
+  iter    18/2800  reward=-415.748
+  iter    19/2800  reward=-371.457
+  iter    20/2800  reward=-404.845
+
+  ── EVAL @ iter 20 ──
+     Accuracy    : 0.7208  (72.08%)  [upstream metric; tracked-only 63.38%]
+     Reward      : -343.304 ± 357.621
+     Ep length   : 205.4 steps
+     Sensors/step: 9.60
+
+  ★ New best: 0.7208 (saved to ./agent_run1570_ppo/best)
+  iter    21/2800  reward=-415.667
+  iter    22/2800  reward=-406.276
+  iter    23/2800  reward=-391.230
+  iter    24/2800  reward=-394.753
+  iter    25/2800  reward=-437.656
+  iter    26/2800  reward=-424.614
+  iter    27/2800  reward=-450.653
+  iter    28/2800  reward=-502.707
+  iter    29/2800  reward=-424.443
+  iter    30/2800  reward=-423.616
+
+  ── EVAL @ iter 30 ──
+     Accuracy    : 0.7386  (73.86%)  [upstream metric; tracked-only 66.11%]
+     Reward      : -294.313 ± 256.966
+     Ep length   : 192.8 steps
+     Sensors/step: 9.30
+
+  ★ New best: 0.7386 (saved to ./agent_run1570_ppo/best)
+  iter    31/2800  reward=-443.416
+  iter    32/2800  reward=-409.096
+  iter    33/2800  reward=-400.028
+  iter    34/2800  reward=-423.020
+  iter    35/2800  reward=-446.092
+  iter    36/2800  reward=-441.580
+  iter    37/2800  reward=-425.926
+  iter    38/2800  reward=-394.433
+  iter    39/2800  reward=-399.645
+  iter    40/2800  reward=-340.480
+
+  ── EVAL @ iter 40 ──
+     Accuracy    : 0.7733  (77.33%)  [upstream metric; tracked-only 71.83%]
+     Reward      : -262.330 ± 260.579
+     Ep length   : 216.2 steps
+     Sensors/step: 8.92
+
+  ★ New best: 0.7733 (saved to ./agent_run1570_ppo/best)
+  iter    41/2800  reward=-346.718
+  iter    42/2800  reward=-374.335
+  iter    43/2800  reward=-386.788
+  iter    44/2800  reward=-397.775
+  iter    45/2800  reward=-388.611
+  iter    46/2800  reward=-381.713
+  iter    47/2800  reward=-379.968
+  iter    48/2800  reward=-384.819
+  iter    49/2800  reward=-360.904
+  iter    50/2800  reward=-405.930
+
+  ── EVAL @ iter 50 ──
+     Accuracy    : 0.7930  (79.30%)  [upstream metric; tracked-only 76.49%]
+     Reward      : -204.098 ± 187.127
+     Ep length   : 215.1 steps
+     Sensors/step: 8.42
+
+  ★ New best: 0.7930 (saved to ./agent_run1570_ppo/best)
+  iter    51/2800  reward=-388.074
+  iter    52/2800  reward=-407.012
+  iter    53/2800  reward=-400.564
+  iter    54/2800  reward=-436.964
+  iter    55/2800  reward=-410.448
+  iter    56/2800  reward=-420.544
+  iter    57/2800  reward=-421.051
+  iter    58/2800  reward=-414.808
+  iter    59/2800  reward=-394.176
+  iter    60/2800  reward=-417.069
+
+  ── EVAL @ iter 60 ──
+     Accuracy    : 0.8056  (80.56%)  [upstream metric; tracked-only 76.59%]
+     Reward      : -213.132 ± 211.686
+     Ep length   : 215.4 steps
+     Sensors/step: 8.55
+
+  ★ New best: 0.8056 (saved to ./agent_run1570_ppo/best)
+  iter    61/2800  reward=-419.351
+  iter    62/2800  reward=-359.582
+  iter    63/2800  reward=-375.886
+  iter    64/2800  reward=-399.722
+  iter    65/2800  reward=-348.571
+  iter    66/2800  reward=-370.176
+  iter    67/2800  reward=-399.776
+  iter    68/2800  reward=-445.024
+  iter    69/2800  reward=-430.320
+  iter    70/2800  reward=-444.619
+
+  ── EVAL @ iter 70 ──
+     Accuracy    : 0.8032  (80.32%)  [upstream metric; tracked-only 75.40%]
+     Reward      : -216.244 ± 181.261
+     Ep length   : 209.3 steps
+     Sensors/step: 8.35
+
+  iter    71/2800  reward=-406.684
+  iter    72/2800  reward=-384.843
+  iter    73/2800  reward=-341.926
+  iter    74/2800  reward=-342.618
+  iter    75/2800  reward=-344.644
+  iter    76/2800  reward=-377.930
+  iter    77/2800  reward=-387.758
+  iter    78/2800  reward=-414.821
+  iter    79/2800  reward=-390.039
+  iter    80/2800  reward=-412.714
+
+  ── EVAL @ iter 80 ──
+     Accuracy    : 0.8031  (80.31%)  [upstream metric; tracked-only 75.69%]
+     Reward      : -177.621 ± 166.321
+     Ep length   : 174.7 steps
+     Sensors/step: 8.33
+
+  iter    81/2800  reward=-379.028
+  iter    82/2800  reward=-384.044
+  iter    83/2800  reward=-370.498
+  iter    84/2800  reward=-391.793
+  iter    85/2800  reward=-380.619
+  iter    86/2800  reward=-389.234
+  iter    87/2800  reward=-408.305
+  iter    88/2800  reward=-399.595
+  iter    89/2800  reward=-411.054
+  iter    90/2800  reward=-409.088
+
+  ── EVAL @ iter 90 ──
+     Accuracy    : 0.7714  (77.14%)  [upstream metric; tracked-only 70.76%]
+     Reward      : -241.759 ± 213.272
+     Ep length   : 202.8 steps
+     Sensors/step: 8.51
+
+  iter    91/2800  reward=-409.641
+  iter    92/2800  reward=-399.750
+  iter    93/2800  reward=-383.550
+  iter    94/2800  reward=-363.226
+  iter    95/2800  reward=-328.519
+  iter    96/2800  reward=-328.540
+  iter    97/2800  reward=-357.880
+  iter    98/2800  reward=-358.710
+  iter    99/2800  reward=-381.465
+  iter   100/2800  reward=-412.388
+
+  ── EVAL @ iter 100 ──
+     Accuracy    : 0.7973  (79.73%)  [upstream metric; tracked-only 74.51%]
+     Reward      : -202.331 ± 175.634
+     Ep length   : 192.2 steps
+     Sensors/step: 8.37
+
+  iter   101/2800  reward=-383.535
+  iter   102/2800  reward=-370.572
+  iter   103/2800  reward=-323.827
+  iter   104/2800  reward=-322.591
+  iter   105/2800  reward=-330.633
+  iter   106/2800  reward=-326.670
+  iter   107/2800  reward=-309.752
+  iter   108/2800  reward=-269.110
+  iter   109/2800  reward=-243.073
+  iter   110/2800  reward=-259.950
+
+  ── EVAL @ iter 110 ──
+     Accuracy    : 0.8222  (82.22%)  [upstream metric; tracked-only 77.15%]
+     Reward      : -182.137 ± 182.537
+     Ep length   : 198.3 steps
+     Sensors/step: 7.96
+
+  ★ New best: 0.8222 (saved to ./agent_run1570_ppo/best)
+  iter   111/2800  reward=-288.632
+  iter   112/2800  reward=-286.628
+  iter   113/2800  reward=-296.382
+  iter   114/2800  reward=-324.640
+  iter   115/2800  reward=-310.969
+  iter   116/2800  reward=-296.322
+  iter   117/2800  reward=-303.493
+  iter   118/2800  reward=-307.620
+  iter   119/2800  reward=-301.400
+  iter   120/2800  reward=-313.017
+
+  ── EVAL @ iter 120 ──
+     Accuracy    : 0.8279  (82.79%)  [upstream metric; tracked-only 78.39%]
+     Reward      : -142.114 ± 140.345
+     Ep length   : 162.0 steps
+     Sensors/step: 7.87
+
+  ★ New best: 0.8279 (saved to ./agent_run1570_ppo/best)
+  iter   121/2800  reward=-340.648
+  iter   122/2800  reward=-330.816
+  iter   123/2800  reward=-365.713
+  iter   124/2800  reward=-334.448
+  iter   125/2800  reward=-301.250
+  iter   126/2800  reward=-292.702
+  iter   127/2800  reward=-302.143
+  iter   128/2800  reward=-283.998
+  iter   129/2800  reward=-294.620
+  iter   130/2800  reward=-307.417
+
+  ── EVAL @ iter 130 ──
+     Accuracy    : 0.8518  (85.18%)  [upstream metric; tracked-only 81.72%]
+     Reward      : -146.077 ± 131.884
+     Ep length   : 181.5 steps
+     Sensors/step: 8.02
+
+  ★ New best: 0.8518 (saved to ./agent_run1570_ppo/best)
+  iter   131/2800  reward=-289.916
+  iter   132/2800  reward=-279.704
+  iter   133/2800  reward=-265.922
+  iter   134/2800  reward=-275.614
+  iter   135/2800  reward=-261.566
+  iter   136/2800  reward=-277.231
+  iter   137/2800  reward=-297.385
+  iter   138/2800  reward=-292.236
+  iter   139/2800  reward=-326.413
+  iter   140/2800  reward=-332.372
+
+  ── EVAL @ iter 140 ──
+     Accuracy    : 0.8417  (84.17%)  [upstream metric; tracked-only 80.78%]
+     Reward      : -166.706 ± 143.340
+     Ep length   : 199.2 steps
+     Sensors/step: 8.15
+
+  iter   141/2800  reward=-331.764
+  iter   142/2800  reward=-306.137
+  iter   143/2800  reward=-275.797
+  iter   144/2800  reward=-279.122
+  iter   145/2800  reward=-266.455
+  iter   146/2800  reward=-246.685
+  iter   147/2800  reward=-262.806
+  iter   148/2800  reward=-248.248
+  iter   149/2800  reward=-225.491
+  iter   150/2800  reward=-222.244
+
+  ── EVAL @ iter 150 ──
+     Accuracy    : 0.8601  (86.01%)  [upstream metric; tracked-only 84.30%]
+     Reward      : -112.866 ± 100.398
+     Ep length   : 177.8 steps
+     Sensors/step: 7.53
+
+  ★ New best: 0.8601 (saved to ./agent_run1570_ppo/best)
+  iter   151/2800  reward=-205.092
+  iter   152/2800  reward=-222.623
+  iter   153/2800  reward=-222.378
+  iter   154/2800  reward=-232.572
+  iter   155/2800  reward=-225.952
+  iter   156/2800  reward=-226.878
+  iter   157/2800  reward=-210.806
+  iter   158/2800  reward=-191.082
+  iter   159/2800  reward=-205.995
+  iter   160/2800  reward=-221.962
+
+  ── EVAL @ iter 160 ──
+     Accuracy    : 0.8687  (86.87%)  [upstream metric; tracked-only 84.72%]
+     Reward      : -100.830 ± 90.793
+     Ep length   : 185.1 steps
+     Sensors/step: 7.31
+
+  ★ New best: 0.8687 (saved to ./agent_run1570_ppo/best)
+  iter   161/2800  reward=-216.079
+  iter   162/2800  reward=-214.051
+  iter   163/2800  reward=-233.895
+  iter   164/2800  reward=-216.458
+  iter   165/2800  reward=-221.457
+  iter   166/2800  reward=-219.887
+  iter   167/2800  reward=-226.205
+  iter   168/2800  reward=-220.738
+  iter   169/2800  reward=-203.526
+  iter   170/2800  reward=-191.376
+
+  ── EVAL @ iter 170 ──
+     Accuracy    : 0.8908  (89.08%)  [upstream metric; tracked-only 87.32%]
+     Reward      : -86.524 ± 75.899
+     Ep length   : 182.6 steps
+     Sensors/step: 7.13
+
+  ★ New best: 0.8908 (saved to ./agent_run1570_ppo/best)
+  iter   171/2800  reward=-183.511
+  iter   172/2800  reward=-189.470
+  iter   173/2800  reward=-175.232
+  iter   174/2800  reward=-197.869
+  iter   175/2800  reward=-217.218
+  iter   176/2800  reward=-200.275
+  iter   177/2800  reward=-201.094
+  iter   178/2800  reward=-204.047
+  iter   179/2800  reward=-194.809
+  iter   180/2800  reward=-170.050
+
+  ── EVAL @ iter 180 ──
+     Accuracy    : 0.8866  (88.66%)  [upstream metric; tracked-only 87.51%]
+     Reward      : -88.433 ± 69.967
+     Ep length   : 208.6 steps
+     Sensors/step: 7.04
+
+  iter   181/2800  reward=-182.383
+  iter   182/2800  reward=-190.903
+  iter   183/2800  reward=-197.274
+  iter   184/2800  reward=-183.180
+  iter   185/2800  reward=-186.667
+  iter   186/2800  reward=-176.843
+  iter   187/2800  reward=-171.910
+  iter   188/2800  reward=-162.988
+  iter   189/2800  reward=-186.506
+  iter   190/2800  reward=-197.746
+
+  ── EVAL @ iter 190 ──
+     Accuracy    : 0.8847  (88.47%)  [upstream metric; tracked-only 86.98%]
+     Reward      : -78.544 ± 74.942
+     Ep length   : 192.7 steps
+     Sensors/step: 6.90
+
+  iter   191/2800  reward=-209.205
+  iter   192/2800  reward=-203.020
+  iter   193/2800  reward=-207.202
+  iter   194/2800  reward=-185.246
+  iter   195/2800  reward=-178.260
+  iter   196/2800  reward=-181.022
+  iter   197/2800  reward=-197.781
+  iter   198/2800  reward=-174.378
+  iter   199/2800  reward=-177.368
+  iter   200/2800  reward=-173.190
+
+  ── EVAL @ iter 200 ──
+     Accuracy    : 0.9055  (90.55%)  [upstream metric; tracked-only 88.79%]
+     Reward      : -82.509 ± 75.619
+     Ep length   : 207.8 steps
+     Sensors/step: 6.80
+
+  ★ New best: 0.9055 (saved to ./agent_run1570_ppo/best)
+  iter   201/2800  reward=-162.562
+  iter   202/2800  reward=-157.256
+  iter   203/2800  reward=-168.566
+  iter   204/2800  reward=-161.772
+  iter   205/2800  reward=-164.764
+  iter   206/2800  reward=-158.303
+  iter   207/2800  reward=-181.010
+  iter   208/2800  reward=-175.715
+  iter   209/2800  reward=-176.410
+  iter   210/2800  reward=-167.082
+
+  ── EVAL @ iter 210 ──
+     Accuracy    : 0.9218  (92.18%)  [upstream metric; tracked-only 90.33%]
+     Reward      : -73.264 ± 61.082
+     Ep length   : 223.2 steps
+     Sensors/step: 6.70
+
+  ★ New best: 0.9218 (saved to ./agent_run1570_ppo/best)
+  iter   211/2800  reward=-178.196
+  iter   212/2800  reward=-162.179
+  iter   213/2800  reward=-165.800
+  iter   214/2800  reward=-173.400
+  iter   215/2800  reward=-179.396
+  iter   216/2800  reward=-188.137
+  iter   217/2800  reward=-184.721
+  iter   218/2800  reward=-182.730
+  iter   219/2800  reward=-179.507
+  iter   220/2800  reward=-147.003
+
+  ── EVAL @ iter 220 ──
+     Accuracy    : 0.9182  (91.82%)  [upstream metric; tracked-only 90.59%]
+     Reward      : -59.422 ± 46.163
+     Ep length   : 190.7 steps
+     Sensors/step: 6.74
+
+  iter   221/2800  reward=-149.205
+  iter   222/2800  reward=-138.966
+  iter   223/2800  reward=-140.614
+  iter   224/2800  reward=-145.936
+  iter   225/2800  reward=-154.783
+  iter   226/2800  reward=-154.561
+  iter   227/2800  reward=-152.319
+  iter   228/2800  reward=-146.649
+  iter   229/2800  reward=-141.935
+  iter   230/2800  reward=-161.975
+
+  ── EVAL @ iter 230 ──
+     Accuracy    : 0.9228  (92.28%)  [upstream metric; tracked-only 90.08%]
+     Reward      : -53.370 ± 44.885
+     Ep length   : 175.3 steps
+     Sensors/step: 6.42
+
+  ★ New best: 0.9228 (saved to ./agent_run1570_ppo/best)
+  iter   231/2800  reward=-171.404
+  iter   232/2800  reward=-184.712
+  iter   233/2800  reward=-191.413
+  iter   234/2800  reward=-182.042
+  iter   235/2800  reward=-180.118
+  iter   236/2800  reward=-159.478
+  iter   237/2800  reward=-145.773
+  iter   238/2800  reward=-145.352
+  iter   239/2800  reward=-162.548
+  iter   240/2800  reward=-158.070
+
+  ── EVAL @ iter 240 ──
+     Accuracy    : 0.9178  (91.78%)  [upstream metric; tracked-only 89.77%]
+     Reward      : -79.935 ± 79.699
+     Ep length   : 248.3 steps
+     Sensors/step: 6.68
+
+  iter   241/2800  reward=-160.306
+  iter   242/2800  reward=-150.987
+  iter   243/2800  reward=-147.962
+  iter   244/2800  reward=-139.114
+  iter   245/2800  reward=-125.362
+  iter   246/2800  reward=-136.305
+  iter   247/2800  reward=-134.734
+  iter   248/2800  reward=-125.080
+  iter   249/2800  reward=-128.578
+  iter   250/2800  reward=-139.617
+
+  ── EVAL @ iter 250 ──
+     Accuracy    : 0.9049  (90.49%)  [upstream metric; tracked-only 90.28%]
+     Reward      : -54.980 ± 46.372
+     Ep length   : 179.8 steps
+     Sensors/step: 6.70
+
+  iter   251/2800  reward=-130.088
+  iter   252/2800  reward=-133.069
+  iter   253/2800  reward=-135.296
+  iter   254/2800  reward=-136.615
+  iter   255/2800  reward=-141.600
+  iter   256/2800  reward=-138.662
+  iter   257/2800  reward=-128.385
+  iter   258/2800  reward=-123.304
+  iter   259/2800  reward=-129.012
+  iter   260/2800  reward=-129.848
+
+  ── EVAL @ iter 260 ──
+     Accuracy    : 0.9204  (92.04%)  [upstream metric; tracked-only 91.01%]
+     Reward      : -43.137 ± 46.628
+     Ep length   : 186.1 steps
+     Sensors/step: 6.21
+
+  iter   261/2800  reward=-139.496
+  iter   262/2800  reward=-128.990
+  iter   263/2800  reward=-131.874
+  iter   264/2800  reward=-120.299
+  iter   265/2800  reward=-119.552
+  iter   266/2800  reward=-127.147
+  iter   267/2800  reward=-130.465
+  iter   268/2800  reward=-120.032
+  iter   269/2800  reward=-122.025
+  iter   270/2800  reward=-115.148
+
+  ── EVAL @ iter 270 ──
+     Accuracy    : 0.9418  (94.18%)  [upstream metric; tracked-only 93.43%]
+     Reward      : -31.560 ± 33.517
+     Ep length   : 184.9 steps
+     Sensors/step: 6.17
+
+  ★ New best: 0.9418 (saved to ./agent_run1570_ppo/best)
+  iter   271/2800  reward=-112.599
+  iter   272/2800  reward=-111.476
+  iter   273/2800  reward=-106.223
+  iter   274/2800  reward=-112.863
+  iter   275/2800  reward=-111.620
+  iter   276/2800  reward=-101.868
+  iter   277/2800  reward= -96.916
+  iter   278/2800  reward=-103.234
+  iter   279/2800  reward=-100.062
+  iter   280/2800  reward=-105.531
+
+  ── EVAL @ iter 280 ──
+     Accuracy    : 0.9379  (93.79%)  [upstream metric; tracked-only 93.39%]
+     Reward      : -31.913 ± 33.968
+     Ep length   : 176.7 steps
+     Sensors/step: 6.19
+
+  iter   281/2800  reward= -96.133
+  iter   282/2800  reward=-101.632
+  iter   283/2800  reward= -95.572
+  iter   284/2800  reward=-100.514
+  iter   285/2800  reward=-102.077
+  iter   286/2800  reward=-109.440
+  iter   287/2800  reward=-110.043
+  iter   288/2800  reward=-108.254
+  iter   289/2800  reward=-101.716
+  iter   290/2800  reward=-100.530
+
+  ── EVAL @ iter 290 ──
+     Accuracy    : 0.9375  (93.75%)  [upstream metric; tracked-only 93.78%]
+     Reward      : -29.868 ± 35.220
+     Ep length   : 188.4 steps
+     Sensors/step: 6.23
+
+  iter   291/2800  reward= -99.576
+  iter   292/2800  reward=-103.219
+  iter   293/2800  reward=-102.570
+  iter   294/2800  reward=-104.319
+  iter   295/2800  reward=-112.520
+  iter   296/2800  reward=-102.757
+  iter   297/2800  reward= -85.888
+  iter   298/2800  reward= -83.395
+  iter   299/2800  reward= -80.912
+  iter   300/2800  reward= -89.562
+
+  ── EVAL @ iter 300 ──
+     Accuracy    : 0.9480  (94.80%)  [upstream metric; tracked-only 94.32%]
+     Reward      : -25.733 ± 26.540
+     Ep length   : 178.3 steps
+     Sensors/step: 6.13
+
+  ★ New best: 0.9480 (saved to ./agent_run1570_ppo/best)
+  iter   301/2800  reward= -97.036
+  iter   302/2800  reward= -91.764
+  iter   303/2800  reward= -92.416
+  iter   304/2800  reward= -90.392
+  iter   305/2800  reward= -83.211
+  iter   306/2800  reward= -85.770
+  iter   307/2800  reward= -82.314
+  iter   308/2800  reward= -77.841
+  iter   309/2800  reward= -75.917
+  iter   310/2800  reward= -79.639
+
+  ── EVAL @ iter 310 ──
+     Accuracy    : 0.9388  (93.88%)  [upstream metric; tracked-only 92.48%]
+     Reward      : -32.947 ± 28.901
+     Ep length   : 172.4 steps
+     Sensors/step: 6.18
+
+  iter   311/2800  reward= -79.984
+  iter   312/2800  reward= -80.099
+  iter   313/2800  reward= -86.183
+  iter   314/2800  reward= -94.220
+  iter   315/2800  reward= -95.464
+  iter   316/2800  reward= -99.335
+  iter   317/2800  reward=-100.394
+  iter   318/2800  reward= -93.018
+  iter   319/2800  reward= -91.058
+  iter   320/2800  reward= -82.644
+
+  ── EVAL @ iter 320 ──
+     Accuracy    : 0.9463  (94.63%)  [upstream metric; tracked-only 93.87%]
+     Reward      : -19.990 ± 23.472
+     Ep length   : 191.7 steps
+     Sensors/step: 5.92
+
+  iter   321/2800  reward= -85.135
+  iter   322/2800  reward= -79.136
+  iter   323/2800  reward= -79.878
+  iter   324/2800  reward= -79.369
+  iter   325/2800  reward= -80.794
+  iter   326/2800  reward= -78.971
+  iter   327/2800  reward= -83.612
+  iter   328/2800  reward= -82.310
+  iter   329/2800  reward= -81.108
+  iter   330/2800  reward= -81.650
+
+  ── EVAL @ iter 330 ──
+     Accuracy    : 0.9613  (96.13%)  [upstream metric; tracked-only 95.73%]
+     Reward      : -13.617 ± 21.083
+     Ep length   : 156.1 steps
+     Sensors/step: 5.83
+
+  ★ New best: 0.9613 (saved to ./agent_run1570_ppo/best)
+  iter   331/2800  reward= -76.562
+  iter   332/2800  reward= -74.644
+  iter   333/2800  reward= -78.543
+  iter   334/2800  reward= -81.116
+  iter   335/2800  reward= -79.006
+  iter   336/2800  reward= -78.282
+  iter   337/2800  reward= -72.638
+  iter   338/2800  reward= -70.883
+  iter   339/2800  reward= -63.230
+  iter   340/2800  reward= -72.006
+
+  ── EVAL @ iter 340 ──
+     Accuracy    : 0.9607  (96.07%)  [upstream metric; tracked-only 95.59%]
+     Reward      : -13.972 ± 23.536
+     Ep length   : 195.5 steps
+     Sensors/step: 6.06
+
+  iter   341/2800  reward= -70.325
+  iter   342/2800  reward= -70.183
+  iter   343/2800  reward= -73.206
+  iter   344/2800  reward= -72.812
+  iter   345/2800  reward= -68.337
+  iter   346/2800  reward= -60.383
+  iter   347/2800  reward= -59.809
+  iter   348/2800  reward= -60.546
+  iter   349/2800  reward= -60.941
+  iter   350/2800  reward= -59.396
+
+  ── EVAL @ iter 350 ──
+     Accuracy    : 0.9621  (96.21%)  [upstream metric; tracked-only 95.73%]
+     Reward      : -12.409 ± 21.611
+     Ep length   : 189.6 steps
+     Sensors/step: 5.87
+
+  ★ New best: 0.9621 (saved to ./agent_run1570_ppo/best)
+  iter   351/2800  reward= -62.554
+  iter   352/2800  reward= -63.748
+  iter   353/2800  reward= -56.114
+  iter   354/2800  reward= -57.842
+  iter   355/2800  reward= -55.815
+  iter   356/2800  reward= -55.475
+  iter   357/2800  reward= -54.129
+  iter   358/2800  reward= -49.513
+  iter   359/2800  reward= -49.584
+  iter   360/2800  reward= -51.992
+
+  ── EVAL @ iter 360 ──
+     Accuracy    : 0.9554  (95.54%)  [upstream metric; tracked-only 95.30%]
+     Reward      : -18.168 ± 38.237
+     Ep length   : 219.4 steps
+     Sensors/step: 6.06
+
+  iter   361/2800  reward= -53.911
+  iter   362/2800  reward= -54.314
+  iter   363/2800  reward= -57.198
+  iter   364/2800  reward= -58.119
+  iter   365/2800  reward= -58.422
+  iter   366/2800  reward= -60.893
+  iter   367/2800  reward= -65.698
+  iter   368/2800  reward= -61.181
+  iter   369/2800  reward= -60.700
+  iter   370/2800  reward= -56.198
+
+  ── EVAL @ iter 370 ──
+     Accuracy    : 0.9526  (95.26%)  [upstream metric; tracked-only 95.94%]
+     Reward      : -12.822 ± 29.314
+     Ep length   : 176.5 steps
+     Sensors/step: 6.14
+
+  iter   371/2800  reward= -53.528
+  iter   372/2800  reward= -53.128
+  iter   373/2800  reward= -53.721
+  iter   374/2800  reward= -52.864
+  iter   375/2800  reward= -53.063
+  iter   376/2800  reward= -55.490
+  iter   377/2800  reward= -52.234
+  iter   378/2800  reward= -52.337
+  iter   379/2800  reward= -53.929
+  iter   380/2800  reward= -51.974
+
+  ── EVAL @ iter 380 ──
+     Accuracy    : 0.9574  (95.74%)  [upstream metric; tracked-only 96.26%]
+     Reward      : -8.064 ± 29.343
+     Ep length   : 184.8 steps
+     Sensors/step: 5.92
+
+  iter   381/2800  reward= -53.202
+  iter   382/2800  reward= -51.576
+  iter   383/2800  reward= -46.030
+  iter   384/2800  reward= -46.286
+  iter   385/2800  reward= -48.367
+  iter   386/2800  reward= -48.271
+  iter   387/2800  reward= -47.755
+  iter   388/2800  reward= -48.419
+  iter   389/2800  reward= -44.798
+  iter   390/2800  reward= -41.614
+
+  ── EVAL @ iter 390 ──
+     Accuracy    : 0.9526  (95.26%)  [upstream metric; tracked-only 95.17%]
+     Reward      : -18.744 ± 24.449
+     Ep length   : 192.8 steps
+     Sensors/step: 6.10
+
+  iter   391/2800  reward= -46.026
+  iter   392/2800  reward= -46.158
+  iter   393/2800  reward= -41.980
+  iter   394/2800  reward= -40.630
+  iter   395/2800  reward= -39.059
+  iter   396/2800  reward= -38.441
+  iter   397/2800  reward= -40.531
+  iter   398/2800  reward= -38.566
+  iter   399/2800  reward= -43.808
+  iter   400/2800  reward= -49.386
+
+  ── EVAL @ iter 400 ──
+     Accuracy    : 0.9530  (95.30%)  [upstream metric; tracked-only 95.89%]
+     Reward      : -3.745 ± 29.318
+     Ep length   : 191.7 steps
+     Sensors/step: 5.76
+
+  iter   401/2800  reward= -51.324
+  iter   402/2800  reward= -50.683
+  iter   403/2800  reward= -50.382
+  iter   404/2800  reward= -50.127
+  iter   405/2800  reward= -46.150
+  iter   406/2800  reward= -41.083
+  iter   407/2800  reward= -41.388
+  iter   408/2800  reward= -38.881
+  iter   409/2800  reward= -38.102
+  iter   410/2800  reward= -41.492
+
+  ── EVAL @ iter 410 ──
+     Accuracy    : 0.9654  (96.54%)  [upstream metric; tracked-only 95.88%]
+     Reward      : -4.087 ± 29.930
+     Ep length   : 184.6 steps
+     Sensors/step: 5.63
+
+  ★ New best: 0.9654 (saved to ./agent_run1570_ppo/best)
+  iter   411/2800  reward= -43.534
+  iter   412/2800  reward= -40.821
+  iter   413/2800  reward= -41.579
+  iter   414/2800  reward= -39.459
+  iter   415/2800  reward= -35.540
+  iter   416/2800  reward= -34.988
+  iter   417/2800  reward= -36.550
+  iter   418/2800  reward= -38.524
+  iter   419/2800  reward= -42.608
+  iter   420/2800  reward= -42.968
+
+  ── EVAL @ iter 420 ──
+     Accuracy    : 0.9682  (96.82%)  [upstream metric; tracked-only 96.81%]
+     Reward      : +1.215 ± 35.133
+     Ep length   : 188.1 steps
+     Sensors/step: 5.74
+
+  ★ New best: 0.9682 (saved to ./agent_run1570_ppo/best)
+  iter   421/2800  reward= -42.810
+  iter   422/2800  reward= -41.271
+  iter   423/2800  reward= -40.924
+  iter   424/2800  reward= -32.930
+  iter   425/2800  reward= -32.930
+  iter   426/2800  reward= -33.612
+  iter   427/2800  reward= -31.208
+  iter   428/2800  reward= -29.455
+  iter   429/2800  reward= -27.283
+  iter   430/2800  reward= -24.929
+
+  ── EVAL @ iter 430 ──
+     Accuracy    : 0.9659  (96.59%)  [upstream metric; tracked-only 96.57%]
+     Reward      : +0.176 ± 26.393
+     Ep length   : 195.6 steps
+     Sensors/step: 5.67
+
+  iter   431/2800  reward= -24.740
+  iter   432/2800  reward= -23.996
+  iter   433/2800  reward= -26.121
+  iter   434/2800  reward= -28.618
+  iter   435/2800  reward= -25.591
+  iter   436/2800  reward= -29.064
+  iter   437/2800  reward= -34.744
+  iter   438/2800  reward= -36.484
+  iter   439/2800  reward= -38.000
+  iter   440/2800  reward= -43.671
+
+  ── EVAL @ iter 440 ──
+     Accuracy    : 0.9686  (96.86%)  [upstream metric; tracked-only 97.15%]
+     Reward      : +6.542 ± 33.575
+     Ep length   : 205.6 steps
+     Sensors/step: 5.55
+
+  ★ New best: 0.9686 (saved to ./agent_run1570_ppo/best)
+  iter   441/2800  reward= -40.942
+  iter   442/2800  reward= -37.332
+  iter   443/2800  reward= -39.924
+  iter   444/2800  reward= -39.216
+  iter   445/2800  reward= -33.730
+  iter   446/2800  reward= -30.749
+  iter   447/2800  reward= -28.552
+  iter   448/2800  reward= -27.727
+  iter   449/2800  reward= -26.032
+  iter   450/2800  reward= -26.682
+
+  ── EVAL @ iter 450 ──
+     Accuracy    : 0.9631  (96.31%)  [upstream metric; tracked-only 95.86%]
+     Reward      : -4.404 ± 29.046
+     Ep length   : 214.9 steps
+     Sensors/step: 5.64
+
+  iter   451/2800  reward= -26.428
+  iter   452/2800  reward= -23.878
+  iter   453/2800  reward= -28.375
+  iter   454/2800  reward= -30.119
+  iter   455/2800  reward= -29.606
+  iter   456/2800  reward= -28.740
+  iter   457/2800  reward= -33.426
+  iter   458/2800  reward= -31.010
+  iter   459/2800  reward= -25.067
+  iter   460/2800  reward= -25.402
+
+  ── EVAL @ iter 460 ──
+     Accuracy    : 0.9720  (97.20%)  [upstream metric; tracked-only 96.88%]
+     Reward      : +5.827 ± 30.989
+     Ep length   : 230.5 steps
+     Sensors/step: 5.58
+
+  ★ New best: 0.9720 (saved to ./agent_run1570_ppo/best)
+  iter   461/2800  reward= -24.096
+  iter   462/2800  reward= -25.156
+  iter   463/2800  reward= -25.307
+  iter   464/2800  reward= -26.647
+  iter   465/2800  reward= -28.852
+  iter   466/2800  reward= -25.812
+  iter   467/2800  reward= -24.757
+  iter   468/2800  reward= -24.608
+  iter   469/2800  reward= -23.622
+  iter   470/2800  reward= -24.926
+
+  ── EVAL @ iter 470 ──
+     Accuracy    : 0.9677  (96.77%)  [upstream metric; tracked-only 96.61%]
+     Reward      : +1.166 ± 27.691
+     Ep length   : 183.5 steps
+     Sensors/step: 5.53
+
+  iter   471/2800  reward= -25.270
+  iter   472/2800  reward= -26.825
+  iter   473/2800  reward= -25.428
+  iter   474/2800  reward= -26.018
+  iter   475/2800  reward= -26.503
+  iter   476/2800  reward= -26.792
+  iter   477/2800  reward= -27.883
+  iter   478/2800  reward= -25.301
+  iter   479/2800  reward= -25.545
+  iter   480/2800  reward= -25.756
+
+  ── EVAL @ iter 480 ──
+     Accuracy    : 0.9721  (97.21%)  [upstream metric; tracked-only 97.12%]
+     Reward      : +5.686 ± 32.638
+     Ep length   : 194.3 steps
+     Sensors/step: 5.64
+
+  ★ New best: 0.9721 (saved to ./agent_run1570_ppo/best)
+  iter   481/2800  reward= -24.084
+  iter   482/2800  reward= -26.250
+  iter   483/2800  reward= -31.776
+  iter   484/2800  reward= -30.088
+  iter   485/2800  reward= -29.755
+  iter   486/2800  reward= -32.354
+  iter   487/2800  reward= -28.084
+  iter   488/2800  reward= -19.868
+  iter   489/2800  reward= -17.996
+  iter   490/2800  reward= -17.671
+
+  ── EVAL @ iter 490 ──
+     Accuracy    : 0.9720  (97.20%)  [upstream metric; tracked-only 97.40%]
+     Reward      : +10.761 ± 36.199
+     Ep length   : 197.9 steps
+     Sensors/step: 5.35
+
+  iter   491/2800  reward= -18.775
+  iter   492/2800  reward= -19.813
+  iter   493/2800  reward= -19.884
+  iter   494/2800  reward= -24.109
+  iter   495/2800  reward= -22.550
+  iter   496/2800  reward= -19.841
+  iter   497/2800  reward= -21.932
+  iter   498/2800  reward= -25.472
+  iter   499/2800  reward= -23.411
+  iter   500/2800  reward= -22.193
+
+  ── EVAL @ iter 500 ──
+     Accuracy    : 0.9746  (97.46%)  [upstream metric; tracked-only 97.38%]
+     Reward      : +8.562 ± 26.008
+     Ep length   : 198.2 steps
+     Sensors/step: 5.46
+
+  ★ New best: 0.9746 (saved to ./agent_run1570_ppo/best)
+  iter   501/2800  reward= -21.838
+  iter   502/2800  reward= -22.570
+  iter   503/2800  reward= -19.665
+  iter   504/2800  reward= -25.763
+  iter   505/2800  reward= -24.101
+  iter   506/2800  reward= -21.959
+  iter   507/2800  reward= -19.980
+  iter   508/2800  reward= -17.636
+  iter   509/2800  reward= -12.471
+  iter   510/2800  reward= -10.458
+
+  ── EVAL @ iter 510 ──
+     Accuracy    : 0.9686  (96.86%)  [upstream metric; tracked-only 96.82%]
+     Reward      : +2.206 ± 24.930
+     Ep length   : 159.6 steps
+     Sensors/step: 5.49
+
+  iter   511/2800  reward= -10.960
+  iter   512/2800  reward= -11.282
+  iter   513/2800  reward=  -9.411
+  iter   514/2800  reward=  -9.902
+  iter   515/2800  reward= -13.871
+  iter   516/2800  reward= -13.766
+  iter   517/2800  reward= -12.309
+  iter   518/2800  reward=  -9.478
+  iter   519/2800  reward=  -8.717
+  iter   520/2800  reward=  -7.885
+
+  ── EVAL @ iter 520 ──
+     Accuracy    : 0.9780  (97.80%)  [upstream metric; tracked-only 97.33%]
+     Reward      : +12.478 ± 35.040
+     Ep length   : 240.6 steps
+     Sensors/step: 5.41
+
+  ★ New best: 0.9780 (saved to ./agent_run1570_ppo/best)
+  iter   521/2800  reward= -10.416
+  iter   522/2800  reward= -11.500
+  iter   523/2800  reward= -10.058
+  iter   524/2800  reward= -11.203
+  iter   525/2800  reward= -13.315
+  iter   526/2800  reward= -14.146
+  iter   527/2800  reward=  -7.008
+  iter   528/2800  reward=  -8.976
+  iter   529/2800  reward=  -9.052
+  iter   530/2800  reward= -10.235
+
+  ── EVAL @ iter 530 ──
+     Accuracy    : 0.9784  (97.84%)  [upstream metric; tracked-only 97.34%]
+     Reward      : +3.412 ± 26.098
+     Ep length   : 146.5 steps
+     Sensors/step: 5.47
+
+  ★ New best: 0.9784 (saved to ./agent_run1570_ppo/best)
+  iter   531/2800  reward=  -6.555
+  iter   532/2800  reward= -13.434
+  iter   533/2800  reward= -12.937
+  iter   534/2800  reward= -14.021
+  iter   535/2800  reward= -15.796
+  iter   536/2800  reward= -11.910
+  iter   537/2800  reward= -12.149
+  iter   538/2800  reward= -10.049
+  iter   539/2800  reward= -11.119
+  iter   540/2800  reward=  -9.938
+
+  ── EVAL @ iter 540 ──
+     Accuracy    : 0.9862  (98.62%)  [upstream metric; tracked-only 97.85%]
+     Reward      : +14.716 ± 34.459
+     Ep length   : 204.0 steps
+     Sensors/step: 5.20
+
+  ★ New best: 0.9862 (saved to ./agent_run1570_ppo/best)
+  iter   541/2800  reward= -12.470
+  iter   542/2800  reward= -12.030
+  iter   543/2800  reward= -15.272
+  iter   544/2800  reward= -14.739
+  iter   545/2800  reward= -12.826
+  iter   546/2800  reward= -13.420
+  iter   547/2800  reward= -13.420
+  iter   548/2800  reward= -11.506
+  iter   549/2800  reward= -12.272
+  iter   550/2800  reward= -11.454
+
+  ── EVAL @ iter 550 ──
+     Accuracy    : 0.9747  (97.47%)  [upstream metric; tracked-only 97.62%]
+     Reward      : +13.517 ± 38.128
+     Ep length   : 194.7 steps
+     Sensors/step: 5.33
+
+  iter   551/2800  reward= -13.530
+  iter   552/2800  reward= -16.858
+  iter   553/2800  reward= -14.357
+  iter   554/2800  reward= -15.378
+  iter   555/2800  reward= -12.888
+  iter   556/2800  reward= -12.644
+  iter   557/2800  reward=  -8.786
+  iter   558/2800  reward=  -7.572
+  iter   559/2800  reward=  -7.898
+  iter   560/2800  reward=  -4.972
+
+  ── EVAL @ iter 560 ──
+     Accuracy    : 0.9769  (97.69%)  [upstream metric; tracked-only 97.53%]
+     Reward      : +21.844 ± 40.103
+     Ep length   : 232.9 steps
+     Sensors/step: 5.22
+
+  iter   561/2800  reward=  -4.366
+  iter   562/2800  reward=  -4.261
+  iter   563/2800  reward=  -7.323
+  iter   564/2800  reward=  -7.014
+  iter   565/2800  reward=  -3.900
+  iter   566/2800  reward=  -7.598
+  iter   567/2800  reward=  -8.571
+  iter   568/2800  reward=  -5.988
+  iter   569/2800  reward=  -3.963
+  iter   570/2800  reward=  -6.952
+
+  ── EVAL @ iter 570 ──
+     Accuracy    : 0.9771  (97.71%)  [upstream metric; tracked-only 97.52%]
+     Reward      : +22.364 ± 36.588
+     Ep length   : 235.3 steps
+     Sensors/step: 5.13
+
+  iter   571/2800  reward=  -5.023
+  iter   572/2800  reward=  -7.364
+  iter   573/2800  reward=  -6.676
+  iter   574/2800  reward=  -9.294
+  iter   575/2800  reward= -10.456
+  iter   576/2800  reward=  -7.035
+  iter   577/2800  reward=  -6.574
+  iter   578/2800  reward= -10.758
+  iter   579/2800  reward= -12.172
+  iter   580/2800  reward=  -9.878
+
+  ── EVAL @ iter 580 ──
+     Accuracy    : 0.9767  (97.67%)  [upstream metric; tracked-only 97.11%]
+     Reward      : +12.359 ± 33.734
+     Ep length   : 169.9 steps
+     Sensors/step: 5.10
+
+  iter   581/2800  reward=  -8.822
+  iter   582/2800  reward=  -7.502
+  iter   583/2800  reward=  -3.971
+  iter   584/2800  reward=  -5.526
+  iter   585/2800  reward=  -3.675
+  iter   586/2800  reward=  -1.170
+  iter   587/2800  reward=  +0.105
+  iter   588/2800  reward=  +1.692
+  iter   589/2800  reward=  +2.745
+  iter   590/2800  reward=  -2.043
+
+  ── EVAL @ iter 590 ──
+     Accuracy    : 0.9742  (97.42%)  [upstream metric; tracked-only 97.04%]
+     Reward      : +18.254 ± 35.549
+     Ep length   : 190.7 steps
+     Sensors/step: 5.11
+
+  iter   591/2800  reward=  -3.180
+  iter   592/2800  reward=  -4.181
+  iter   593/2800  reward=  -5.272
+  iter   594/2800  reward=  -7.978
+  iter   595/2800  reward=  -5.795
+  iter   596/2800  reward= -10.546
+  iter   597/2800  reward= -10.537
+  iter   598/2800  reward=  -8.934
+  iter   599/2800  reward= -10.460
+  iter   600/2800  reward=  -5.168
+
+  ── EVAL @ iter 600 ──
+     Accuracy    : 0.9748  (97.48%)  [upstream metric; tracked-only 97.37%]
+     Reward      : +17.237 ± 37.210
+     Ep length   : 179.7 steps
+     Sensors/step: 5.05
+
+  iter   601/2800  reward=  -1.096
+  iter   602/2800  reward=  -2.231
+  iter   603/2800  reward=  -1.026
+  iter   604/2800  reward=  +1.060
+  iter   605/2800  reward=  -2.622
+  iter   606/2800  reward=  -4.201
+  iter   607/2800  reward=  -3.546
+  iter   608/2800  reward=  -2.698
+  iter   609/2800  reward=  -1.837
+  iter   610/2800  reward=  +3.402
+
+  ── EVAL @ iter 610 ──
+     Accuracy    : 0.9798  (97.98%)  [upstream metric; tracked-only 97.56%]
+     Reward      : +19.680 ± 38.193
+     Ep length   : 199.8 steps
+     Sensors/step: 5.08
+
+  iter   611/2800  reward=  +3.776
+  iter   612/2800  reward=  +3.199
+  iter   613/2800  reward=  +1.668
+  iter   614/2800  reward=  +4.924
+  iter   615/2800  reward=  +4.405
+  iter   616/2800  reward=  +4.897
+  iter   617/2800  reward=  +6.010
+  iter   618/2800  reward=  +8.114
+  iter   619/2800  reward=  +2.675
+  iter   620/2800  reward=  +0.944
+
+  ── EVAL @ iter 620 ──
+     Accuracy    : 0.9747  (97.47%)  [upstream metric; tracked-only 97.20%]
+     Reward      : +16.414 ± 37.705
+     Ep length   : 163.7 steps
+     Sensors/step: 5.02
+
+  iter   621/2800  reward=  +3.746
+  iter   622/2800  reward=  +5.625
+  iter   623/2800  reward=  +2.564
+  iter   624/2800  reward=  +3.308
+  iter   625/2800  reward=  +3.402
+  iter   626/2800  reward=  -0.244
+  iter   627/2800  reward=  -0.166
+  iter   628/2800  reward=  +3.898
+  iter   629/2800  reward=  +6.174
+  iter   630/2800  reward=  +3.954
+
+  ── EVAL @ iter 630 ──
+     Accuracy    : 0.9756  (97.56%)  [upstream metric; tracked-only 96.99%]
+     Reward      : +18.914 ± 38.117
+     Ep length   : 206.8 steps
+     Sensors/step: 5.16
+
+  iter   631/2800  reward=  +4.232
+  iter   632/2800  reward=  +2.441
+  iter   633/2800  reward=  +6.120
+  iter   634/2800  reward=  +4.660
+  iter   635/2800  reward=  +2.653
+  iter   636/2800  reward=  +3.577
+  iter   637/2800  reward=  +1.424
+  iter   638/2800  reward=  -0.890
+  iter   639/2800  reward=  -2.218
+  iter   640/2800  reward=  -0.477
+
+  ── EVAL @ iter 640 ──
+     Accuracy    : 0.9788  (97.88%)  [upstream metric; tracked-only 97.78%]
+     Reward      : +25.010 ± 50.801
+     Ep length   : 198.0 steps
+     Sensors/step: 4.95
+
+  iter   641/2800  reward=  +0.535
+  iter   642/2800  reward=  +0.400
+  iter   643/2800  reward=  +1.676
+  iter   644/2800  reward=  +5.162
+  iter   645/2800  reward=  +2.426
+  iter   646/2800  reward=  +4.563
+  iter   647/2800  reward=  +5.077
+  iter   648/2800  reward=  +7.395
+  iter   649/2800  reward=  +7.926
+  iter   650/2800  reward=  +7.429
+
+  ── EVAL @ iter 650 ──
+     Accuracy    : 0.9668  (96.68%)  [upstream metric; tracked-only 97.28%]
+     Reward      : +23.644 ± 47.722
+     Ep length   : 192.7 steps
+     Sensors/step: 5.00
+
+  iter   651/2800  reward=  +7.443
+  iter   652/2800  reward=  +6.390
+  iter   653/2800  reward=  +4.474
+  iter   654/2800  reward=  +1.810
+  iter   655/2800  reward=  +2.823
+  iter   656/2800  reward=  +1.879
+  iter   657/2800  reward=  +1.926
+  iter   658/2800  reward=  -1.234
+  iter   659/2800  reward=  +1.016
+  iter   660/2800  reward=  +0.458
+
+  ── EVAL @ iter 660 ──
+     Accuracy    : 0.9714  (97.14%)  [upstream metric; tracked-only 97.31%]
+     Reward      : +25.562 ± 49.275
+     Ep length   : 204.8 steps
+     Sensors/step: 5.08
+
+  iter   661/2800  reward=  +2.695
+  iter   662/2800  reward=  +5.649
+  iter   663/2800  reward=  +6.382
+  iter   664/2800  reward=  +3.880
+  iter   665/2800  reward=  +3.656
+  iter   666/2800  reward=  +5.581
+  iter   667/2800  reward=  +3.484
+  iter   668/2800  reward= +10.635
+  iter   669/2800  reward= +10.883
+  iter   670/2800  reward= +12.642
+
+  ── EVAL @ iter 670 ──
+     Accuracy    : 0.9747  (97.47%)  [upstream metric; tracked-only 97.04%]
+     Reward      : +19.387 ± 37.957
+     Ep length   : 171.0 steps
+     Sensors/step: 4.87
+
+  iter   671/2800  reward= +14.053
+  iter   672/2800  reward= +12.164
+  iter   673/2800  reward=  +8.935
+  iter   674/2800  reward=  +8.852
+  iter   675/2800  reward= +10.607
+  iter   676/2800  reward= +14.985
+  iter   677/2800  reward= +16.272
+  iter   678/2800  reward= +17.140
+  iter   679/2800  reward= +17.901
+  iter   680/2800  reward= +17.286
+
+  ── EVAL @ iter 680 ──
+     Accuracy    : 0.9765  (97.65%)  [upstream metric; tracked-only 97.45%]
+     Reward      : +25.260 ± 41.135
+     Ep length   : 198.4 steps
+     Sensors/step: 4.91
+
+  iter   681/2800  reward=  +7.141
+  iter   682/2800  reward=  +6.683
+  iter   683/2800  reward=  +4.095
+  iter   684/2800  reward=  +3.729
+  iter   685/2800  reward=  +5.427
+  iter   686/2800  reward=  +9.807
+  iter   687/2800  reward=  +9.057
+  iter   688/2800  reward=  +8.640
+  iter   689/2800  reward=  +9.574
+  iter   690/2800  reward= +13.188
+
+  ── EVAL @ iter 690 ──
+     Accuracy    : 0.9737  (97.37%)  [upstream metric; tracked-only 97.66%]
+     Reward      : +33.803 ± 56.276
+     Ep length   : 218.1 steps
+     Sensors/step: 4.88
+
+  iter   691/2800  reward= +16.577
+  iter   692/2800  reward= +16.434
+  iter   693/2800  reward= +17.627
+  iter   694/2800  reward= +18.268
+  iter   695/2800  reward= +13.593
+  iter   696/2800  reward= +11.104
+  iter   697/2800  reward=  +9.873
+  iter   698/2800  reward=  +9.104
+  iter   699/2800  reward= +13.016
+  iter   700/2800  reward= +14.317
+
+  ── EVAL @ iter 700 ──
+     Accuracy    : 0.9749  (97.49%)  [upstream metric; tracked-only 97.39%]
+     Reward      : +31.320 ± 50.213
+     Ep length   : 209.5 steps
+     Sensors/step: 4.80
+
+
+  >>> movement model O1 (model 1) active in 5 worker envs + eval env
+
+
+  ── EVAL @ iter 700 (right after switch to O1) ──
+     Accuracy    : 0.7515  (75.15%)  [upstream metric; tracked-only 72.50%]
+     Reward      : -173.082 ± 220.923
+     Ep length   : 194.3 steps
+     Sensors/step: 7.95
+
+  iter   701/2800  reward= -25.028
+  iter   702/2800  reward= -54.960
+  iter   703/2800  reward= -99.094
+  iter   704/2800  reward=-139.965
+  iter   705/2800  reward=-163.767
+  iter   706/2800  reward=-157.096
+  iter   707/2800  reward=-154.078
+  iter   708/2800  reward=-116.715
+  iter   709/2800  reward=-104.738
+  iter   710/2800  reward=-131.417
+
+  ── EVAL @ iter 710 ──
+     Accuracy    : 0.7614  (76.14%)  [upstream metric; tracked-only 75.50%]
+     Reward      : -181.462 ± 235.534
+     Ep length   : 254.6 steps
+     Sensors/step: 7.87
+
+  iter   711/2800  reward=-141.582
+  iter   712/2800  reward=-151.686
+  iter   713/2800  reward=-147.470
+  iter   714/2800  reward=-154.420
+  iter   715/2800  reward=-145.824
+  iter   716/2800  reward=-142.602
+  iter   717/2800  reward=-132.682
+  iter   718/2800  reward=-145.035
+  iter   719/2800  reward=-132.903
+  iter   720/2800  reward=-117.224
+
+  ── EVAL @ iter 720 ──
+     Accuracy    : 0.7697  (76.97%)  [upstream metric; tracked-only 77.14%]
+     Reward      : -139.110 ± 255.833
+     Ep length   : 204.2 steps
+     Sensors/step: 7.56
+
+  iter   721/2800  reward=-112.512
+  iter   722/2800  reward=-114.478
+  iter   723/2800  reward=-125.773
+  iter   724/2800  reward=-131.875
+  iter   725/2800  reward=-134.386
+  iter   726/2800  reward=-135.735
+  iter   727/2800  reward=-152.890
+  iter   728/2800  reward=-170.738
+  iter   729/2800  reward=-169.174
+  iter   730/2800  reward=-151.552
+
+  ── EVAL @ iter 730 ──
+     Accuracy    : 0.7958  (79.58%)  [upstream metric; tracked-only 77.86%]
+     Reward      : -122.285 ± 187.563
+     Ep length   : 160.5 steps
+     Sensors/step: 7.64
+
+  iter   731/2800  reward=-168.126
+  iter   732/2800  reward=-161.290
+  iter   733/2800  reward=-147.572
+  iter   734/2800  reward=-133.617
+  iter   735/2800  reward=-161.432
+  iter   736/2800  reward=-174.258
+  iter   737/2800  reward=-158.856
+  iter   738/2800  reward=-155.757
+  iter   739/2800  reward=-150.059
+  iter   740/2800  reward=-169.660
+
+  ── EVAL @ iter 740 ──
+     Accuracy    : 0.8186  (81.86%)  [upstream metric; tracked-only 80.33%]
+     Reward      : -135.086 ± 187.415
+     Ep length   : 217.7 steps
+     Sensors/step: 7.30
+
+  iter   741/2800  reward=-137.710
+  iter   742/2800  reward=-136.936
+  iter   743/2800  reward=-120.306
+  iter   744/2800  reward=-113.793
+  iter   745/2800  reward=-107.372
+  iter   746/2800  reward=-107.175
+  iter   747/2800  reward=-111.576
+  iter   748/2800  reward=-118.099
+  iter   749/2800  reward=-120.234
+  iter   750/2800  reward=-135.468
+
+  ── EVAL @ iter 750 ──
+     Accuracy    : 0.8245  (82.45%)  [upstream metric; tracked-only 81.01%]
+     Reward      : -90.948 ± 150.618
+     Ep length   : 164.6 steps
+     Sensors/step: 7.01
+
+  iter   751/2800  reward=-133.444
+  iter   752/2800  reward=-115.892
+  iter   753/2800  reward=-102.729
+  iter   754/2800  reward= -80.978
+  iter   755/2800  reward= -89.639
+  iter   756/2800  reward= -80.092
+  iter   757/2800  reward=-101.143
+  iter   758/2800  reward=-113.286
+  iter   759/2800  reward=-130.533
+  iter   760/2800  reward=-134.590
+
+  ── EVAL @ iter 760 ──
+     Accuracy    : 0.8369  (83.69%)  [upstream metric; tracked-only 84.45%]
+     Reward      : -72.993 ± 126.468
+     Ep length   : 188.5 steps
+     Sensors/step: 6.84
+
+  iter   761/2800  reward=-129.056
+  iter   762/2800  reward=-119.371
+  iter   763/2800  reward=-127.941
+  iter   764/2800  reward=-106.459
+  iter   765/2800  reward=-106.052
+  iter   766/2800  reward=-105.877
+  iter   767/2800  reward= -97.375
+  iter   768/2800  reward= -96.268
+  iter   769/2800  reward=-103.881
+  iter   770/2800  reward= -85.403
+
+  ── EVAL @ iter 770 ──
+     Accuracy    : 0.8179  (81.79%)  [upstream metric; tracked-only 83.71%]
+     Reward      : -98.181 ± 171.187
+     Ep length   : 225.0 steps
+     Sensors/step: 7.30
+
+  iter   771/2800  reward= -88.951
+  iter   772/2800  reward= -85.119
+  iter   773/2800  reward= -87.575
+  iter   774/2800  reward= -99.011
+  iter   775/2800  reward=-103.920
+  iter   776/2800  reward= -96.698
+  iter   777/2800  reward=-106.738
+  iter   778/2800  reward= -99.480
+  iter   779/2800  reward=-108.211
+  iter   780/2800  reward=-110.167
+
+  ── EVAL @ iter 780 ──
+     Accuracy    : 0.8376  (83.76%)  [upstream metric; tracked-only 84.31%]
+     Reward      : -78.958 ± 171.411
+     Ep length   : 219.4 steps
+     Sensors/step: 6.77
+
+  iter   781/2800  reward= -99.290
+  iter   782/2800  reward=-101.472
+  iter   783/2800  reward=-108.374
+  iter   784/2800  reward= -92.368
+  iter   785/2800  reward= -86.472
+  iter   786/2800  reward= -91.179
+  iter   787/2800  reward= -90.416
+  iter   788/2800  reward= -98.307
+  iter   789/2800  reward=-109.383
+  iter   790/2800  reward=-120.521
+
+  ── EVAL @ iter 790 ──
+     Accuracy    : 0.8225  (82.25%)  [upstream metric; tracked-only 83.95%]
+     Reward      : -79.731 ± 148.103
+     Ep length   : 230.3 steps
+     Sensors/step: 6.83
+
+  iter   791/2800  reward=-133.122
+  iter   792/2800  reward=-131.889
+  iter   793/2800  reward=-119.785
+  iter   794/2800  reward=-123.013
+  iter   795/2800  reward=-117.490
+  iter   796/2800  reward=-116.440
+  iter   797/2800  reward=-117.220
+  iter   798/2800  reward=-134.485
+  iter   799/2800  reward=-113.568
+  iter   800/2800  reward=-125.826
+
+  ── EVAL @ iter 800 ──
+     Accuracy    : 0.8278  (82.78%)  [upstream metric; tracked-only 81.10%]
+     Reward      : -93.681 ± 146.866
+     Ep length   : 189.3 steps
+     Sensors/step: 6.85
+
+  iter   801/2800  reward=-123.572
+  iter   802/2800  reward=-108.770
+  iter   803/2800  reward=-111.145
+  iter   804/2800  reward=-127.340
+  iter   805/2800  reward=-118.940
+  iter   806/2800  reward=-114.670
+  iter   807/2800  reward=-111.488
+  iter   808/2800  reward=-103.730
+  iter   809/2800  reward= -88.861
+  iter   810/2800  reward= -89.494
+
+  ── EVAL @ iter 810 ──
+     Accuracy    : 0.8259  (82.59%)  [upstream metric; tracked-only 84.03%]
+     Reward      : -80.400 ± 137.681
+     Ep length   : 204.8 steps
+     Sensors/step: 6.96
+
+  iter   811/2800  reward= -78.000
+  iter   812/2800  reward= -84.448
+  iter   813/2800  reward= -97.303
+  iter   814/2800  reward=-109.785
+  iter   815/2800  reward=-117.388
+  iter   816/2800  reward=-117.010
+  iter   817/2800  reward=-115.918
+  iter   818/2800  reward=-108.676
+  iter   819/2800  reward=-111.766
+  iter   820/2800  reward=-100.516
+
+  ── EVAL @ iter 820 ──
+     Accuracy    : 0.8643  (86.43%)  [upstream metric; tracked-only 84.20%]
+     Reward      : -76.659 ± 139.905
+     Ep length   : 183.8 steps
+     Sensors/step: 6.68
+
+  iter   821/2800  reward= -94.677
+  iter   822/2800  reward= -71.871
+  iter   823/2800  reward= -74.207
+  iter   824/2800  reward= -79.994
+  iter   825/2800  reward= -90.545
+  iter   826/2800  reward= -97.658
+  iter   827/2800  reward=-102.664
+  iter   828/2800  reward=-109.684
+  iter   829/2800  reward= -96.600
+  iter   830/2800  reward= -96.143
+
+  ── EVAL @ iter 830 ──
+     Accuracy    : 0.8288  (82.88%)  [upstream metric; tracked-only 84.66%]
+     Reward      : -67.182 ± 105.432
+     Ep length   : 189.9 steps
+     Sensors/step: 6.96
+
+  iter   831/2800  reward=-107.336
+  iter   832/2800  reward= -96.508
+  iter   833/2800  reward= -96.982
+  iter   834/2800  reward=-104.156
+  iter   835/2800  reward=-114.986
+  iter   836/2800  reward=-104.193
+  iter   837/2800  reward= -94.095
+  iter   838/2800  reward=-107.384
+  iter   839/2800  reward=-120.051
+  iter   840/2800  reward=-109.928
+
+  ── EVAL @ iter 840 ──
+     Accuracy    : 0.8612  (86.12%)  [upstream metric; tracked-only 86.87%]
+     Reward      : -60.058 ± 108.399
+     Ep length   : 209.1 steps
+     Sensors/step: 6.77
+
+  iter   841/2800  reward= -97.062
+  iter   842/2800  reward=-111.486
+  iter   843/2800  reward=-110.204
+  iter   844/2800  reward= -97.513
+  iter   845/2800  reward=-100.444
+  iter   846/2800  reward= -96.245
+  iter   847/2800  reward= -70.314
+  iter   848/2800  reward= -77.574
+  iter   849/2800  reward= -55.657
+  iter   850/2800  reward= -71.242
+
+  ── EVAL @ iter 850 ──
+     Accuracy    : 0.8409  (84.09%)  [upstream metric; tracked-only 85.23%]
+     Reward      : -70.211 ± 116.095
+     Ep length   : 202.2 steps
+     Sensors/step: 6.90
+
+  iter   851/2800  reward= -70.941
+  iter   852/2800  reward=-104.522
+  iter   853/2800  reward= -96.963
+  iter   854/2800  reward=-111.279
+  iter   855/2800  reward= -95.080
+  iter   856/2800  reward=-107.677
+  iter   857/2800  reward= -93.364
+  iter   858/2800  reward= -94.879
+  iter   859/2800  reward=-100.685
+  iter   860/2800  reward=-111.818
+
+  ── EVAL @ iter 860 ──
+     Accuracy    : 0.8782  (87.82%)  [upstream metric; tracked-only 88.39%]
+     Reward      : -40.970 ± 132.593
+     Ep length   : 236.1 steps
+     Sensors/step: 6.10
+
+  iter   861/2800  reward=-105.238
+  iter   862/2800  reward= -98.034
+  iter   863/2800  reward=-103.837
+  iter   864/2800  reward= -93.468
+  iter   865/2800  reward= -93.277
+  iter   866/2800  reward= -89.074
+  iter   867/2800  reward=-100.711
+  iter   868/2800  reward=-101.609
+  iter   869/2800  reward=-100.601
+  iter   870/2800  reward= -93.446
+
+  ── EVAL @ iter 870 ──
+     Accuracy    : 0.8754  (87.54%)  [upstream metric; tracked-only 89.36%]
+     Reward      : -29.680 ± 84.810
+     Ep length   : 181.5 steps
+     Sensors/step: 6.43
+
+  iter   871/2800  reward= -79.019
+  iter   872/2800  reward= -75.520
+  iter   873/2800  reward= -75.460
+  iter   874/2800  reward= -79.523
+  iter   875/2800  reward= -88.000
+  iter   876/2800  reward= -99.694
+  iter   877/2800  reward=-105.812
+  iter   878/2800  reward= -96.498
+  iter   879/2800  reward= -85.283
+  iter   880/2800  reward= -96.937
+
+  ── EVAL @ iter 880 ──
+     Accuracy    : 0.8797  (87.97%)  [upstream metric; tracked-only 87.55%]
+     Reward      : -44.358 ± 91.586
+     Ep length   : 179.2 steps
+     Sensors/step: 6.36
+
+  iter   881/2800  reward=-109.174
+  iter   882/2800  reward=-100.618
+  iter   883/2800  reward= -92.575
+  iter   884/2800  reward=-104.004
+  iter   885/2800  reward=-113.908
+  iter   886/2800  reward=-102.203
+  iter   887/2800  reward= -83.326
+  iter   888/2800  reward= -96.948
+  iter   889/2800  reward= -90.258
+  iter   890/2800  reward= -74.967
+
+  ── EVAL @ iter 890 ──
+     Accuracy    : 0.8530  (85.30%)  [upstream metric; tracked-only 87.07%]
+     Reward      : -47.874 ± 87.062
+     Ep length   : 171.3 steps
+     Sensors/step: 6.68
+
+  iter   891/2800  reward= -72.536
+  iter   892/2800  reward= -79.065
+  iter   893/2800  reward= -63.322
+  iter   894/2800  reward= -61.485
+  iter   895/2800  reward= -66.207
+  iter   896/2800  reward= -57.710
+  iter   897/2800  reward= -60.101
+  iter   898/2800  reward= -55.751
+  iter   899/2800  reward= -49.138
+  iter   900/2800  reward= -49.248
+
+  ── EVAL @ iter 900 ──
+     Accuracy    : 0.8793  (87.93%)  [upstream metric; tracked-only 88.41%]
+     Reward      : -35.476 ± 78.291
+     Ep length   : 190.4 steps
+     Sensors/step: 6.21
+
+  iter   901/2800  reward= -56.873
+  iter   902/2800  reward= -61.200
+  iter   903/2800  reward= -60.927
+  iter   904/2800  reward= -56.296
+  iter   905/2800  reward= -59.128
+  iter   906/2800  reward= -53.262
+  iter   907/2800  reward= -47.759
+  iter   908/2800  reward= -46.643
+  iter   909/2800  reward= -46.303
+  iter   910/2800  reward= -61.424
+
+  ── EVAL @ iter 910 ──
+     Accuracy    : 0.8967  (89.67%)  [upstream metric; tracked-only 90.40%]
+     Reward      : -23.066 ± 73.750
+     Ep length   : 196.7 steps
+     Sensors/step: 6.13
+
+  iter   911/2800  reward= -54.160
+  iter   912/2800  reward= -55.879
+  iter   913/2800  reward= -66.184
+  iter   914/2800  reward= -75.637
+  iter   915/2800  reward= -61.862
+  iter   916/2800  reward= -70.871
+  iter   917/2800  reward= -67.023
+  iter   918/2800  reward= -59.549
+  iter   919/2800  reward= -58.619
+  iter   920/2800  reward= -54.952
+
+  ── EVAL @ iter 920 ──
+     Accuracy    : 0.8832  (88.32%)  [upstream metric; tracked-only 89.30%]
+     Reward      : -32.925 ± 64.695
+     Ep length   : 183.7 steps
+     Sensors/step: 6.37
+
+  iter   921/2800  reward= -65.068
+  iter   922/2800  reward= -60.169
+  iter   923/2800  reward= -52.907
+  iter   924/2800  reward= -50.521
+  iter   925/2800  reward= -63.885
+  iter   926/2800  reward= -56.183
+  iter   927/2800  reward= -54.520
+  iter   928/2800  reward= -57.378
+  iter   929/2800  reward= -41.304
+  iter   930/2800  reward= -37.170
+
+  ── EVAL @ iter 930 ──
+     Accuracy    : 0.9022  (90.22%)  [upstream metric; tracked-only 91.91%]
+     Reward      : -15.071 ± 69.095
+     Ep length   : 192.0 steps
+     Sensors/step: 6.23
+
+  iter   931/2800  reward= -48.665
+  iter   932/2800  reward= -43.303
+  iter   933/2800  reward= -36.859
+  iter   934/2800  reward= -36.016
+  iter   935/2800  reward= -43.419
+  iter   936/2800  reward= -53.948
+  iter   937/2800  reward= -51.752
+  iter   938/2800  reward= -55.658
+  iter   939/2800  reward= -54.471
+  iter   940/2800  reward= -51.520
+
+  ── EVAL @ iter 940 ──
+     Accuracy    : 0.9062  (90.62%)  [upstream metric; tracked-only 92.15%]
+     Reward      : -13.587 ± 86.471
+     Ep length   : 199.8 steps
+     Sensors/step: 6.08
+
+  iter   941/2800  reward= -50.966
+  iter   942/2800  reward= -52.028
+  iter   943/2800  reward= -48.733
+  iter   944/2800  reward= -45.096
+  iter   945/2800  reward= -40.756
+  iter   946/2800  reward= -41.590
+  iter   947/2800  reward= -32.964
+  iter   948/2800  reward= -47.973
+  iter   949/2800  reward= -51.400
+  iter   950/2800  reward= -52.512
+
+  ── EVAL @ iter 950 ──
+     Accuracy    : 0.9066  (90.66%)  [upstream metric; tracked-only 92.74%]
+     Reward      : -8.940 ± 97.609
+     Ep length   : 214.7 steps
+     Sensors/step: 6.10
+
+  iter   951/2800  reward= -35.967
+  iter   952/2800  reward= -43.284
+  iter   953/2800  reward= -38.534
+  iter   954/2800  reward= -35.978
+  iter   955/2800  reward= -30.376
+  iter   956/2800  reward= -37.248
+  iter   957/2800  reward= -35.963
+  iter   958/2800  reward= -26.705
+  iter   959/2800  reward= -38.512
+  iter   960/2800  reward= -51.505
+
+  ── EVAL @ iter 960 ──
+     Accuracy    : 0.8883  (88.83%)  [upstream metric; tracked-only 89.54%]
+     Reward      : -31.345 ± 67.730
+     Ep length   : 187.9 steps
+     Sensors/step: 6.30
+
+  iter   961/2800  reward= -56.245
+  iter   962/2800  reward= -51.611
+  iter   963/2800  reward= -61.198
+  iter   964/2800  reward= -64.264
+  iter   965/2800  reward= -52.050
+  iter   966/2800  reward= -51.163
+  iter   967/2800  reward= -53.477
+  iter   968/2800  reward= -45.717
+  iter   969/2800  reward= -41.955
+  iter   970/2800  reward= -51.743
+
+  ── EVAL @ iter 970 ──
+     Accuracy    : 0.8908  (89.08%)  [upstream metric; tracked-only 91.32%]
+     Reward      : -14.392 ± 75.019
+     Ep length   : 199.7 steps
+     Sensors/step: 6.09
+
+  iter   971/2800  reward= -59.099
+  iter   972/2800  reward= -60.650
+  iter   973/2800  reward= -50.125
+  iter   974/2800  reward= -46.682
+  iter   975/2800  reward= -38.662
+  iter   976/2800  reward= -34.091
+  iter   977/2800  reward= -22.972
+  iter   978/2800  reward= -21.236
+  iter   979/2800  reward= -16.624
+  iter   980/2800  reward= -15.681
+
+  ── EVAL @ iter 980 ──
+     Accuracy    : 0.9088  (90.88%)  [upstream metric; tracked-only 92.90%]
+     Reward      : -3.711 ± 68.197
+     Ep length   : 184.8 steps
+     Sensors/step: 5.94
+
+  iter   981/2800  reward= -16.784
+  iter   982/2800  reward= -25.150
+  iter   983/2800  reward= -31.457
+  iter   984/2800  reward= -33.658
+  iter   985/2800  reward= -30.611
+  iter   986/2800  reward= -24.922
+  iter   987/2800  reward= -24.939
+  iter   988/2800  reward= -25.916
+  iter   989/2800  reward= -25.564
+  iter   990/2800  reward= -35.616
+
+  ── EVAL @ iter 990 ──
+     Accuracy    : 0.9012  (90.12%)  [upstream metric; tracked-only 91.21%]
+     Reward      : -17.360 ± 63.483
+     Ep length   : 191.4 steps
+     Sensors/step: 6.04
+
+  iter   991/2800  reward= -34.406
+  iter   992/2800  reward= -33.158
+  iter   993/2800  reward= -35.911
+  iter   994/2800  reward= -33.655
+  iter   995/2800  reward= -40.690
+  iter   996/2800  reward= -39.233
+  iter   997/2800  reward= -46.040
+  iter   998/2800  reward= -49.662
+  iter   999/2800  reward= -50.626
+  iter  1000/2800  reward= -52.599
+
+  ── EVAL @ iter 1000 ──
+     Accuracy    : 0.8907  (89.07%)  [upstream metric; tracked-only 92.17%]
+     Reward      : -9.759 ± 102.181
+     Ep length   : 205.3 steps
+     Sensors/step: 6.10
+
+  iter  1001/2800  reward= -51.768
+  iter  1002/2800  reward= -36.894
+  iter  1003/2800  reward= -33.022
+  iter  1004/2800  reward= -20.402
+  iter  1005/2800  reward= -17.359
+  iter  1006/2800  reward= -26.549
+  iter  1007/2800  reward= -33.778
+  iter  1008/2800  reward= -34.004
+  iter  1009/2800  reward= -40.919
+  iter  1010/2800  reward= -42.394
+
+  ── EVAL @ iter 1010 ──
+     Accuracy    : 0.9014  (90.14%)  [upstream metric; tracked-only 92.15%]
+     Reward      : -8.862 ± 92.349
+     Ep length   : 198.2 steps
+     Sensors/step: 6.06
+
+  iter  1011/2800  reward= -37.806
+  iter  1012/2800  reward= -40.354
+  iter  1013/2800  reward= -37.335
+  iter  1014/2800  reward= -26.402
+  iter  1015/2800  reward= -27.614
+  iter  1016/2800  reward= -21.532
+  iter  1017/2800  reward= -25.447
+  iter  1018/2800  reward= -35.502
+  iter  1019/2800  reward= -40.564
+  iter  1020/2800  reward= -38.996
+
+  ── EVAL @ iter 1020 ──
+     Accuracy    : 0.8890  (88.90%)  [upstream metric; tracked-only 91.15%]
+     Reward      : -12.654 ± 76.605
+     Ep length   : 176.7 steps
+     Sensors/step: 5.99
+
+  iter  1021/2800  reward= -44.616
+  iter  1022/2800  reward= -47.798
+  iter  1023/2800  reward= -41.443
+  iter  1024/2800  reward= -37.683
+  iter  1025/2800  reward= -35.494
+  iter  1026/2800  reward= -31.630
+  iter  1027/2800  reward= -29.900
+  iter  1028/2800  reward= -19.138
+  iter  1029/2800  reward= -23.626
+  iter  1030/2800  reward= -20.509
+
+  ── EVAL @ iter 1030 ──
+     Accuracy    : 0.9042  (90.42%)  [upstream metric; tracked-only 92.96%]
+     Reward      : -0.341 ± 80.954
+     Ep length   : 190.1 steps
+     Sensors/step: 5.95
+
+  iter  1031/2800  reward= -23.916
+  iter  1032/2800  reward= -21.050
+  iter  1033/2800  reward= -14.731
+  iter  1034/2800  reward= -13.768
+  iter  1035/2800  reward= -10.292
+  iter  1036/2800  reward= -11.566
+  iter  1037/2800  reward= -12.336
+  iter  1038/2800  reward=  -9.545
+  iter  1039/2800  reward= -17.298
+  iter  1040/2800  reward= -12.540
+
+  ── EVAL @ iter 1040 ──
+     Accuracy    : 0.9157  (91.57%)  [upstream metric; tracked-only 91.33%]
+     Reward      : -18.082 ± 54.528
+     Ep length   : 184.2 steps
+     Sensors/step: 5.82
+
+  iter  1041/2800  reward= -14.672
+  iter  1042/2800  reward=  -6.276
+  iter  1043/2800  reward= -12.135
+  iter  1044/2800  reward=  -4.953
+  iter  1045/2800  reward=  -8.111
+  iter  1046/2800  reward= -12.141
+  iter  1047/2800  reward=  -7.355
+  iter  1048/2800  reward=  -8.521
+  iter  1049/2800  reward= -22.200
+  iter  1050/2800  reward= -35.100
+
+  ── EVAL @ iter 1050 ──
+     Accuracy    : 0.9129  (91.29%)  [upstream metric; tracked-only 92.80%]
+     Reward      : -4.624 ± 67.477
+     Ep length   : 174.0 steps
+     Sensors/step: 5.84
+
+  iter  1051/2800  reward= -32.725
+  iter  1052/2800  reward= -32.754
+  iter  1053/2800  reward= -29.134
+  iter  1054/2800  reward= -24.083
+  iter  1055/2800  reward= -18.607
+  iter  1056/2800  reward= -15.454
+  iter  1057/2800  reward=  -9.189
+  iter  1058/2800  reward= -16.384
+  iter  1059/2800  reward=  -4.676
+  iter  1060/2800  reward=  -6.996
+
+  ── EVAL @ iter 1060 ──
+     Accuracy    : 0.9229  (92.29%)  [upstream metric; tracked-only 92.37%]
+     Reward      : -8.420 ± 54.627
+     Ep length   : 173.2 steps
+     Sensors/step: 5.64
+
+  iter  1061/2800  reward= -10.378
+  iter  1062/2800  reward= -12.466
+  iter  1063/2800  reward= -11.145
+  iter  1064/2800  reward= -27.595
+  iter  1065/2800  reward= -24.039
+  iter  1066/2800  reward= -22.074
+  iter  1067/2800  reward= -24.948
+  iter  1068/2800  reward= -30.590
+  iter  1069/2800  reward= -29.689
+  iter  1070/2800  reward= -20.501
+
+  ── EVAL @ iter 1070 ──
+     Accuracy    : 0.9147  (91.47%)  [upstream metric; tracked-only 92.71%]
+     Reward      : -4.244 ± 71.724
+     Ep length   : 186.7 steps
+     Sensors/step: 5.85
+
+  iter  1071/2800  reward= -14.194
+  iter  1072/2800  reward=  -7.580
+  iter  1073/2800  reward=  -5.081
+  iter  1074/2800  reward=  -1.305
+  iter  1075/2800  reward=  +1.156
+  iter  1076/2800  reward=  +3.080
+  iter  1077/2800  reward=  -1.675
+  iter  1078/2800  reward=  -6.838
+  iter  1079/2800  reward=  -4.230
+  iter  1080/2800  reward=  -2.116
+
+  ── EVAL @ iter 1080 ──
+     Accuracy    : 0.9068  (90.68%)  [upstream metric; tracked-only 93.24%]
+     Reward      : +8.972 ± 82.952
+     Ep length   : 229.0 steps
+     Sensors/step: 5.69
+
+  iter  1081/2800  reward=  -0.486
+  iter  1082/2800  reward=  -9.665
+  iter  1083/2800  reward= -12.681
+  iter  1084/2800  reward= -11.807
+  iter  1085/2800  reward= -11.214
+  iter  1086/2800  reward= -19.138
+  iter  1087/2800  reward= -19.180
+  iter  1088/2800  reward= -16.741
+  iter  1089/2800  reward= -17.869
+  iter  1090/2800  reward= -21.964
+
+  ── EVAL @ iter 1090 ──
+     Accuracy    : 0.9137  (91.37%)  [upstream metric; tracked-only 94.28%]
+     Reward      : +6.462 ± 72.724
+     Ep length   : 192.8 steps
+     Sensors/step: 5.75
+
+  iter  1091/2800  reward= -16.489
+  iter  1092/2800  reward=  -4.264
+  iter  1093/2800  reward=  -3.204
+  iter  1094/2800  reward= -12.788
+  iter  1095/2800  reward= -10.522
+  iter  1096/2800  reward= -15.804
+  iter  1097/2800  reward= -24.125
+  iter  1098/2800  reward= -26.321
+  iter  1099/2800  reward= -18.333
+  iter  1100/2800  reward= -21.020
+
+  ── EVAL @ iter 1100 ──
+     Accuracy    : 0.9292  (92.92%)  [upstream metric; tracked-only 94.05%]
+     Reward      : +7.462 ± 74.040
+     Ep length   : 206.7 steps
+     Sensors/step: 5.59
+
+  iter  1101/2800  reward= -21.974
+  iter  1102/2800  reward= -22.008
+  iter  1103/2800  reward= -17.181
+  iter  1104/2800  reward= -15.968
+  iter  1105/2800  reward= -13.790
+  iter  1106/2800  reward= -14.620
+  iter  1107/2800  reward= -19.209
+  iter  1108/2800  reward= -20.134
+  iter  1109/2800  reward= -30.692
+  iter  1110/2800  reward= -27.454
+
+  ── EVAL @ iter 1110 ──
+     Accuracy    : 0.9191  (91.91%)  [upstream metric; tracked-only 92.39%]
+     Reward      : -10.413 ± 44.166
+     Ep length   : 182.0 steps
+     Sensors/step: 5.78
+
+  iter  1111/2800  reward= -24.323
+  iter  1112/2800  reward= -18.295
+  iter  1113/2800  reward= -14.434
+  iter  1114/2800  reward=  -4.564
+  iter  1115/2800  reward=  -6.184
+  iter  1116/2800  reward=  -5.370
+  iter  1117/2800  reward=  -1.834
+  iter  1118/2800  reward=  -6.794
+  iter  1119/2800  reward=  -6.044
+  iter  1120/2800  reward=  -9.346
+
+  ── EVAL @ iter 1120 ──
+     Accuracy    : 0.9152  (91.52%)  [upstream metric; tracked-only 93.35%]
+     Reward      : +1.457 ± 79.399
+     Ep length   : 180.5 steps
+     Sensors/step: 5.77
+
+  iter  1121/2800  reward= -12.843
+  iter  1122/2800  reward= -17.863
+  iter  1123/2800  reward= -16.308
+  iter  1124/2800  reward= -15.309
+  iter  1125/2800  reward=  -9.592
+  iter  1126/2800  reward=  -6.550
+  iter  1127/2800  reward=  -7.034
+  iter  1128/2800  reward=  -3.648
+  iter  1129/2800  reward=  -8.636
+  iter  1130/2800  reward=  -9.493
+
+  ── EVAL @ iter 1130 ──
+     Accuracy    : 0.9082  (90.82%)  [upstream metric; tracked-only 93.30%]
+     Reward      : -1.473 ± 68.823
+     Ep length   : 202.2 steps
+     Sensors/step: 5.92
+
+  iter  1131/2800  reward= -15.890
+  iter  1132/2800  reward= -17.089
+  iter  1133/2800  reward= -21.759
+  iter  1134/2800  reward= -24.578
+  iter  1135/2800  reward= -16.454
+  iter  1136/2800  reward= -24.136
+  iter  1137/2800  reward= -29.788
+  iter  1138/2800  reward= -23.084
+  iter  1139/2800  reward= -16.556
+  iter  1140/2800  reward= -16.269
+
+  ── EVAL @ iter 1140 ──
+     Accuracy    : 0.9007  (90.07%)  [upstream metric; tracked-only 92.20%]
+     Reward      : -6.296 ± 78.911
+     Ep length   : 199.3 steps
+     Sensors/step: 6.01
+
+  iter  1141/2800  reward= -16.820
+  iter  1142/2800  reward=  -8.942
+  iter  1143/2800  reward=  +1.637
+  iter  1144/2800  reward=  -5.224
+  iter  1145/2800  reward=  -8.636
+  iter  1146/2800  reward=  -4.088
+  iter  1147/2800  reward=  -7.300
+  iter  1148/2800  reward= -17.312
+  iter  1149/2800  reward= -11.942
+  iter  1150/2800  reward= -11.828
+
+  ── EVAL @ iter 1150 ──
+     Accuracy    : 0.9175  (91.75%)  [upstream metric; tracked-only 94.47%]
+     Reward      : +13.789 ± 76.365
+     Ep length   : 206.7 steps
+     Sensors/step: 5.68
+
+  iter  1151/2800  reward= -18.675
+  iter  1152/2800  reward= -23.151
+  iter  1153/2800  reward= -21.105
+  iter  1154/2800  reward= -27.032
+  iter  1155/2800  reward= -23.244
+  iter  1156/2800  reward= -19.663
+  iter  1157/2800  reward= -14.216
+  iter  1158/2800  reward= -16.227
+  iter  1159/2800  reward= -13.713
+  iter  1160/2800  reward=  -4.771
+
+  ── EVAL @ iter 1160 ──
+     Accuracy    : 0.9240  (92.40%)  [upstream metric; tracked-only 92.92%]
+     Reward      : -6.122 ± 70.352
+     Ep length   : 178.5 steps
+     Sensors/step: 5.74
+
+  iter  1161/2800  reward=  -1.111
+  iter  1162/2800  reward=  -3.734
+  iter  1163/2800  reward=  +0.954
+  iter  1164/2800  reward=  +4.412
+  iter  1165/2800  reward=  +4.890
+  iter  1166/2800  reward=  -5.960
+  iter  1167/2800  reward=  -1.344
+  iter  1168/2800  reward=  -1.653
+  iter  1169/2800  reward=  -4.739
+  iter  1170/2800  reward=  -4.655
+
+  ── EVAL @ iter 1170 ──
+     Accuracy    : 0.9142  (91.42%)  [upstream metric; tracked-only 92.50%]
+     Reward      : -8.306 ± 61.960
+     Ep length   : 199.0 steps
+     Sensors/step: 5.87
+
+  iter  1171/2800  reward=  +3.441
+  iter  1172/2800  reward=  +0.050
+  iter  1173/2800  reward=  -6.052
+  iter  1174/2800  reward=  -7.117
+  iter  1175/2800  reward= -11.184
+  iter  1176/2800  reward= -10.621
+  iter  1177/2800  reward=  -4.157
+  iter  1178/2800  reward=  -5.308
+  iter  1179/2800  reward=  -4.080
+  iter  1180/2800  reward=  +1.632
+
+  ── EVAL @ iter 1180 ──
+     Accuracy    : 0.9146  (91.46%)  [upstream metric; tracked-only 92.73%]
+     Reward      : -0.788 ± 83.073
+     Ep length   : 212.9 steps
+     Sensors/step: 5.69
+
+  iter  1181/2800  reward=  +3.297
+  iter  1182/2800  reward=  +3.144
+  iter  1183/2800  reward=  +2.094
+  iter  1184/2800  reward=  -1.124
+  iter  1185/2800  reward=  -6.716
+  iter  1186/2800  reward=  -9.524
+  iter  1187/2800  reward= -11.642
+  iter  1188/2800  reward=  -9.882
+  iter  1189/2800  reward=  -6.755
+  iter  1190/2800  reward=  -5.360
+
+  ── EVAL @ iter 1190 ──
+     Accuracy    : 0.9142  (91.42%)  [upstream metric; tracked-only 92.68%]
+     Reward      : -8.900 ± 65.465
+     Ep length   : 151.9 steps
+     Sensors/step: 5.83
+
+  iter  1191/2800  reward=  -3.434
+  iter  1192/2800  reward=  +1.005
+  iter  1193/2800  reward=  -5.460
+  iter  1194/2800  reward=  -5.800
+  iter  1195/2800  reward=  +0.689
+  iter  1196/2800  reward=  -4.528
+  iter  1197/2800  reward=  +1.058
+  iter  1198/2800  reward=  -4.057
+  iter  1199/2800  reward=  -4.840
+  iter  1200/2800  reward=  -8.932
+
+  ── EVAL @ iter 1200 ──
+     Accuracy    : 0.9465  (94.65%)  [upstream metric; tracked-only 95.18%]
+     Reward      : +9.554 ± 52.382
+     Ep length   : 207.4 steps
+     Sensors/step: 5.41
+
+  iter  1201/2800  reward= -11.413
+  iter  1202/2800  reward=  -7.593
+  iter  1203/2800  reward=  -3.542
+  iter  1204/2800  reward=  -0.254
+  iter  1205/2800  reward=  -8.624
+  iter  1206/2800  reward=  -4.491
+  iter  1207/2800  reward=  -1.841
+  iter  1208/2800  reward=  -8.959
+  iter  1209/2800  reward=  -6.136
+  iter  1210/2800  reward=  -3.045
+
+  ── EVAL @ iter 1210 ──
+     Accuracy    : 0.9358  (93.58%)  [upstream metric; tracked-only 95.41%]
+     Reward      : +10.188 ± 61.109
+     Ep length   : 200.5 steps
+     Sensors/step: 5.59
+
+  iter  1211/2800  reward= -11.990
+  iter  1212/2800  reward= -11.835
+  iter  1213/2800  reward=  -4.564
+  iter  1214/2800  reward=  -0.281
+  iter  1215/2800  reward=  +5.018
+  iter  1216/2800  reward=  +7.570
+  iter  1217/2800  reward= +11.033
+  iter  1218/2800  reward=  +5.493
+  iter  1219/2800  reward=  -0.051
+  iter  1220/2800  reward= -11.070
+
+  ── EVAL @ iter 1220 ──
+     Accuracy    : 0.9381  (93.81%)  [upstream metric; tracked-only 94.53%]
+     Reward      : +9.746 ± 69.519
+     Ep length   : 207.7 steps
+     Sensors/step: 5.46
+
+  iter  1221/2800  reward= -12.878
+  iter  1222/2800  reward= -11.000
+  iter  1223/2800  reward= -10.894
+  iter  1224/2800  reward=  -7.576
+  iter  1225/2800  reward=  -7.679
+  iter  1226/2800  reward= -20.742
+  iter  1227/2800  reward= -23.186
+  iter  1228/2800  reward= -22.540
+  iter  1229/2800  reward= -28.328
+  iter  1230/2800  reward= -11.748
+
+  ── EVAL @ iter 1230 ──
+     Accuracy    : 0.9464  (94.64%)  [upstream metric; tracked-only 94.36%]
+     Reward      : +6.011 ± 57.349
+     Ep length   : 188.4 steps
+     Sensors/step: 5.33
+
+  iter  1231/2800  reward=  -8.521
+  iter  1232/2800  reward=  -9.300
+  iter  1233/2800  reward=  -9.746
+  iter  1234/2800  reward= -10.653
+  iter  1235/2800  reward= -15.350
+  iter  1236/2800  reward= -15.063
+  iter  1237/2800  reward= -23.463
+  iter  1238/2800  reward= -25.094
+  iter  1239/2800  reward= -17.021
+  iter  1240/2800  reward= -20.191
+
+  ── EVAL @ iter 1240 ──
+     Accuracy    : 0.9209  (92.09%)  [upstream metric; tracked-only 93.74%]
+     Reward      : +5.066 ± 74.233
+     Ep length   : 191.2 steps
+     Sensors/step: 5.48
+
+  iter  1241/2800  reward= -27.837
+  iter  1242/2800  reward= -14.803
+  iter  1243/2800  reward= -22.086
+  iter  1244/2800  reward= -23.269
+  iter  1245/2800  reward= -24.938
+  iter  1246/2800  reward= -23.668
+  iter  1247/2800  reward= -19.186
+  iter  1248/2800  reward= -13.747
+  iter  1249/2800  reward=  -7.936
+  iter  1250/2800  reward=  -5.108
+
+  ── EVAL @ iter 1250 ──
+     Accuracy    : 0.9345  (93.45%)  [upstream metric; tracked-only 94.77%]
+     Reward      : +7.630 ± 69.995
+     Ep length   : 170.0 steps
+     Sensors/step: 5.41
+
+  iter  1251/2800  reward=  -6.684
+  iter  1252/2800  reward=  -7.010
+  iter  1253/2800  reward=  -4.499
+  iter  1254/2800  reward=  -8.633
+  iter  1255/2800  reward=  -4.368
+  iter  1256/2800  reward=  -8.092
+  iter  1257/2800  reward= -14.926
+  iter  1258/2800  reward= -17.263
+  iter  1259/2800  reward= -18.259
+  iter  1260/2800  reward= -21.266
+
+  ── EVAL @ iter 1260 ──
+     Accuracy    : 0.9241  (92.41%)  [upstream metric; tracked-only 94.02%]
+     Reward      : -0.945 ± 60.883
+     Ep length   : 184.4 steps
+     Sensors/step: 5.54
+
+  iter  1261/2800  reward= -26.176
+  iter  1262/2800  reward= -22.873
+  iter  1263/2800  reward=  -9.676
+  iter  1264/2800  reward=  -3.680
+  iter  1265/2800  reward=  -7.746
+  iter  1266/2800  reward=  -6.381
+  iter  1267/2800  reward=  +3.584
+  iter  1268/2800  reward=  -4.178
+  iter  1269/2800  reward=  -6.458
+  iter  1270/2800  reward=  -1.413
+
+  ── EVAL @ iter 1270 ──
+     Accuracy    : 0.9238  (92.38%)  [upstream metric; tracked-only 93.93%]
+     Reward      : -0.458 ± 63.746
+     Ep length   : 188.0 steps
+     Sensors/step: 5.71
+
+  iter  1271/2800  reward= -11.602
+  iter  1272/2800  reward= -11.773
+  iter  1273/2800  reward= -21.732
+  iter  1274/2800  reward= -26.166
+  iter  1275/2800  reward= -21.057
+  iter  1276/2800  reward=  -8.133
+  iter  1277/2800  reward=  -5.422
+  iter  1278/2800  reward=  +8.028
+  iter  1279/2800  reward= +11.746
+  iter  1280/2800  reward= +11.238
+
+  ── EVAL @ iter 1280 ──
+     Accuracy    : 0.9295  (92.95%)  [upstream metric; tracked-only 94.18%]
+     Reward      : +1.598 ± 65.349
+     Ep length   : 193.2 steps
+     Sensors/step: 5.70
+
+  iter  1281/2800  reward=  -4.005
+  iter  1282/2800  reward=  +2.352
+  iter  1283/2800  reward=  +2.561
+  iter  1284/2800  reward=  +2.010
+  iter  1285/2800  reward=  +2.494
+  iter  1286/2800  reward= +10.066
+  iter  1287/2800  reward=  -0.237
+  iter  1288/2800  reward=  -7.981
+  iter  1289/2800  reward= -11.147
+  iter  1290/2800  reward=  -2.591
+
+  ── EVAL @ iter 1290 ──
+     Accuracy    : 0.9337  (93.37%)  [upstream metric; tracked-only 94.09%]
+     Reward      : -1.936 ± 66.168
+     Ep length   : 176.4 steps
+     Sensors/step: 5.80
+
+  iter  1291/2800  reward=  +0.283
+  iter  1292/2800  reward=  +3.048
+  iter  1293/2800  reward=  +9.480
+  iter  1294/2800  reward=  +8.694
+  iter  1295/2800  reward=  +0.845
+  iter  1296/2800  reward=  +8.027
+  iter  1297/2800  reward=  +5.838
+  iter  1298/2800  reward=  +3.748
+  iter  1299/2800  reward=  +3.640
+  iter  1300/2800  reward=  +5.833
+
+  ── EVAL @ iter 1300 ──
+     Accuracy    : 0.9395  (93.95%)  [upstream metric; tracked-only 94.84%]
+     Reward      : +7.333 ± 83.229
+     Ep length   : 212.7 steps
+     Sensors/step: 5.52
+
+  iter  1301/2800  reward=  +4.875
+  iter  1302/2800  reward=  -0.170
+  iter  1303/2800  reward=  -3.455
+  iter  1304/2800  reward=  +1.353
+  iter  1305/2800  reward=  -0.370
+  iter  1306/2800  reward=  +5.259
+  iter  1307/2800  reward=  +8.538
+  iter  1308/2800  reward=  +6.706
+  iter  1309/2800  reward=  +5.311
+  iter  1310/2800  reward=  +2.353
+
+  ── EVAL @ iter 1310 ──
+     Accuracy    : 0.9294  (92.94%)  [upstream metric; tracked-only 94.83%]
+     Reward      : +13.650 ± 89.389
+     Ep length   : 222.1 steps
+     Sensors/step: 5.37
+
+  iter  1311/2800  reward=  -3.274
+  iter  1312/2800  reward=  -8.286
+  iter  1313/2800  reward=  -5.129
+  iter  1314/2800  reward=  -0.236
+  iter  1315/2800  reward=  +7.869
+  iter  1316/2800  reward=  +0.429
+  iter  1317/2800  reward=  +1.830
+  iter  1318/2800  reward= +12.452
+  iter  1319/2800  reward=  +7.934
+  iter  1320/2800  reward=  -3.438
+
+  ── EVAL @ iter 1320 ──
+     Accuracy    : 0.9344  (93.44%)  [upstream metric; tracked-only 94.70%]
+     Reward      : +10.724 ± 80.214
+     Ep length   : 225.9 steps
+     Sensors/step: 5.46
+
+  iter  1321/2800  reward=  -4.558
+  iter  1322/2800  reward= -14.984
+  iter  1323/2800  reward= -21.108
+  iter  1324/2800  reward= -14.578
+  iter  1325/2800  reward= -12.850
+  iter  1326/2800  reward=  -9.810
+  iter  1327/2800  reward=  -4.631
+  iter  1328/2800  reward=  +8.732
+  iter  1329/2800  reward=  +7.663
+  iter  1330/2800  reward=  +7.742
+
+  ── EVAL @ iter 1330 ──
+     Accuracy    : 0.9188  (91.88%)  [upstream metric; tracked-only 94.59%]
+     Reward      : +12.326 ± 81.574
+     Ep length   : 201.8 steps
+     Sensors/step: 5.59
+
+  iter  1331/2800  reward=  +3.018
+  iter  1332/2800  reward=  -4.084
+  iter  1333/2800  reward=  +1.117
+  iter  1334/2800  reward=  +1.801
+  iter  1335/2800  reward=  +3.186
+  iter  1336/2800  reward=  +3.972
+  iter  1337/2800  reward=  +3.015
+  iter  1338/2800  reward=  +0.678
+  iter  1339/2800  reward=  +1.504
+  iter  1340/2800  reward=  +0.370
+
+  ── EVAL @ iter 1340 ──
+     Accuracy    : 0.9197  (91.97%)  [upstream metric; tracked-only 94.73%]
+     Reward      : +15.342 ± 83.793
+     Ep length   : 213.5 steps
+     Sensors/step: 5.69
+
+  iter  1341/2800  reward=  -4.025
+  iter  1342/2800  reward=  +2.584
+  iter  1343/2800  reward=  +2.396
+  iter  1344/2800  reward=  +1.412
+  iter  1345/2800  reward=  -1.385
+  iter  1346/2800  reward=  -5.180
+  iter  1347/2800  reward=  -4.597
+  iter  1348/2800  reward=  -5.742
+  iter  1349/2800  reward=  -4.381
+  iter  1350/2800  reward=  -0.856
+
+  ── EVAL @ iter 1350 ──
+     Accuracy    : 0.9280  (92.80%)  [upstream metric; tracked-only 94.32%]
+     Reward      : +9.145 ± 64.099
+     Ep length   : 193.4 steps
+     Sensors/step: 5.44
+
+  iter  1351/2800  reward=  +0.787
+  iter  1352/2800  reward=  +3.158
+  iter  1353/2800  reward=  +4.634
+  iter  1354/2800  reward=  -1.928
+  iter  1355/2800  reward=  +3.912
+  iter  1356/2800  reward=  -0.471
+  iter  1357/2800  reward=  +2.259
+  iter  1358/2800  reward=  -2.857
+  iter  1359/2800  reward=  -4.523
+  iter  1360/2800  reward=  -4.640
+
+  ── EVAL @ iter 1360 ──
+     Accuracy    : 0.9354  (93.54%)  [upstream metric; tracked-only 94.77%]
+     Reward      : +18.778 ± 63.528
+     Ep length   : 211.3 steps
+     Sensors/step: 5.23
+
+  iter  1361/2800  reward=  +0.309
+  iter  1362/2800  reward=  -7.770
+  iter  1363/2800  reward=  -4.232
+  iter  1364/2800  reward=  -0.700
+  iter  1365/2800  reward=  +4.091
+  iter  1366/2800  reward=  +9.860
+  iter  1367/2800  reward=  +6.430
+  iter  1368/2800  reward= +13.922
+  iter  1369/2800  reward=  +7.559
+  iter  1370/2800  reward=  +3.125
+
+  ── EVAL @ iter 1370 ──
+     Accuracy    : 0.9489  (94.89%)  [upstream metric; tracked-only 95.41%]
+     Reward      : +24.429 ± 74.160
+     Ep length   : 219.0 steps
+     Sensors/step: 5.17
+
+  iter  1371/2800  reward=  +3.152
+  iter  1372/2800  reward=  +2.754
+  iter  1373/2800  reward=  +4.905
+  iter  1374/2800  reward=  +9.180
+  iter  1375/2800  reward= +20.166
+  iter  1376/2800  reward= +15.610
+  iter  1377/2800  reward=  +9.949
+  iter  1378/2800  reward= +10.186
+  iter  1379/2800  reward=  +2.946
+  iter  1380/2800  reward=  +4.846
+
+  ── EVAL @ iter 1380 ──
+     Accuracy    : 0.9336  (93.36%)  [upstream metric; tracked-only 94.72%]
+     Reward      : +11.332 ± 62.595
+     Ep length   : 182.1 steps
+     Sensors/step: 5.33
+
+  iter  1381/2800  reward=  +7.470
+  iter  1382/2800  reward=  +9.208
+  iter  1383/2800  reward=  +4.118
+  iter  1384/2800  reward=  +0.975
+  iter  1385/2800  reward=  +2.010
+  iter  1386/2800  reward=  +6.572
+  iter  1387/2800  reward=  +5.814
+  iter  1388/2800  reward= +15.728
+  iter  1389/2800  reward= +22.887
+  iter  1390/2800  reward= +19.772
+
+  ── EVAL @ iter 1390 ──
+     Accuracy    : 0.9333  (93.33%)  [upstream metric; tracked-only 95.08%]
+     Reward      : +14.122 ± 55.445
+     Ep length   : 210.3 steps
+     Sensors/step: 5.36
+
+  iter  1391/2800  reward= +15.849
+  iter  1392/2800  reward= +17.688
+  iter  1393/2800  reward=  -0.515
+  iter  1394/2800  reward=  -0.322
+  iter  1395/2800  reward=  -2.239
+  iter  1396/2800  reward=  -2.356
+  iter  1397/2800  reward=  +7.137
+  iter  1398/2800  reward= +14.488
+  iter  1399/2800  reward=  +6.908
+  iter  1400/2800  reward=  +7.340
+
+  ── EVAL @ iter 1400 ──
+     Accuracy    : 0.9433  (94.33%)  [upstream metric; tracked-only 95.21%]
+     Reward      : +20.963 ± 72.387
+     Ep length   : 178.3 steps
+     Sensors/step: 5.02
+
+
+  >>> movement model O2 (model 2) active in 5 worker envs + eval env
+
+
+  ── EVAL @ iter 1400 (right after switch to O2) ──
+     Accuracy    : 0.8010  (80.10%)  [upstream metric; tracked-only 76.78%]
+     Reward      : -166.728 ± 147.069
+     Ep length   : 190.2 steps
+     Sensors/step: 8.01
+
+  iter  1401/2800  reward= -28.892
+  iter  1402/2800  reward= -76.230
+  iter  1403/2800  reward=-121.298
+  iter  1404/2800  reward=-150.207
+  iter  1405/2800  reward=-185.975
+  iter  1406/2800  reward=-235.735
+  iter  1407/2800  reward=-243.541
+  iter  1408/2800  reward=-238.115
+  iter  1409/2800  reward=-251.615
+  iter  1410/2800  reward=-228.803
+
+  ── EVAL @ iter 1410 ──
+     Accuracy    : 0.7583  (75.83%)  [upstream metric; tracked-only 72.19%]
+     Reward      : -205.744 ± 194.434
+     Ep length   : 185.0 steps
+     Sensors/step: 8.71
+
+  iter  1411/2800  reward=-211.156
+  iter  1412/2800  reward=-216.437
+  iter  1413/2800  reward=-226.302
+  iter  1414/2800  reward=-238.862
+  iter  1415/2800  reward=-228.972
+  iter  1416/2800  reward=-243.064
+  iter  1417/2800  reward=-234.662
+  iter  1418/2800  reward=-224.667
+  iter  1419/2800  reward=-224.886
+  iter  1420/2800  reward=-234.485
+
+  ── EVAL @ iter 1420 ──
+     Accuracy    : 0.7726  (77.26%)  [upstream metric; tracked-only 74.25%]
+     Reward      : -177.744 ± 172.765
+     Ep length   : 178.9 steps
+     Sensors/step: 8.55
+
+  iter  1421/2800  reward=-204.720
+  iter  1422/2800  reward=-210.104
+  iter  1423/2800  reward=-214.499
+  iter  1424/2800  reward=-239.706
+  iter  1425/2800  reward=-225.343
+  iter  1426/2800  reward=-209.701
+  iter  1427/2800  reward=-199.741
+  iter  1428/2800  reward=-192.031
+  iter  1429/2800  reward=-168.388
+  iter  1430/2800  reward=-186.481
+
+  ── EVAL @ iter 1430 ──
+     Accuracy    : 0.7761  (77.61%)  [upstream metric; tracked-only 74.02%]
+     Reward      : -207.362 ± 161.662
+     Ep length   : 211.2 steps
+     Sensors/step: 8.61
+
+  iter  1431/2800  reward=-203.412
+  iter  1432/2800  reward=-210.136
+  iter  1433/2800  reward=-215.976
+  iter  1434/2800  reward=-225.762
+  iter  1435/2800  reward=-205.324
+  iter  1436/2800  reward=-205.536
+  iter  1437/2800  reward=-196.782
+  iter  1438/2800  reward=-199.174
+  iter  1439/2800  reward=-192.818
+  iter  1440/2800  reward=-190.528
+
+  ── EVAL @ iter 1440 ──
+     Accuracy    : 0.7748  (77.48%)  [upstream metric; tracked-only 75.18%]
+     Reward      : -158.065 ± 130.641
+     Ep length   : 176.5 steps
+     Sensors/step: 8.36
+
+  iter  1441/2800  reward=-174.004
+  iter  1442/2800  reward=-160.941
+  iter  1443/2800  reward=-176.354
+  iter  1444/2800  reward=-187.456
+  iter  1445/2800  reward=-183.566
+  iter  1446/2800  reward=-186.330
+  iter  1447/2800  reward=-192.062
+  iter  1448/2800  reward=-192.828
+  iter  1449/2800  reward=-185.252
+  iter  1450/2800  reward=-175.958
+
+  ── EVAL @ iter 1450 ──
+     Accuracy    : 0.7872  (78.72%)  [upstream metric; tracked-only 73.79%]
+     Reward      : -187.004 ± 201.273
+     Ep length   : 184.8 steps
+     Sensors/step: 8.36
+
+  iter  1451/2800  reward=-180.608
+  iter  1452/2800  reward=-184.658
+  iter  1453/2800  reward=-204.414
+  iter  1454/2800  reward=-203.085
+  iter  1455/2800  reward=-207.798
+  iter  1456/2800  reward=-210.268
+  iter  1457/2800  reward=-213.599
+  iter  1458/2800  reward=-209.454
+  iter  1459/2800  reward=-211.812
+  iter  1460/2800  reward=-219.118
+
+  ── EVAL @ iter 1460 ──
+     Accuracy    : 0.7832  (78.32%)  [upstream metric; tracked-only 76.17%]
+     Reward      : -171.511 ± 165.000
+     Ep length   : 211.3 steps
+     Sensors/step: 7.98
+
+  iter  1461/2800  reward=-225.123
+  iter  1462/2800  reward=-232.160
+  iter  1463/2800  reward=-222.800
+  iter  1464/2800  reward=-213.099
+  iter  1465/2800  reward=-206.384
+  iter  1466/2800  reward=-215.791
+  iter  1467/2800  reward=-221.864
+  iter  1468/2800  reward=-223.348
+  iter  1469/2800  reward=-232.646
+  iter  1470/2800  reward=-243.396
+
+  ── EVAL @ iter 1470 ──
+     Accuracy    : 0.7858  (78.58%)  [upstream metric; tracked-only 76.42%]
+     Reward      : -160.348 ± 167.849
+     Ep length   : 192.6 steps
+     Sensors/step: 8.11
+
+  iter  1471/2800  reward=-249.824
+  iter  1472/2800  reward=-254.556
+  iter  1473/2800  reward=-261.757
+  iter  1474/2800  reward=-256.831
+  iter  1475/2800  reward=-242.173
+  iter  1476/2800  reward=-222.168
+  iter  1477/2800  reward=-193.371
+  iter  1478/2800  reward=-158.050
+  iter  1479/2800  reward=-146.034
+  iter  1480/2800  reward=-158.471
+
+  ── EVAL @ iter 1480 ──
+     Accuracy    : 0.7886  (78.86%)  [upstream metric; tracked-only 76.42%]
+     Reward      : -133.782 ± 132.534
+     Ep length   : 160.4 steps
+     Sensors/step: 8.11
+
+  iter  1481/2800  reward=-163.856
+  iter  1482/2800  reward=-172.940
+  iter  1483/2800  reward=-182.496
+  iter  1484/2800  reward=-185.933
+  iter  1485/2800  reward=-171.072
+  iter  1486/2800  reward=-166.826
+  iter  1487/2800  reward=-160.716
+  iter  1488/2800  reward=-175.619
+  iter  1489/2800  reward=-181.073
+  iter  1490/2800  reward=-192.595
+
+  ── EVAL @ iter 1490 ──
+     Accuracy    : 0.8132  (81.32%)  [upstream metric; tracked-only 78.33%]
+     Reward      : -147.761 ± 135.879
+     Ep length   : 190.1 steps
+     Sensors/step: 7.93
+
+  iter  1491/2800  reward=-190.344
+  iter  1492/2800  reward=-194.157
+  iter  1493/2800  reward=-190.660
+  iter  1494/2800  reward=-194.770
+  iter  1495/2800  reward=-174.557
+  iter  1496/2800  reward=-177.350
+  iter  1497/2800  reward=-175.820
+  iter  1498/2800  reward=-172.014
+  iter  1499/2800  reward=-167.013
+  iter  1500/2800  reward=-173.915
+
+  ── EVAL @ iter 1500 ──
+     Accuracy    : 0.8064  (80.64%)  [upstream metric; tracked-only 78.74%]
+     Reward      : -131.759 ± 111.168
+     Ep length   : 186.7 steps
+     Sensors/step: 7.69
+
+  iter  1501/2800  reward=-181.038
+  iter  1502/2800  reward=-176.748
+  iter  1503/2800  reward=-173.386
+  iter  1504/2800  reward=-162.938
+  iter  1505/2800  reward=-169.352
+  iter  1506/2800  reward=-175.514
+  iter  1507/2800  reward=-177.414
+  iter  1508/2800  reward=-179.295
+  iter  1509/2800  reward=-182.717
+  iter  1510/2800  reward=-176.470
+
+  ── EVAL @ iter 1510 ──
+     Accuracy    : 0.8086  (80.86%)  [upstream metric; tracked-only 78.34%]
+     Reward      : -142.404 ± 131.798
+     Ep length   : 198.2 steps
+     Sensors/step: 7.79
+
+  iter  1511/2800  reward=-179.402
+  iter  1512/2800  reward=-171.619
+  iter  1513/2800  reward=-168.990
+  iter  1514/2800  reward=-171.556
+  iter  1515/2800  reward=-179.786
+  iter  1516/2800  reward=-163.763
+  iter  1517/2800  reward=-161.488
+  iter  1518/2800  reward=-164.965
+  iter  1519/2800  reward=-168.585
+  iter  1520/2800  reward=-165.382
+
+  ── EVAL @ iter 1520 ──
+     Accuracy    : 0.8046  (80.46%)  [upstream metric; tracked-only 78.53%]
+     Reward      : -139.224 ± 130.054
+     Ep length   : 191.5 steps
+     Sensors/step: 7.77
+
+  iter  1521/2800  reward=-180.162
+  iter  1522/2800  reward=-182.423
+  iter  1523/2800  reward=-191.872
+  iter  1524/2800  reward=-192.106
+  iter  1525/2800  reward=-174.818
+  iter  1526/2800  reward=-153.945
+  iter  1527/2800  reward=-150.786
+  iter  1528/2800  reward=-137.381
+  iter  1529/2800  reward=-154.992
+  iter  1530/2800  reward=-155.054
+
+  ── EVAL @ iter 1530 ──
+     Accuracy    : 0.8071  (80.71%)  [upstream metric; tracked-only 78.81%]
+     Reward      : -148.288 ± 129.133
+     Ep length   : 213.1 steps
+     Sensors/step: 7.65
+
+  iter  1531/2800  reward=-160.398
+  iter  1532/2800  reward=-161.890
+  iter  1533/2800  reward=-171.854
+  iter  1534/2800  reward=-151.792
+  iter  1535/2800  reward=-165.378
+  iter  1536/2800  reward=-159.529
+  iter  1537/2800  reward=-156.187
+  iter  1538/2800  reward=-155.713
+  iter  1539/2800  reward=-169.297
+  iter  1540/2800  reward=-181.802
+
+  ── EVAL @ iter 1540 ──
+     Accuracy    : 0.8188  (81.88%)  [upstream metric; tracked-only 79.19%]
+     Reward      : -148.621 ± 140.110
+     Ep length   : 228.7 steps
+     Sensors/step: 7.41
+
+  iter  1541/2800  reward=-174.686
+  iter  1542/2800  reward=-172.242
+  iter  1543/2800  reward=-163.910
+  iter  1544/2800  reward=-164.733
+  iter  1545/2800  reward=-153.205
+  iter  1546/2800  reward=-150.839
+  iter  1547/2800  reward=-145.046
+  iter  1548/2800  reward=-151.382
+  iter  1549/2800  reward=-147.324
+  iter  1550/2800  reward=-147.445
+
+  ── EVAL @ iter 1550 ──
+     Accuracy    : 0.8309  (83.09%)  [upstream metric; tracked-only 80.57%]
+     Reward      : -120.651 ± 126.687
+     Ep length   : 183.8 steps
+     Sensors/step: 7.54
+
+  iter  1551/2800  reward=-152.427
+  iter  1552/2800  reward=-163.459
+  iter  1553/2800  reward=-161.168
+  iter  1554/2800  reward=-161.254
+  iter  1555/2800  reward=-157.106
+  iter  1556/2800  reward=-151.474
+  iter  1557/2800  reward=-152.270
+  iter  1558/2800  reward=-145.933
+  iter  1559/2800  reward=-157.180
+  iter  1560/2800  reward=-140.931
+
+  ── EVAL @ iter 1560 ──
+     Accuracy    : 0.8426  (84.26%)  [upstream metric; tracked-only 82.27%]
+     Reward      : -109.506 ± 103.744
+     Ep length   : 195.3 steps
+     Sensors/step: 7.17
+
+  iter  1561/2800  reward=-127.358
+  iter  1562/2800  reward=-131.134
+  iter  1563/2800  reward=-123.842
+  iter  1564/2800  reward=-138.047
+  iter  1565/2800  reward=-143.037
+  iter  1566/2800  reward=-155.266
+  iter  1567/2800  reward=-138.907
+  iter  1568/2800  reward=-135.414
+  iter  1569/2800  reward=-131.745
+  iter  1570/2800  reward=-126.204
+
+  ── EVAL @ iter 1570 ──
+     Accuracy    : 0.8592  (85.92%)  [upstream metric; tracked-only 84.23%]
+     Reward      : -104.930 ± 85.334
+     Ep length   : 224.0 steps
+     Sensors/step: 7.13
+
+  iter  1571/2800  reward=-119.561
+  iter  1572/2800  reward=-130.852
+  iter  1573/2800  reward=-129.575
+  iter  1574/2800  reward=-133.019
+  iter  1575/2800  reward=-140.854
+  iter  1576/2800  reward=-136.656
+  iter  1577/2800  reward=-146.401
+  iter  1578/2800  reward=-149.404
+  iter  1579/2800  reward=-128.584
+  iter  1580/2800  reward=-119.193
+
+  ── EVAL @ iter 1580 ──
+     Accuracy    : 0.8266  (82.66%)  [upstream metric; tracked-only 82.17%]
+     Reward      : -101.145 ± 84.373
+     Ep length   : 180.7 steps
+     Sensors/step: 7.50
+
+  iter  1581/2800  reward=-124.619
+  iter  1582/2800  reward=-113.977
+  iter  1583/2800  reward=-118.062
+  iter  1584/2800  reward=-124.854
+  iter  1585/2800  reward=-136.970
+  iter  1586/2800  reward=-135.091
+  iter  1587/2800  reward=-139.928
+  iter  1588/2800  reward=-150.803
+  iter  1589/2800  reward=-149.869
+  iter  1590/2800  reward=-148.078
+
+  ── EVAL @ iter 1590 ──
+     Accuracy    : 0.8684  (86.84%)  [upstream metric; tracked-only 85.97%]
+     Reward      : -73.080 ± 55.784
+     Ep length   : 202.0 steps
+     Sensors/step: 6.77
+
+  iter  1591/2800  reward=-147.374
+  iter  1592/2800  reward=-150.576
+  iter  1593/2800  reward=-150.636
+  iter  1594/2800  reward=-141.394
+  iter  1595/2800  reward=-140.547
+  iter  1596/2800  reward=-139.362
+  iter  1597/2800  reward=-134.168
+  iter  1598/2800  reward=-126.081
+  iter  1599/2800  reward=-128.128
+  iter  1600/2800  reward=-118.534
+
+  ── EVAL @ iter 1600 ──
+     Accuracy    : 0.8793  (87.93%)  [upstream metric; tracked-only 86.51%]
+     Reward      : -74.292 ± 61.201
+     Ep length   : 194.5 steps
+     Sensors/step: 6.87
+
+  iter  1601/2800  reward=-122.006
+  iter  1602/2800  reward=-121.897
+  iter  1603/2800  reward=-125.388
+  iter  1604/2800  reward=-124.476
+  iter  1605/2800  reward=-138.539
+  iter  1606/2800  reward=-140.419
+  iter  1607/2800  reward=-132.138
+  iter  1608/2800  reward=-140.888
+  iter  1609/2800  reward=-143.060
+  iter  1610/2800  reward=-133.024
+
+  ── EVAL @ iter 1610 ──
+     Accuracy    : 0.8582  (85.82%)  [upstream metric; tracked-only 84.22%]
+     Reward      : -87.493 ± 68.334
+     Ep length   : 187.4 steps
+     Sensors/step: 7.04
+
+  iter  1611/2800  reward=-135.552
+  iter  1612/2800  reward=-142.644
+  iter  1613/2800  reward=-133.517
+  iter  1614/2800  reward=-133.287
+  iter  1615/2800  reward=-135.820
+  iter  1616/2800  reward=-142.662
+  iter  1617/2800  reward=-148.089
+  iter  1618/2800  reward=-141.883
+  iter  1619/2800  reward=-148.176
+  iter  1620/2800  reward=-140.496
+
+  ── EVAL @ iter 1620 ──
+     Accuracy    : 0.8611  (86.11%)  [upstream metric; tracked-only 85.21%]
+     Reward      : -89.107 ± 65.308
+     Ep length   : 228.6 steps
+     Sensors/step: 6.82
+
+  iter  1621/2800  reward=-150.487
+  iter  1622/2800  reward=-128.381
+  iter  1623/2800  reward=-130.620
+  iter  1624/2800  reward=-136.563
+  iter  1625/2800  reward=-122.368
+  iter  1626/2800  reward=-130.622
+  iter  1627/2800  reward=-138.950
+  iter  1628/2800  reward=-144.325
+  iter  1629/2800  reward=-144.534
+  iter  1630/2800  reward=-137.468
+
+  ── EVAL @ iter 1630 ──
+     Accuracy    : 0.8537  (85.37%)  [upstream metric; tracked-only 83.27%]
+     Reward      : -90.292 ± 74.536
+     Ep length   : 183.1 steps
+     Sensors/step: 7.08
+
+  iter  1631/2800  reward=-148.886
+  iter  1632/2800  reward=-135.002
+  iter  1633/2800  reward=-130.531
+  iter  1634/2800  reward=-122.739
+  iter  1635/2800  reward=-131.194
+  iter  1636/2800  reward=-129.957
+  iter  1637/2800  reward=-125.360
+  iter  1638/2800  reward=-121.596
+  iter  1639/2800  reward=-124.195
+  iter  1640/2800  reward=-113.746
+
+  ── EVAL @ iter 1640 ──
+     Accuracy    : 0.8413  (84.13%)  [upstream metric; tracked-only 84.26%]
+     Reward      : -94.335 ± 78.735
+     Ep length   : 212.5 steps
+     Sensors/step: 7.09
+
+  iter  1641/2800  reward=-120.328
+  iter  1642/2800  reward=-120.830
+  iter  1643/2800  reward=-129.748
+  iter  1644/2800  reward=-130.986
+  iter  1645/2800  reward=-133.978
+  iter  1646/2800  reward=-131.125
+  iter  1647/2800  reward=-142.390
+  iter  1648/2800  reward=-126.576
+  iter  1649/2800  reward=-123.828
+  iter  1650/2800  reward=-123.563
+
+  ── EVAL @ iter 1650 ──
+     Accuracy    : 0.8589  (85.89%)  [upstream metric; tracked-only 84.64%]
+     Reward      : -90.403 ± 71.950
+     Ep length   : 214.1 steps
+     Sensors/step: 6.97
+
+  iter  1651/2800  reward=-130.728
+  iter  1652/2800  reward=-127.069
+  iter  1653/2800  reward=-125.155
+  iter  1654/2800  reward=-122.883
+  iter  1655/2800  reward=-119.872
+  iter  1656/2800  reward=-109.177
+  iter  1657/2800  reward=-107.553
+  iter  1658/2800  reward=-109.057
+  iter  1659/2800  reward=-122.540
+  iter  1660/2800  reward=-123.642
+
+  ── EVAL @ iter 1660 ──
+     Accuracy    : 0.8511  (85.11%)  [upstream metric; tracked-only 83.42%]
+     Reward      : -111.849 ± 98.122
+     Ep length   : 217.7 steps
+     Sensors/step: 7.20
+
+  iter  1661/2800  reward=-130.284
+  iter  1662/2800  reward=-132.115
+  iter  1663/2800  reward=-129.156
+  iter  1664/2800  reward=-122.662
+  iter  1665/2800  reward=-124.619
+  iter  1666/2800  reward=-125.794
+  iter  1667/2800  reward=-128.046
+  iter  1668/2800  reward=-129.530
+  iter  1669/2800  reward=-131.370
+  iter  1670/2800  reward=-129.443
+
+  ── EVAL @ iter 1670 ──
+     Accuracy    : 0.8772  (87.72%)  [upstream metric; tracked-only 85.91%]
+     Reward      : -77.054 ± 68.073
+     Ep length   : 187.8 steps
+     Sensors/step: 6.77
+
+  iter  1671/2800  reward=-135.934
+  iter  1672/2800  reward=-114.467
+  iter  1673/2800  reward=-112.886
+  iter  1674/2800  reward=-116.378
+  iter  1675/2800  reward=-109.094
+  iter  1676/2800  reward=-105.866
+  iter  1677/2800  reward=-111.059
+  iter  1678/2800  reward=-115.851
+  iter  1679/2800  reward= -99.097
+  iter  1680/2800  reward= -91.882
+
+  ── EVAL @ iter 1680 ──
+     Accuracy    : 0.8746  (87.46%)  [upstream metric; tracked-only 85.56%]
+     Reward      : -71.487 ± 57.042
+     Ep length   : 178.4 steps
+     Sensors/step: 6.76
+
+  iter  1681/2800  reward= -92.614
+  iter  1682/2800  reward= -91.231
+  iter  1683/2800  reward=-100.821
+  iter  1684/2800  reward=-114.689
+  iter  1685/2800  reward=-115.950
+  iter  1686/2800  reward=-122.142
+  iter  1687/2800  reward=-129.753
+  iter  1688/2800  reward=-127.301
+  iter  1689/2800  reward=-116.106
+  iter  1690/2800  reward=-110.115
+
+  ── EVAL @ iter 1690 ──
+     Accuracy    : 0.8828  (88.28%)  [upstream metric; tracked-only 86.49%]
+     Reward      : -77.968 ± 66.722
+     Ep length   : 213.4 steps
+     Sensors/step: 6.60
+
+  iter  1691/2800  reward= -92.860
+  iter  1692/2800  reward=-103.828
+  iter  1693/2800  reward= -97.713
+  iter  1694/2800  reward= -99.806
+  iter  1695/2800  reward= -99.489
+  iter  1696/2800  reward=-108.556
+  iter  1697/2800  reward=-109.473
+  iter  1698/2800  reward=-112.962
+  iter  1699/2800  reward=-110.572
+  iter  1700/2800  reward=-107.238
+
+  ── EVAL @ iter 1700 ──
+     Accuracy    : 0.8880  (88.80%)  [upstream metric; tracked-only 87.23%]
+     Reward      : -71.120 ± 62.191
+     Ep length   : 200.9 steps
+     Sensors/step: 6.68
+
+  iter  1701/2800  reward= -98.107
+  iter  1702/2800  reward= -98.866
+  iter  1703/2800  reward=-102.131
+  iter  1704/2800  reward=-108.260
+  iter  1705/2800  reward=-110.254
+  iter  1706/2800  reward=-111.433
+  iter  1707/2800  reward=-115.759
+  iter  1708/2800  reward=-118.873
+  iter  1709/2800  reward=-120.104
+  iter  1710/2800  reward=-123.161
+
+  ── EVAL @ iter 1710 ──
+     Accuracy    : 0.8774  (87.74%)  [upstream metric; tracked-only 85.71%]
+     Reward      : -77.639 ± 71.273
+     Ep length   : 193.4 steps
+     Sensors/step: 6.70
+
+  iter  1711/2800  reward=-116.270
+  iter  1712/2800  reward=-124.263
+  iter  1713/2800  reward=-125.821
+  iter  1714/2800  reward=-128.503
+  iter  1715/2800  reward=-131.474
+  iter  1716/2800  reward=-126.896
+  iter  1717/2800  reward=-126.151
+  iter  1718/2800  reward=-125.970
+  iter  1719/2800  reward=-117.375
+  iter  1720/2800  reward=-122.922
+
+  ── EVAL @ iter 1720 ──
+     Accuracy    : 0.8786  (87.86%)  [upstream metric; tracked-only 86.91%]
+     Reward      : -74.777 ± 56.130
+     Ep length   : 212.9 steps
+     Sensors/step: 6.66
+
+  iter  1721/2800  reward=-113.536
+  iter  1722/2800  reward=-110.111
+  iter  1723/2800  reward=-108.476
+  iter  1724/2800  reward=-106.824
+  iter  1725/2800  reward= -99.750
+  iter  1726/2800  reward= -97.663
+  iter  1727/2800  reward=-100.148
+  iter  1728/2800  reward= -96.792
+  iter  1729/2800  reward= -98.921
+  iter  1730/2800  reward= -98.470
+
+  ── EVAL @ iter 1730 ──
+     Accuracy    : 0.8840  (88.40%)  [upstream metric; tracked-only 86.13%]
+     Reward      : -75.124 ± 65.037
+     Ep length   : 198.6 steps
+     Sensors/step: 6.77
+
+  iter  1731/2800  reward=-104.634
+  iter  1732/2800  reward=-106.708
+  iter  1733/2800  reward=-111.090
+  iter  1734/2800  reward=-115.092
+  iter  1735/2800  reward=-125.870
+  iter  1736/2800  reward=-119.454
+  iter  1737/2800  reward=-116.359
+  iter  1738/2800  reward=-113.820
+  iter  1739/2800  reward= -99.435
+  iter  1740/2800  reward= -97.284
+
+  ── EVAL @ iter 1740 ──
+     Accuracy    : 0.8960  (89.60%)  [upstream metric; tracked-only 87.86%]
+     Reward      : -66.831 ± 59.006
+     Ep length   : 217.4 steps
+     Sensors/step: 6.36
+
+  iter  1741/2800  reward= -93.736
+  iter  1742/2800  reward=-105.962
+  iter  1743/2800  reward=-109.909
+  iter  1744/2800  reward=-112.688
+  iter  1745/2800  reward=-103.984
+  iter  1746/2800  reward= -96.073
+  iter  1747/2800  reward= -82.648
+  iter  1748/2800  reward= -78.284
+  iter  1749/2800  reward= -82.942
+  iter  1750/2800  reward= -93.384
+
+  ── EVAL @ iter 1750 ──
+     Accuracy    : 0.8838  (88.38%)  [upstream metric; tracked-only 87.17%]
+     Reward      : -67.432 ± 55.944
+     Ep length   : 213.6 steps
+     Sensors/step: 6.59
+
+  iter  1751/2800  reward= -97.304
+  iter  1752/2800  reward= -96.904
+  iter  1753/2800  reward=-102.223
+  iter  1754/2800  reward=-104.556
+  iter  1755/2800  reward=-108.290
+  iter  1756/2800  reward=-110.696
+  iter  1757/2800  reward=-109.998
+  iter  1758/2800  reward=-113.418
+  iter  1759/2800  reward=-104.830
+  iter  1760/2800  reward=-106.114
+
+  ── EVAL @ iter 1760 ──
+     Accuracy    : 0.8974  (89.74%)  [upstream metric; tracked-only 87.62%]
+     Reward      : -63.556 ± 50.104
+     Ep length   : 203.2 steps
+     Sensors/step: 6.57
+
+  iter  1761/2800  reward=-107.184
+  iter  1762/2800  reward=-110.031
+  iter  1763/2800  reward=-115.857
+  iter  1764/2800  reward=-111.842
+  iter  1765/2800  reward=-107.801
+  iter  1766/2800  reward=-107.126
+  iter  1767/2800  reward=-108.588
+  iter  1768/2800  reward=-100.087
+  iter  1769/2800  reward= -99.295
+  iter  1770/2800  reward= -99.914
+
+  ── EVAL @ iter 1770 ──
+     Accuracy    : 0.8949  (89.49%)  [upstream metric; tracked-only 87.94%]
+     Reward      : -55.607 ± 48.889
+     Ep length   : 189.3 steps
+     Sensors/step: 6.44
+
+  iter  1771/2800  reward=-100.859
+  iter  1772/2800  reward= -97.974
+  iter  1773/2800  reward= -96.491
+  iter  1774/2800  reward=-103.883
+  iter  1775/2800  reward= -96.135
+  iter  1776/2800  reward=-105.214
+  iter  1777/2800  reward= -99.841
+  iter  1778/2800  reward=-105.444
+  iter  1779/2800  reward=-101.054
+  iter  1780/2800  reward= -96.500
+
+  ── EVAL @ iter 1780 ──
+     Accuracy    : 0.8848  (88.48%)  [upstream metric; tracked-only 86.75%]
+     Reward      : -72.093 ± 62.708
+     Ep length   : 217.5 steps
+     Sensors/step: 6.54
+
+  iter  1781/2800  reward= -99.849
+  iter  1782/2800  reward=-101.897
+  iter  1783/2800  reward= -99.853
+  iter  1784/2800  reward= -99.968
+  iter  1785/2800  reward= -95.409
+  iter  1786/2800  reward= -90.701
+  iter  1787/2800  reward=-100.946
+  iter  1788/2800  reward= -95.868
+  iter  1789/2800  reward= -94.650
+  iter  1790/2800  reward= -93.694
+
+  ── EVAL @ iter 1790 ──
+     Accuracy    : 0.8840  (88.40%)  [upstream metric; tracked-only 87.67%]
+     Reward      : -63.168 ± 58.497
+     Ep length   : 213.3 steps
+     Sensors/step: 6.52
+
+  iter  1791/2800  reward= -95.397
+  iter  1792/2800  reward= -92.630
+  iter  1793/2800  reward=-102.873
+  iter  1794/2800  reward= -97.637
+  iter  1795/2800  reward=-111.194
+  iter  1796/2800  reward=-111.462
+  iter  1797/2800  reward=-116.066
+  iter  1798/2800  reward=-114.598
+  iter  1799/2800  reward=-108.381
+  iter  1800/2800  reward= -96.668
+
+  ── EVAL @ iter 1800 ──
+     Accuracy    : 0.8904  (89.04%)  [upstream metric; tracked-only 87.48%]
+     Reward      : -64.666 ± 51.122
+     Ep length   : 202.7 steps
+     Sensors/step: 6.68
+
+  iter  1801/2800  reward= -92.935
+  iter  1802/2800  reward= -88.502
+  iter  1803/2800  reward= -94.745
+  iter  1804/2800  reward= -93.483
+  iter  1805/2800  reward= -97.794
+  iter  1806/2800  reward= -92.579
+  iter  1807/2800  reward= -80.723
+  iter  1808/2800  reward= -86.647
+  iter  1809/2800  reward= -91.621
+  iter  1810/2800  reward= -95.023
+
+  ── EVAL @ iter 1810 ──
+     Accuracy    : 0.8883  (88.83%)  [upstream metric; tracked-only 87.21%]
+     Reward      : -65.436 ± 59.677
+     Ep length   : 194.4 steps
+     Sensors/step: 6.68
+
+  iter  1811/2800  reward= -97.180
+  iter  1812/2800  reward=-100.819
+  iter  1813/2800  reward= -92.168
+  iter  1814/2800  reward= -79.846
+  iter  1815/2800  reward= -81.059
+  iter  1816/2800  reward= -92.638
+  iter  1817/2800  reward= -99.967
+  iter  1818/2800  reward=-106.354
+  iter  1819/2800  reward=-107.255
+  iter  1820/2800  reward=-113.013
+
+  ── EVAL @ iter 1820 ──
+     Accuracy    : 0.8948  (89.48%)  [upstream metric; tracked-only 87.43%]
+     Reward      : -60.889 ± 53.086
+     Ep length   : 200.5 steps
+     Sensors/step: 6.39
+
+  iter  1821/2800  reward=-106.146
+  iter  1822/2800  reward=-103.896
+  iter  1823/2800  reward=-107.821
+  iter  1824/2800  reward=-112.299
+  iter  1825/2800  reward=-115.336
+  iter  1826/2800  reward=-109.668
+  iter  1827/2800  reward=-106.400
+  iter  1828/2800  reward=-109.610
+  iter  1829/2800  reward=-106.972
+  iter  1830/2800  reward=-103.950
+
+  ── EVAL @ iter 1830 ──
+     Accuracy    : 0.8680  (86.80%)  [upstream metric; tracked-only 85.93%]
+     Reward      : -76.365 ± 70.796
+     Ep length   : 211.2 steps
+     Sensors/step: 6.60
+
+  iter  1831/2800  reward=-104.626
+  iter  1832/2800  reward=-103.144
+  iter  1833/2800  reward= -98.670
+  iter  1834/2800  reward= -96.789
+  iter  1835/2800  reward= -90.201
+  iter  1836/2800  reward= -90.900
+  iter  1837/2800  reward= -84.251
+  iter  1838/2800  reward= -84.170
+  iter  1839/2800  reward= -85.988
+  iter  1840/2800  reward= -83.234
+
+  ── EVAL @ iter 1840 ──
+     Accuracy    : 0.8719  (87.19%)  [upstream metric; tracked-only 86.26%]
+     Reward      : -60.337 ± 44.543
+     Ep length   : 172.8 steps
+     Sensors/step: 6.62
+
+  iter  1841/2800  reward= -89.813
+  iter  1842/2800  reward= -87.802
+  iter  1843/2800  reward= -87.973
+  iter  1844/2800  reward= -84.970
+  iter  1845/2800  reward= -89.506
+  iter  1846/2800  reward= -86.906
+  iter  1847/2800  reward= -86.530
+  iter  1848/2800  reward= -83.204
+  iter  1849/2800  reward= -82.772
+  iter  1850/2800  reward= -82.801
+
+  ── EVAL @ iter 1850 ──
+     Accuracy    : 0.8909  (89.09%)  [upstream metric; tracked-only 87.57%]
+     Reward      : -48.460 ± 39.449
+     Ep length   : 170.3 steps
+     Sensors/step: 6.28
+
+  iter  1851/2800  reward= -88.622
+  iter  1852/2800  reward= -86.024
+  iter  1853/2800  reward= -95.852
+  iter  1854/2800  reward=-106.032
+  iter  1855/2800  reward=-110.021
+  iter  1856/2800  reward=-111.340
+  iter  1857/2800  reward=-108.577
+  iter  1858/2800  reward=-103.624
+  iter  1859/2800  reward= -89.370
+  iter  1860/2800  reward= -82.581
+
+  ── EVAL @ iter 1860 ──
+     Accuracy    : 0.8793  (87.93%)  [upstream metric; tracked-only 87.33%]
+     Reward      : -55.690 ± 42.184
+     Ep length   : 193.1 steps
+     Sensors/step: 6.44
+
+  iter  1861/2800  reward= -85.310
+  iter  1862/2800  reward= -82.030
+  iter  1863/2800  reward= -78.655
+  iter  1864/2800  reward= -79.436
+  iter  1865/2800  reward= -85.290
+  iter  1866/2800  reward= -84.264
+  iter  1867/2800  reward= -91.814
+  iter  1868/2800  reward= -89.008
+  iter  1869/2800  reward= -97.446
+  iter  1870/2800  reward= -98.763
+
+  ── EVAL @ iter 1870 ──
+     Accuracy    : 0.8863  (88.63%)  [upstream metric; tracked-only 88.04%]
+     Reward      : -54.144 ± 38.702
+     Ep length   : 228.4 steps
+     Sensors/step: 6.32
+
+  iter  1871/2800  reward= -92.646
+  iter  1872/2800  reward= -91.674
+  iter  1873/2800  reward= -91.362
+  iter  1874/2800  reward= -85.970
+  iter  1875/2800  reward= -85.149
+  iter  1876/2800  reward= -73.799
+  iter  1877/2800  reward= -73.752
+  iter  1878/2800  reward= -70.315
+  iter  1879/2800  reward= -72.291
+  iter  1880/2800  reward= -80.377
+
+  ── EVAL @ iter 1880 ──
+     Accuracy    : 0.8940  (89.40%)  [upstream metric; tracked-only 89.02%]
+     Reward      : -39.367 ± 29.242
+     Ep length   : 174.7 steps
+     Sensors/step: 6.34
+
+  iter  1881/2800  reward= -83.489
+  iter  1882/2800  reward= -81.813
+  iter  1883/2800  reward= -86.130
+  iter  1884/2800  reward= -90.030
+  iter  1885/2800  reward= -91.906
+  iter  1886/2800  reward= -90.800
+  iter  1887/2800  reward= -92.808
+  iter  1888/2800  reward= -94.076
+  iter  1889/2800  reward= -94.967
+  iter  1890/2800  reward=-102.684
+
+  ── EVAL @ iter 1890 ──
+     Accuracy    : 0.9021  (90.21%)  [upstream metric; tracked-only 89.10%]
+     Reward      : -40.832 ± 33.146
+     Ep length   : 174.2 steps
+     Sensors/step: 6.33
+
+  iter  1891/2800  reward=-100.226
+  iter  1892/2800  reward=-105.426
+  iter  1893/2800  reward=-109.115
+  iter  1894/2800  reward=-104.650
+  iter  1895/2800  reward=-102.244
+  iter  1896/2800  reward= -99.112
+  iter  1897/2800  reward= -97.093
+  iter  1898/2800  reward= -86.041
+  iter  1899/2800  reward= -90.074
+  iter  1900/2800  reward= -85.264
+
+  ── EVAL @ iter 1900 ──
+     Accuracy    : 0.9113  (91.13%)  [upstream metric; tracked-only 89.57%]
+     Reward      : -47.393 ± 39.936
+     Ep length   : 187.6 steps
+     Sensors/step: 6.54
+
+  iter  1901/2800  reward= -81.691
+  iter  1902/2800  reward= -85.542
+  iter  1903/2800  reward= -90.139
+  iter  1904/2800  reward= -88.369
+  iter  1905/2800  reward= -89.216
+  iter  1906/2800  reward= -82.536
+  iter  1907/2800  reward= -86.013
+  iter  1908/2800  reward= -81.396
+  iter  1909/2800  reward= -81.290
+  iter  1910/2800  reward= -84.076
+
+  ── EVAL @ iter 1910 ──
+     Accuracy    : 0.9140  (91.40%)  [upstream metric; tracked-only 89.64%]
+     Reward      : -47.746 ± 38.099
+     Ep length   : 201.3 steps
+     Sensors/step: 6.32
+
+  iter  1911/2800  reward= -89.970
+  iter  1912/2800  reward= -87.418
+  iter  1913/2800  reward= -85.326
+  iter  1914/2800  reward= -77.259
+  iter  1915/2800  reward= -82.804
+  iter  1916/2800  reward= -73.038
+  iter  1917/2800  reward= -79.397
+  iter  1918/2800  reward= -78.863
+  iter  1919/2800  reward= -85.577
+  iter  1920/2800  reward= -84.167
+
+  ── EVAL @ iter 1920 ──
+     Accuracy    : 0.9190  (91.90%)  [upstream metric; tracked-only 90.49%]
+     Reward      : -39.200 ± 35.122
+     Ep length   : 196.2 steps
+     Sensors/step: 6.22
+
+  iter  1921/2800  reward= -86.720
+  iter  1922/2800  reward= -87.748
+  iter  1923/2800  reward= -89.174
+  iter  1924/2800  reward= -94.605
+  iter  1925/2800  reward= -94.738
+  iter  1926/2800  reward= -86.320
+  iter  1927/2800  reward= -95.522
+  iter  1928/2800  reward= -87.221
+  iter  1929/2800  reward= -86.993
+  iter  1930/2800  reward= -86.686
+
+  ── EVAL @ iter 1930 ──
+     Accuracy    : 0.9133  (91.33%)  [upstream metric; tracked-only 90.15%]
+     Reward      : -36.497 ± 25.166
+     Ep length   : 183.0 steps
+     Sensors/step: 6.27
+
+  iter  1931/2800  reward= -83.244
+  iter  1932/2800  reward= -73.746
+  iter  1933/2800  reward= -77.933
+  iter  1934/2800  reward= -84.797
+  iter  1935/2800  reward= -82.357
+  iter  1936/2800  reward= -81.111
+  iter  1937/2800  reward= -85.193
+  iter  1938/2800  reward= -69.841
+  iter  1939/2800  reward= -73.516
+  iter  1940/2800  reward= -76.088
+
+  ── EVAL @ iter 1940 ──
+     Accuracy    : 0.9074  (90.74%)  [upstream metric; tracked-only 90.33%]
+     Reward      : -38.245 ± 30.461
+     Ep length   : 202.1 steps
+     Sensors/step: 6.35
+
+  iter  1941/2800  reward= -81.584
+  iter  1942/2800  reward= -77.555
+  iter  1943/2800  reward= -84.379
+  iter  1944/2800  reward= -81.233
+  iter  1945/2800  reward= -81.184
+  iter  1946/2800  reward= -81.357
+  iter  1947/2800  reward= -78.895
+  iter  1948/2800  reward= -79.535
+  iter  1949/2800  reward= -75.121
+  iter  1950/2800  reward= -70.357
+
+  ── EVAL @ iter 1950 ──
+     Accuracy    : 0.9118  (91.18%)  [upstream metric; tracked-only 90.01%]
+     Reward      : -35.283 ± 27.677
+     Ep length   : 184.7 steps
+     Sensors/step: 6.35
+
+  iter  1951/2800  reward= -72.697
+  iter  1952/2800  reward= -76.007
+  iter  1953/2800  reward= -82.778
+  iter  1954/2800  reward= -79.631
+  iter  1955/2800  reward= -83.990
+  iter  1956/2800  reward= -90.172
+  iter  1957/2800  reward= -83.983
+  iter  1958/2800  reward= -78.848
+  iter  1959/2800  reward= -82.311
+  iter  1960/2800  reward= -78.074
+
+  ── EVAL @ iter 1960 ──
+     Accuracy    : 0.9132  (91.32%)  [upstream metric; tracked-only 89.65%]
+     Reward      : -47.983 ± 41.834
+     Ep length   : 200.1 steps
+     Sensors/step: 6.33
+
+  iter  1961/2800  reward= -71.066
+  iter  1962/2800  reward= -72.665
+  iter  1963/2800  reward= -66.753
+  iter  1964/2800  reward= -73.155
+  iter  1965/2800  reward= -70.723
+  iter  1966/2800  reward= -70.520
+  iter  1967/2800  reward= -77.008
+  iter  1968/2800  reward= -68.971
+  iter  1969/2800  reward= -64.195
+  iter  1970/2800  reward= -69.882
+
+  ── EVAL @ iter 1970 ──
+     Accuracy    : 0.9046  (90.46%)  [upstream metric; tracked-only 89.40%]
+     Reward      : -46.348 ± 37.718
+     Ep length   : 187.6 steps
+     Sensors/step: 6.55
+
+  iter  1971/2800  reward= -76.650
+  iter  1972/2800  reward= -68.486
+  iter  1973/2800  reward= -79.254
+  iter  1974/2800  reward= -85.500
+  iter  1975/2800  reward= -83.382
+  iter  1976/2800  reward= -79.910
+  iter  1977/2800  reward= -75.502
+  iter  1978/2800  reward= -72.836
+  iter  1979/2800  reward= -74.231
+  iter  1980/2800  reward= -77.604
+
+  ── EVAL @ iter 1980 ──
+     Accuracy    : 0.9129  (91.29%)  [upstream metric; tracked-only 90.27%]
+     Reward      : -39.110 ± 32.405
+     Ep length   : 213.6 steps
+     Sensors/step: 6.24
+
+  iter  1981/2800  reward= -74.753
+  iter  1982/2800  reward= -71.027
+  iter  1983/2800  reward= -66.988
+  iter  1984/2800  reward= -59.885
+  iter  1985/2800  reward= -65.032
+  iter  1986/2800  reward= -61.584
+  iter  1987/2800  reward= -67.168
+  iter  1988/2800  reward= -69.918
+  iter  1989/2800  reward= -76.011
+  iter  1990/2800  reward= -70.318
+
+  ── EVAL @ iter 1990 ──
+     Accuracy    : 0.9256  (92.56%)  [upstream metric; tracked-only 91.53%]
+     Reward      : -29.333 ± 19.995
+     Ep length   : 172.1 steps
+     Sensors/step: 6.13
+
+  iter  1991/2800  reward= -71.675
+  iter  1992/2800  reward= -72.838
+  iter  1993/2800  reward= -64.136
+  iter  1994/2800  reward= -64.836
+  iter  1995/2800  reward= -62.560
+  iter  1996/2800  reward= -61.545
+  iter  1997/2800  reward= -61.140
+  iter  1998/2800  reward= -66.996
+  iter  1999/2800  reward= -68.032
+  iter  2000/2800  reward= -71.382
+
+  ── EVAL @ iter 2000 ──
+     Accuracy    : 0.9277  (92.77%)  [upstream metric; tracked-only 91.57%]
+     Reward      : -31.092 ± 23.509
+     Ep length   : 193.9 steps
+     Sensors/step: 6.18
+
+  iter  2001/2800  reward= -70.101
+  iter  2002/2800  reward= -69.172
+  iter  2003/2800  reward= -60.808
+  iter  2004/2800  reward= -57.283
+  iter  2005/2800  reward= -60.762
+  iter  2006/2800  reward= -63.046
+  iter  2007/2800  reward= -66.855
+  iter  2008/2800  reward= -73.480
+  iter  2009/2800  reward= -74.750
+  iter  2010/2800  reward= -68.721
+
+  ── EVAL @ iter 2010 ──
+     Accuracy    : 0.9278  (92.78%)  [upstream metric; tracked-only 91.82%]
+     Reward      : -31.972 ± 24.521
+     Ep length   : 218.5 steps
+     Sensors/step: 6.11
+
+  iter  2011/2800  reward= -63.012
+  iter  2012/2800  reward= -60.191
+  iter  2013/2800  reward= -55.626
+  iter  2014/2800  reward= -54.576
+  iter  2015/2800  reward= -56.220
+  iter  2016/2800  reward= -60.808
+  iter  2017/2800  reward= -62.264
+  iter  2018/2800  reward= -66.738
+  iter  2019/2800  reward= -66.883
+  iter  2020/2800  reward= -67.743
+
+  ── EVAL @ iter 2020 ──
+     Accuracy    : 0.9369  (93.69%)  [upstream metric; tracked-only 92.19%]
+     Reward      : -27.436 ± 27.973
+     Ep length   : 224.4 steps
+     Sensors/step: 6.05
+
+  iter  2021/2800  reward= -64.401
+  iter  2022/2800  reward= -66.116
+  iter  2023/2800  reward= -61.156
+  iter  2024/2800  reward= -59.369
+  iter  2025/2800  reward= -56.451
+  iter  2026/2800  reward= -55.388
+  iter  2027/2800  reward= -53.078
+  iter  2028/2800  reward= -51.735
+  iter  2029/2800  reward= -51.711
+  iter  2030/2800  reward= -51.178
+
+  ── EVAL @ iter 2030 ──
+     Accuracy    : 0.9359  (93.59%)  [upstream metric; tracked-only 92.34%]
+     Reward      : -26.252 ± 23.033
+     Ep length   : 195.7 steps
+     Sensors/step: 6.11
+
+  iter  2031/2800  reward= -47.914
+  iter  2032/2800  reward= -49.589
+  iter  2033/2800  reward= -45.526
+  iter  2034/2800  reward= -50.208
+  iter  2035/2800  reward= -49.961
+  iter  2036/2800  reward= -51.615
+  iter  2037/2800  reward= -55.756
+  iter  2038/2800  reward= -61.516
+  iter  2039/2800  reward= -58.878
+  iter  2040/2800  reward= -60.863
+
+  ── EVAL @ iter 2040 ──
+     Accuracy    : 0.9283  (92.83%)  [upstream metric; tracked-only 91.52%]
+     Reward      : -33.524 ± 28.735
+     Ep length   : 218.9 steps
+     Sensors/step: 6.26
+
+  iter  2041/2800  reward= -63.738
+  iter  2042/2800  reward= -61.133
+  iter  2043/2800  reward= -55.898
+  iter  2044/2800  reward= -54.254
+  iter  2045/2800  reward= -53.885
+  iter  2046/2800  reward= -54.831
+  iter  2047/2800  reward= -53.893
+  iter  2048/2800  reward= -54.094
+  iter  2049/2800  reward= -52.397
+  iter  2050/2800  reward= -50.534
+
+  ── EVAL @ iter 2050 ──
+     Accuracy    : 0.9214  (92.14%)  [upstream metric; tracked-only 91.63%]
+     Reward      : -33.885 ± 29.685
+     Ep length   : 235.3 steps
+     Sensors/step: 6.15
+
+  iter  2051/2800  reward= -51.244
+  iter  2052/2800  reward= -54.189
+  iter  2053/2800  reward= -51.739
+  iter  2054/2800  reward= -51.198
+  iter  2055/2800  reward= -48.336
+  iter  2056/2800  reward= -45.872
+  iter  2057/2800  reward= -42.907
+  iter  2058/2800  reward= -43.820
+  iter  2059/2800  reward= -40.395
+  iter  2060/2800  reward= -41.935
+
+  ── EVAL @ iter 2060 ──
+     Accuracy    : 0.9398  (93.98%)  [upstream metric; tracked-only 92.70%]
+     Reward      : -23.562 ± 20.229
+     Ep length   : 198.5 steps
+     Sensors/step: 6.01
+
+  iter  2061/2800  reward= -43.522
+  iter  2062/2800  reward= -47.069
+  iter  2063/2800  reward= -46.168
+  iter  2064/2800  reward= -45.321
+  iter  2065/2800  reward= -46.864
+  iter  2066/2800  reward= -49.228
+  iter  2067/2800  reward= -49.023
+  iter  2068/2800  reward= -49.124
+  iter  2069/2800  reward= -49.178
+  iter  2070/2800  reward= -51.838
+
+  ── EVAL @ iter 2070 ──
+     Accuracy    : 0.9371  (93.71%)  [upstream metric; tracked-only 92.28%]
+     Reward      : -20.826 ± 16.352
+     Ep length   : 214.6 steps
+     Sensors/step: 5.91
+
+  iter  2071/2800  reward= -51.099
+  iter  2072/2800  reward= -50.420
+  iter  2073/2800  reward= -51.161
+  iter  2074/2800  reward= -52.325
+  iter  2075/2800  reward= -51.631
+  iter  2076/2800  reward= -52.073
+  iter  2077/2800  reward= -48.941
+  iter  2078/2800  reward= -46.912
+  iter  2079/2800  reward= -45.853
+  iter  2080/2800  reward= -46.507
+
+  ── EVAL @ iter 2080 ──
+     Accuracy    : 0.9304  (93.04%)  [upstream metric; tracked-only 91.87%]
+     Reward      : -26.239 ± 21.876
+     Ep length   : 182.8 steps
+     Sensors/step: 6.09
+
+  iter  2081/2800  reward= -47.029
+  iter  2082/2800  reward= -46.323
+  iter  2083/2800  reward= -50.887
+  iter  2084/2800  reward= -51.915
+  iter  2085/2800  reward= -48.700
+  iter  2086/2800  reward= -45.695
+  iter  2087/2800  reward= -45.688
+  iter  2088/2800  reward= -44.274
+  iter  2089/2800  reward= -44.627
+  iter  2090/2800  reward= -45.047
+
+  ── EVAL @ iter 2090 ──
+     Accuracy    : 0.9329  (93.29%)  [upstream metric; tracked-only 91.81%]
+     Reward      : -23.017 ± 16.465
+     Ep length   : 194.1 steps
+     Sensors/step: 6.05
+
+  iter  2091/2800  reward= -47.598
+  iter  2092/2800  reward= -49.498
+  iter  2093/2800  reward= -50.259
+  iter  2094/2800  reward= -48.864
+  iter  2095/2800  reward= -49.237
+  iter  2096/2800  reward= -48.040
+  iter  2097/2800  reward= -47.895
+  iter  2098/2800  reward= -45.271
+  iter  2099/2800  reward= -44.494
+  iter  2100/2800  reward= -44.720
+
+  ── EVAL @ iter 2100 ──
+     Accuracy    : 0.9369  (93.69%)  [upstream metric; tracked-only 92.19%]
+     Reward      : -26.779 ± 23.581
+     Ep length   : 201.8 steps
+     Sensors/step: 6.17
+
+
+  >>> movement model O3 (model 3) active in 5 worker envs + eval env
+
+
+  ── EVAL @ iter 2100 (right after switch to O3) ──
+     Accuracy    : 0.7749  (77.49%)  [upstream metric; tracked-only 72.38%]
+     Reward      : -236.767 ± 197.403
+     Ep length   : 215.6 steps
+     Sensors/step: 8.66
+
+  iter  2101/2800  reward= -81.751
+  iter  2102/2800  reward=-116.932
+  iter  2103/2800  reward=-158.592
+  iter  2104/2800  reward=-200.369
+  iter  2105/2800  reward=-231.644
+  iter  2106/2800  reward=-251.013
+  iter  2107/2800  reward=-256.242
+  iter  2108/2800  reward=-243.513
+  iter  2109/2800  reward=-238.820
+  iter  2110/2800  reward=-243.261
+
+  ── EVAL @ iter 2110 ──
+     Accuracy    : 0.7790  (77.90%)  [upstream metric; tracked-only 72.61%]
+     Reward      : -228.025 ± 211.165
+     Ep length   : 205.9 steps
+     Sensors/step: 8.66
+
+  iter  2111/2800  reward=-232.428
+  iter  2112/2800  reward=-271.981
+  iter  2113/2800  reward=-258.942
+  iter  2114/2800  reward=-222.467
+  iter  2115/2800  reward=-235.555
+  iter  2116/2800  reward=-209.767
+  iter  2117/2800  reward=-207.990
+  iter  2118/2800  reward=-215.955
+  iter  2119/2800  reward=-212.421
+  iter  2120/2800  reward=-191.364
+
+  ── EVAL @ iter 2120 ──
+     Accuracy    : 0.7829  (78.29%)  [upstream metric; tracked-only 74.05%]
+     Reward      : -203.441 ± 166.531
+     Ep length   : 211.3 steps
+     Sensors/step: 8.33
+
+  iter  2121/2800  reward=-188.008
+  iter  2122/2800  reward=-195.407
+  iter  2123/2800  reward=-217.847
+  iter  2124/2800  reward=-247.458
+  iter  2125/2800  reward=-249.380
+  iter  2126/2800  reward=-257.913
+  iter  2127/2800  reward=-266.412
+  iter  2128/2800  reward=-273.273
+  iter  2129/2800  reward=-227.514
+  iter  2130/2800  reward=-224.406
+
+  ── EVAL @ iter 2130 ──
+     Accuracy    : 0.7964  (79.64%)  [upstream metric; tracked-only 76.04%]
+     Reward      : -157.105 ± 133.385
+     Ep length   : 185.6 steps
+     Sensors/step: 8.10
+
+  iter  2131/2800  reward=-222.906
+  iter  2132/2800  reward=-227.705
+  iter  2133/2800  reward=-249.632
+  iter  2134/2800  reward=-224.976
+  iter  2135/2800  reward=-246.614
+  iter  2136/2800  reward=-256.100
+  iter  2137/2800  reward=-259.215
+  iter  2138/2800  reward=-254.623
+  iter  2139/2800  reward=-260.214
+  iter  2140/2800  reward=-251.427
+
+  ── EVAL @ iter 2140 ──
+     Accuracy    : 0.8117  (81.17%)  [upstream metric; tracked-only 77.61%]
+     Reward      : -148.622 ± 114.881
+     Ep length   : 184.8 steps
+     Sensors/step: 8.05
+
+  iter  2141/2800  reward=-240.949
+  iter  2142/2800  reward=-251.768
+  iter  2143/2800  reward=-232.712
+  iter  2144/2800  reward=-231.378
+  iter  2145/2800  reward=-214.743
+  iter  2146/2800  reward=-208.456
+  iter  2147/2800  reward=-209.302
+  iter  2148/2800  reward=-210.437
+  iter  2149/2800  reward=-197.916
+  iter  2150/2800  reward=-202.571
+
+  ── EVAL @ iter 2150 ──
+     Accuracy    : 0.8293  (82.93%)  [upstream metric; tracked-only 80.44%]
+     Reward      : -133.804 ± 130.915
+     Ep length   : 202.1 steps
+     Sensors/step: 7.59
+
+  iter  2151/2800  reward=-204.884
+  iter  2152/2800  reward=-203.820
+  iter  2153/2800  reward=-191.152
+  iter  2154/2800  reward=-182.517
+  iter  2155/2800  reward=-186.924
+  iter  2156/2800  reward=-187.855
+  iter  2157/2800  reward=-180.312
+  iter  2158/2800  reward=-194.475
+  iter  2159/2800  reward=-194.033
+  iter  2160/2800  reward=-198.482
+
+  ── EVAL @ iter 2160 ──
+     Accuracy    : 0.8540  (85.40%)  [upstream metric; tracked-only 81.47%]
+     Reward      : -141.968 ± 155.707
+     Ep length   : 211.7 steps
+     Sensors/step: 7.60
+
+  iter  2161/2800  reward=-216.951
+  iter  2162/2800  reward=-214.916
+  iter  2163/2800  reward=-192.685
+  iter  2164/2800  reward=-171.648
+  iter  2165/2800  reward=-187.716
+  iter  2166/2800  reward=-173.102
+  iter  2167/2800  reward=-173.334
+  iter  2168/2800  reward=-175.826
+  iter  2169/2800  reward=-184.863
+  iter  2170/2800  reward=-194.047
+
+  ── EVAL @ iter 2170 ──
+     Accuracy    : 0.8492  (84.92%)  [upstream metric; tracked-only 81.99%]
+     Reward      : -113.773 ± 102.823
+     Ep length   : 183.6 steps
+     Sensors/step: 7.66
+
+  iter  2171/2800  reward=-178.098
+  iter  2172/2800  reward=-163.436
+  iter  2173/2800  reward=-182.951
+  iter  2174/2800  reward=-168.583
+  iter  2175/2800  reward=-178.792
+  iter  2176/2800  reward=-176.110
+  iter  2177/2800  reward=-190.993
+  iter  2178/2800  reward=-193.767
+  iter  2179/2800  reward=-203.126
+  iter  2180/2800  reward=-191.909
+
+  ── EVAL @ iter 2180 ──
+     Accuracy    : 0.8399  (83.99%)  [upstream metric; tracked-only 80.91%]
+     Reward      : -138.255 ± 107.273
+     Ep length   : 197.3 steps
+     Sensors/step: 7.89
+
+  iter  2181/2800  reward=-191.828
+  iter  2182/2800  reward=-204.841
+  iter  2183/2800  reward=-192.838
+  iter  2184/2800  reward=-175.458
+  iter  2185/2800  reward=-171.994
+  iter  2186/2800  reward=-166.190
+  iter  2187/2800  reward=-172.441
+  iter  2188/2800  reward=-168.881
+  iter  2189/2800  reward=-168.083
+  iter  2190/2800  reward=-171.728
+
+  ── EVAL @ iter 2190 ──
+     Accuracy    : 0.8437  (84.37%)  [upstream metric; tracked-only 82.66%]
+     Reward      : -111.136 ± 110.292
+     Ep length   : 203.2 steps
+     Sensors/step: 7.30
+
+  iter  2191/2800  reward=-179.076
+  iter  2192/2800  reward=-159.529
+  iter  2193/2800  reward=-157.587
+  iter  2194/2800  reward=-155.884
+  iter  2195/2800  reward=-151.696
+  iter  2196/2800  reward=-136.649
+  iter  2197/2800  reward=-142.052
+  iter  2198/2800  reward=-149.233
+  iter  2199/2800  reward=-145.921
+  iter  2200/2800  reward=-153.229
+
+  ── EVAL @ iter 2200 ──
+     Accuracy    : 0.8458  (84.58%)  [upstream metric; tracked-only 83.12%]
+     Reward      : -126.760 ± 96.138
+     Ep length   : 227.9 steps
+     Sensors/step: 7.59
+
+  iter  2201/2800  reward=-162.495
+  iter  2202/2800  reward=-170.653
+  iter  2203/2800  reward=-172.063
+  iter  2204/2800  reward=-162.737
+  iter  2205/2800  reward=-160.600
+  iter  2206/2800  reward=-163.763
+  iter  2207/2800  reward=-145.754
+  iter  2208/2800  reward=-133.228
+  iter  2209/2800  reward=-129.888
+  iter  2210/2800  reward=-133.154
+
+  ── EVAL @ iter 2210 ──
+     Accuracy    : 0.8698  (86.98%)  [upstream metric; tracked-only 84.92%]
+     Reward      : -108.428 ± 93.725
+     Ep length   : 215.4 steps
+     Sensors/step: 7.43
+
+  iter  2211/2800  reward=-134.628
+  iter  2212/2800  reward=-145.101
+  iter  2213/2800  reward=-144.008
+  iter  2214/2800  reward=-152.858
+  iter  2215/2800  reward=-157.778
+  iter  2216/2800  reward=-156.244
+  iter  2217/2800  reward=-136.861
+  iter  2218/2800  reward=-134.777
+  iter  2219/2800  reward=-134.278
+  iter  2220/2800  reward=-127.483
+
+  ── EVAL @ iter 2220 ──
+     Accuracy    : 0.8790  (87.90%)  [upstream metric; tracked-only 85.83%]
+     Reward      : -80.190 ± 67.590
+     Ep length   : 171.3 steps
+     Sensors/step: 7.22
+
+  iter  2221/2800  reward=-136.938
+  iter  2222/2800  reward=-139.410
+  iter  2223/2800  reward=-143.910
+  iter  2224/2800  reward=-136.189
+  iter  2225/2800  reward=-123.640
+  iter  2226/2800  reward=-115.650
+  iter  2227/2800  reward=-125.976
+  iter  2228/2800  reward=-119.756
+  iter  2229/2800  reward=-115.418
+  iter  2230/2800  reward=-119.375
+
+  ── EVAL @ iter 2230 ──
+     Accuracy    : 0.8693  (86.93%)  [upstream metric; tracked-only 84.45%]
+     Reward      : -88.174 ± 82.598
+     Ep length   : 180.2 steps
+     Sensors/step: 7.31
+
+  iter  2231/2800  reward=-119.621
+  iter  2232/2800  reward=-111.764
+  iter  2233/2800  reward=-117.049
+  iter  2234/2800  reward=-115.456
+  iter  2235/2800  reward=-113.658
+  iter  2236/2800  reward=-120.503
+  iter  2237/2800  reward=-118.180
+  iter  2238/2800  reward=-116.800
+  iter  2239/2800  reward=-122.716
+  iter  2240/2800  reward=-121.797
+
+  ── EVAL @ iter 2240 ──
+     Accuracy    : 0.8874  (88.74%)  [upstream metric; tracked-only 86.61%]
+     Reward      : -80.742 ± 70.782
+     Ep length   : 200.2 steps
+     Sensors/step: 7.13
+
+  iter  2241/2800  reward=-111.230
+  iter  2242/2800  reward=-108.588
+  iter  2243/2800  reward=-115.020
+  iter  2244/2800  reward=-106.297
+  iter  2245/2800  reward=-118.692
+  iter  2246/2800  reward=-125.830
+  iter  2247/2800  reward=-132.033
+  iter  2248/2800  reward=-141.069
+  iter  2249/2800  reward=-142.615
+  iter  2250/2800  reward=-148.998
+
+  ── EVAL @ iter 2250 ──
+     Accuracy    : 0.8799  (87.99%)  [upstream metric; tracked-only 85.12%]
+     Reward      : -104.024 ± 108.899
+     Ep length   : 216.5 steps
+     Sensors/step: 7.22
+
+  iter  2251/2800  reward=-156.014
+  iter  2252/2800  reward=-145.198
+  iter  2253/2800  reward=-130.652
+  iter  2254/2800  reward=-130.424
+  iter  2255/2800  reward=-119.770
+  iter  2256/2800  reward=-100.103
+  iter  2257/2800  reward= -94.669
+  iter  2258/2800  reward= -95.012
+  iter  2259/2800  reward= -99.456
+  iter  2260/2800  reward=-100.541
+
+  ── EVAL @ iter 2260 ──
+     Accuracy    : 0.8862  (88.62%)  [upstream metric; tracked-only 86.72%]
+     Reward      : -73.142 ± 65.187
+     Ep length   : 177.6 steps
+     Sensors/step: 7.18
+
+  iter  2261/2800  reward=-106.241
+  iter  2262/2800  reward=-110.485
+  iter  2263/2800  reward=-111.354
+  iter  2264/2800  reward=-106.588
+  iter  2265/2800  reward=-104.453
+  iter  2266/2800  reward=-108.988
+  iter  2267/2800  reward=-111.429
+  iter  2268/2800  reward=-121.170
+  iter  2269/2800  reward=-116.214
+  iter  2270/2800  reward=-111.877
+
+  ── EVAL @ iter 2270 ──
+     Accuracy    : 0.8810  (88.10%)  [upstream metric; tracked-only 87.42%]
+     Reward      : -90.541 ± 75.193
+     Ep length   : 237.3 steps
+     Sensors/step: 7.19
+
+  iter  2271/2800  reward=-117.513
+  iter  2272/2800  reward=-102.733
+  iter  2273/2800  reward= -93.246
+  iter  2274/2800  reward=-101.642
+  iter  2275/2800  reward=-104.298
+  iter  2276/2800  reward=-100.849
+  iter  2277/2800  reward=-107.990
+  iter  2278/2800  reward=-112.902
+  iter  2279/2800  reward=-114.438
+  iter  2280/2800  reward=-118.730
+
+  ── EVAL @ iter 2280 ──
+     Accuracy    : 0.8890  (88.90%)  [upstream metric; tracked-only 87.66%]
+     Reward      : -74.930 ± 64.724
+     Ep length   : 182.6 steps
+     Sensors/step: 7.22
+
+  iter  2281/2800  reward=-119.621
+  iter  2282/2800  reward=-125.174
+  iter  2283/2800  reward=-121.604
+  iter  2284/2800  reward=-123.054
+  iter  2285/2800  reward=-109.729
+  iter  2286/2800  reward=-106.591
+  iter  2287/2800  reward=-102.193
+  iter  2288/2800  reward=-103.456
+  iter  2289/2800  reward= -99.917
+  iter  2290/2800  reward=-102.298
+
+  ── EVAL @ iter 2290 ──
+     Accuracy    : 0.8887  (88.87%)  [upstream metric; tracked-only 87.68%]
+     Reward      : -76.877 ± 67.134
+     Ep length   : 201.6 steps
+     Sensors/step: 7.13
+
+  iter  2291/2800  reward=-101.353
+  iter  2292/2800  reward= -98.145
+  iter  2293/2800  reward= -97.784
+  iter  2294/2800  reward= -99.645
+  iter  2295/2800  reward= -99.337
+  iter  2296/2800  reward=-102.050
+  iter  2297/2800  reward= -98.190
+  iter  2298/2800  reward= -86.161
+  iter  2299/2800  reward= -87.062
+  iter  2300/2800  reward= -82.997
+
+  ── EVAL @ iter 2300 ──
+     Accuracy    : 0.8865  (88.65%)  [upstream metric; tracked-only 87.60%]
+     Reward      : -77.206 ± 62.409
+     Ep length   : 201.2 steps
+     Sensors/step: 7.13
+
+  iter  2301/2800  reward= -79.264
+  iter  2302/2800  reward= -85.089
+  iter  2303/2800  reward= -86.060
+  iter  2304/2800  reward= -85.968
+  iter  2305/2800  reward= -80.260
+  iter  2306/2800  reward= -75.593
+  iter  2307/2800  reward= -77.858
+  iter  2308/2800  reward= -77.077
+  iter  2309/2800  reward= -82.803
+  iter  2310/2800  reward= -86.790
+
+  ── EVAL @ iter 2310 ──
+     Accuracy    : 0.9001  (90.01%)  [upstream metric; tracked-only 87.80%]
+     Reward      : -71.476 ± 65.192
+     Ep length   : 192.8 steps
+     Sensors/step: 7.00
+
+  iter  2311/2800  reward= -85.616
+  iter  2312/2800  reward= -90.275
+  iter  2313/2800  reward= -89.620
+  iter  2314/2800  reward= -84.626
+  iter  2315/2800  reward= -82.452
+  iter  2316/2800  reward= -80.606
+  iter  2317/2800  reward= -82.737
+  iter  2318/2800  reward= -81.273
+  iter  2319/2800  reward= -76.723
+  iter  2320/2800  reward= -77.246
+
+  ── EVAL @ iter 2320 ──
+     Accuracy    : 0.8982  (89.82%)  [upstream metric; tracked-only 88.85%]
+     Reward      : -63.328 ± 51.520
+     Ep length   : 186.1 steps
+     Sensors/step: 7.00
+
+  iter  2321/2800  reward= -79.115
+  iter  2322/2800  reward= -83.962
+  iter  2323/2800  reward= -84.102
+  iter  2324/2800  reward= -81.270
+  iter  2325/2800  reward= -75.077
+  iter  2326/2800  reward= -67.607
+  iter  2327/2800  reward= -71.987
+  iter  2328/2800  reward= -74.111
+  iter  2329/2800  reward= -72.377
+  iter  2330/2800  reward= -73.931
+
+  ── EVAL @ iter 2330 ──
+     Accuracy    : 0.8963  (89.63%)  [upstream metric; tracked-only 88.63%]
+     Reward      : -54.839 ± 43.855
+     Ep length   : 165.8 steps
+     Sensors/step: 6.96
+
+  iter  2331/2800  reward= -74.533
+  iter  2332/2800  reward= -74.897
+  iter  2333/2800  reward= -75.456
+  iter  2334/2800  reward= -80.009
+  iter  2335/2800  reward= -77.496
+  iter  2336/2800  reward= -79.580
+  iter  2337/2800  reward= -80.718
+  iter  2338/2800  reward= -74.016
+  iter  2339/2800  reward= -83.582
+  iter  2340/2800  reward= -75.222
+
+  ── EVAL @ iter 2340 ──
+     Accuracy    : 0.9107  (91.07%)  [upstream metric; tracked-only 89.85%]
+     Reward      : -73.120 ± 63.680
+     Ep length   : 247.3 steps
+     Sensors/step: 6.83
+
+  iter  2341/2800  reward= -77.167
+  iter  2342/2800  reward= -76.984
+  iter  2343/2800  reward= -77.912
+  iter  2344/2800  reward= -74.329
+  iter  2345/2800  reward= -78.373
+  iter  2346/2800  reward= -83.806
+  iter  2347/2800  reward= -82.246
+  iter  2348/2800  reward= -82.099
+  iter  2349/2800  reward= -87.511
+  iter  2350/2800  reward= -87.601
+
+  ── EVAL @ iter 2350 ──
+     Accuracy    : 0.9088  (90.88%)  [upstream metric; tracked-only 89.65%]
+     Reward      : -56.021 ± 51.731
+     Ep length   : 198.0 steps
+     Sensors/step: 6.69
+
+  iter  2351/2800  reward= -88.536
+  iter  2352/2800  reward= -91.799
+  iter  2353/2800  reward= -89.588
+  iter  2354/2800  reward= -85.847
+  iter  2355/2800  reward= -82.063
+  iter  2356/2800  reward= -72.990
+  iter  2357/2800  reward= -74.003
+  iter  2358/2800  reward= -78.067
+  iter  2359/2800  reward= -78.256
+  iter  2360/2800  reward= -79.774
+
+  ── EVAL @ iter 2360 ──
+     Accuracy    : 0.9015  (90.15%)  [upstream metric; tracked-only 88.97%]
+     Reward      : -58.233 ± 43.253
+     Ep length   : 204.0 steps
+     Sensors/step: 6.74
+
+  iter  2361/2800  reward= -80.303
+  iter  2362/2800  reward= -76.644
+  iter  2363/2800  reward= -71.394
+  iter  2364/2800  reward= -71.040
+  iter  2365/2800  reward= -66.769
+  iter  2366/2800  reward= -68.003
+  iter  2367/2800  reward= -65.788
+  iter  2368/2800  reward= -64.609
+  iter  2369/2800  reward= -67.486
+  iter  2370/2800  reward= -73.343
+
+  ── EVAL @ iter 2370 ──
+     Accuracy    : 0.9051  (90.51%)  [upstream metric; tracked-only 89.83%]
+     Reward      : -55.398 ± 40.671
+     Ep length   : 193.3 steps
+     Sensors/step: 6.76
+
+  iter  2371/2800  reward= -73.310
+  iter  2372/2800  reward= -76.306
+  iter  2373/2800  reward= -72.544
+  iter  2374/2800  reward= -70.194
+  iter  2375/2800  reward= -67.553
+  iter  2376/2800  reward= -66.564
+  iter  2377/2800  reward= -66.240
+  iter  2378/2800  reward= -69.826
+  iter  2379/2800  reward= -70.797
+  iter  2380/2800  reward= -69.894
+
+  ── EVAL @ iter 2380 ──
+     Accuracy    : 0.8968  (89.68%)  [upstream metric; tracked-only 90.19%]
+     Reward      : -44.508 ± 37.964
+     Ep length   : 172.9 steps
+     Sensors/step: 6.86
+
+  iter  2381/2800  reward= -65.174
+  iter  2382/2800  reward= -63.618
+  iter  2383/2800  reward= -63.819
+  iter  2384/2800  reward= -66.386
+  iter  2385/2800  reward= -68.590
+  iter  2386/2800  reward= -69.619
+  iter  2387/2800  reward= -69.823
+  iter  2388/2800  reward= -71.816
+  iter  2389/2800  reward= -62.549
+  iter  2390/2800  reward= -66.029
+
+  ── EVAL @ iter 2390 ──
+     Accuracy    : 0.9092  (90.92%)  [upstream metric; tracked-only 90.07%]
+     Reward      : -56.781 ± 41.761
+     Ep length   : 202.4 steps
+     Sensors/step: 6.79
+
+  iter  2391/2800  reward= -68.378
+  iter  2392/2800  reward= -68.483
+  iter  2393/2800  reward= -65.896
+  iter  2394/2800  reward= -69.772
+  iter  2395/2800  reward= -65.056
+  iter  2396/2800  reward= -61.688
+  iter  2397/2800  reward= -63.725
+  iter  2398/2800  reward= -62.004
+  iter  2399/2800  reward= -61.652
+  iter  2400/2800  reward= -61.724
+
+  ── EVAL @ iter 2400 ──
+     Accuracy    : 0.9163  (91.63%)  [upstream metric; tracked-only 90.79%]
+     Reward      : -57.042 ± 43.382
+     Ep length   : 220.3 steps
+     Sensors/step: 6.81
+
+  iter  2401/2800  reward= -61.602
+  iter  2402/2800  reward= -60.782
+  iter  2403/2800  reward= -57.396
+  iter  2404/2800  reward= -65.028
+  iter  2405/2800  reward= -68.266
+  iter  2406/2800  reward= -69.372
+  iter  2407/2800  reward= -69.084
+  iter  2408/2800  reward= -74.592
+  iter  2409/2800  reward= -69.660
+  iter  2410/2800  reward= -69.008
+
+  ── EVAL @ iter 2410 ──
+     Accuracy    : 0.9095  (90.95%)  [upstream metric; tracked-only 91.26%]
+     Reward      : -44.992 ± 30.291
+     Ep length   : 198.0 steps
+     Sensors/step: 6.65
+
+  iter  2411/2800  reward= -71.130
+  iter  2412/2800  reward= -75.332
+  iter  2413/2800  reward= -76.108
+  iter  2414/2800  reward= -62.921
+  iter  2415/2800  reward= -62.510
+  iter  2416/2800  reward= -63.187
+  iter  2417/2800  reward= -54.734
+  iter  2418/2800  reward= -56.888
+  iter  2419/2800  reward= -57.359
+  iter  2420/2800  reward= -56.990
+
+  ── EVAL @ iter 2420 ──
+     Accuracy    : 0.9200  (92.00%)  [upstream metric; tracked-only 91.07%]
+     Reward      : -51.492 ± 44.405
+     Ep length   : 213.8 steps
+     Sensors/step: 6.71
+
+  iter  2421/2800  reward= -57.660
+  iter  2422/2800  reward= -55.060
+  iter  2423/2800  reward= -59.743
+  iter  2424/2800  reward= -59.465
+  iter  2425/2800  reward= -60.135
+  iter  2426/2800  reward= -61.979
+  iter  2427/2800  reward= -58.103
+  iter  2428/2800  reward= -56.990
+  iter  2429/2800  reward= -60.026
+  iter  2430/2800  reward= -61.713
+
+  ── EVAL @ iter 2430 ──
+     Accuracy    : 0.9226  (92.26%)  [upstream metric; tracked-only 91.69%]
+     Reward      : -41.388 ± 30.367
+     Ep length   : 184.3 steps
+     Sensors/step: 6.76
+
+  iter  2431/2800  reward= -58.612
+  iter  2432/2800  reward= -65.349
+  iter  2433/2800  reward= -66.702
+  iter  2434/2800  reward= -61.855
+  iter  2435/2800  reward= -63.037
+  iter  2436/2800  reward= -67.197
+  iter  2437/2800  reward= -67.857
+  iter  2438/2800  reward= -63.644
+  iter  2439/2800  reward= -60.591
+  iter  2440/2800  reward= -60.288
+
+  ── EVAL @ iter 2440 ──
+     Accuracy    : 0.9236  (92.36%)  [upstream metric; tracked-only 91.19%]
+     Reward      : -39.987 ± 35.198
+     Ep length   : 170.7 steps
+     Sensors/step: 6.61
+
+  iter  2441/2800  reward= -59.780
+  iter  2442/2800  reward= -54.639
+  iter  2443/2800  reward= -55.771
+  iter  2444/2800  reward= -54.342
+  iter  2445/2800  reward= -54.940
+  iter  2446/2800  reward= -48.747
+  iter  2447/2800  reward= -50.064
+  iter  2448/2800  reward= -52.214
+  iter  2449/2800  reward= -55.519
+  iter  2450/2800  reward= -52.373
+
+  ── EVAL @ iter 2450 ──
+     Accuracy    : 0.9317  (93.17%)  [upstream metric; tracked-only 92.55%]
+     Reward      : -44.214 ± 34.169
+     Ep length   : 211.8 steps
+     Sensors/step: 6.74
+
+  iter  2451/2800  reward= -54.617
+  iter  2452/2800  reward= -54.179
+  iter  2453/2800  reward= -50.384
+  iter  2454/2800  reward= -48.599
+  iter  2455/2800  reward= -49.053
+  iter  2456/2800  reward= -48.298
+  iter  2457/2800  reward= -48.778
+  iter  2458/2800  reward= -52.109
+  iter  2459/2800  reward= -55.185
+  iter  2460/2800  reward= -60.246
+
+  ── EVAL @ iter 2460 ──
+     Accuracy    : 0.9348  (93.48%)  [upstream metric; tracked-only 93.23%]
+     Reward      : -40.474 ± 33.196
+     Ep length   : 216.0 steps
+     Sensors/step: 6.57
+
+  iter  2461/2800  reward= -64.944
+  iter  2462/2800  reward= -66.649
+  iter  2463/2800  reward= -66.406
+  iter  2464/2800  reward= -63.290
+  iter  2465/2800  reward= -64.126
+  iter  2466/2800  reward= -55.768
+  iter  2467/2800  reward= -55.323
+  iter  2468/2800  reward= -53.572
+  iter  2469/2800  reward= -55.943
+  iter  2470/2800  reward= -51.462
+
+  ── EVAL @ iter 2470 ──
+     Accuracy    : 0.9402  (94.02%)  [upstream metric; tracked-only 93.39%]
+     Reward      : -39.411 ± 25.542
+     Ep length   : 193.9 steps
+     Sensors/step: 6.64
+
+  iter  2471/2800  reward= -54.442
+  iter  2472/2800  reward= -54.135
+  iter  2473/2800  reward= -57.565
+  iter  2474/2800  reward= -55.287
+  iter  2475/2800  reward= -55.552
+  iter  2476/2800  reward= -57.430
+  iter  2477/2800  reward= -56.486
+  iter  2478/2800  reward= -56.144
+  iter  2479/2800  reward= -57.131
+  iter  2480/2800  reward= -58.564
+
+  ── EVAL @ iter 2480 ──
+     Accuracy    : 0.9515  (95.15%)  [upstream metric; tracked-only 94.36%]
+     Reward      : -34.584 ± 26.548
+     Ep length   : 193.3 steps
+     Sensors/step: 6.60
+
+  iter  2481/2800  reward= -53.656
+  iter  2482/2800  reward= -51.898
+  iter  2483/2800  reward= -44.730
+  iter  2484/2800  reward= -44.272
+  iter  2485/2800  reward= -44.592
+  iter  2486/2800  reward= -45.511
+  iter  2487/2800  reward= -52.054
+  iter  2488/2800  reward= -49.392
+  iter  2489/2800  reward= -44.600
+  iter  2490/2800  reward= -39.989
+
+  ── EVAL @ iter 2490 ──
+     Accuracy    : 0.9531  (95.31%)  [upstream metric; tracked-only 94.49%]
+     Reward      : -33.961 ± 25.386
+     Ep length   : 197.4 steps
+     Sensors/step: 6.55
+
+  iter  2491/2800  reward= -37.676
+  iter  2492/2800  reward= -39.128
+  iter  2493/2800  reward= -39.296
+  iter  2494/2800  reward= -42.610
+  iter  2495/2800  reward= -43.035
+  iter  2496/2800  reward= -46.224
+  iter  2497/2800  reward= -44.621
+  iter  2498/2800  reward= -45.318
+  iter  2499/2800  reward= -49.092
+  iter  2500/2800  reward= -46.000
+
+  ── EVAL @ iter 2500 ──
+     Accuracy    : 0.9461  (94.61%)  [upstream metric; tracked-only 93.55%]
+     Reward      : -33.453 ± 23.357
+     Ep length   : 192.9 steps
+     Sensors/step: 6.41
+
+  iter  2501/2800  reward= -49.734
+  iter  2502/2800  reward= -54.402
+  iter  2503/2800  reward= -55.775
+  iter  2504/2800  reward= -52.958
+  iter  2505/2800  reward= -53.548
+  iter  2506/2800  reward= -51.808
+  iter  2507/2800  reward= -52.199
+  iter  2508/2800  reward= -50.256
+  iter  2509/2800  reward= -48.351
+  iter  2510/2800  reward= -47.555
+
+  ── EVAL @ iter 2510 ──
+     Accuracy    : 0.9498  (94.98%)  [upstream metric; tracked-only 94.79%]
+     Reward      : -29.538 ± 22.044
+     Ep length   : 171.2 steps
+     Sensors/step: 6.55
+
+  iter  2511/2800  reward= -47.174
+  iter  2512/2800  reward= -44.433
+  iter  2513/2800  reward= -42.737
+  iter  2514/2800  reward= -41.597
+  iter  2515/2800  reward= -44.428
+  iter  2516/2800  reward= -45.116
+  iter  2517/2800  reward= -52.206
+  iter  2518/2800  reward= -54.876
+  iter  2519/2800  reward= -55.379
+  iter  2520/2800  reward= -58.187
+
+  ── EVAL @ iter 2520 ──
+     Accuracy    : 0.9556  (95.56%)  [upstream metric; tracked-only 95.23%]
+     Reward      : -33.183 ± 23.062
+     Ep length   : 205.8 steps
+     Sensors/step: 6.57
+
+  iter  2521/2800  reward= -57.842
+  iter  2522/2800  reward= -58.150
+  iter  2523/2800  reward= -55.290
+  iter  2524/2800  reward= -53.836
+  iter  2525/2800  reward= -54.143
+  iter  2526/2800  reward= -52.050
+  iter  2527/2800  reward= -53.014
+  iter  2528/2800  reward= -48.574
+  iter  2529/2800  reward= -48.824
+  iter  2530/2800  reward= -45.336
+
+  ── EVAL @ iter 2530 ──
+     Accuracy    : 0.9380  (93.80%)  [upstream metric; tracked-only 93.79%]
+     Reward      : -31.550 ± 25.875
+     Ep length   : 174.0 steps
+     Sensors/step: 6.56
+
+  iter  2531/2800  reward= -48.360
+  iter  2532/2800  reward= -48.465
+  iter  2533/2800  reward= -51.507
+  iter  2534/2800  reward= -47.608
+  iter  2535/2800  reward= -48.802
+  iter  2536/2800  reward= -46.784
+  iter  2537/2800  reward= -45.634
+  iter  2538/2800  reward= -40.736
+  iter  2539/2800  reward= -43.520
+  iter  2540/2800  reward= -45.636
+
+  ── EVAL @ iter 2540 ──
+     Accuracy    : 0.9438  (94.38%)  [upstream metric; tracked-only 94.54%]
+     Reward      : -30.330 ± 19.035
+     Ep length   : 206.5 steps
+     Sensors/step: 6.51
+
+  iter  2541/2800  reward= -46.129
+  iter  2542/2800  reward= -46.028
+  iter  2543/2800  reward= -49.604
+  iter  2544/2800  reward= -44.818
+  iter  2545/2800  reward= -43.611
+  iter  2546/2800  reward= -43.355
+  iter  2547/2800  reward= -44.038
+  iter  2548/2800  reward= -43.575
+  iter  2549/2800  reward= -47.967
+  iter  2550/2800  reward= -47.890
+
+  ── EVAL @ iter 2550 ──
+     Accuracy    : 0.9702  (97.02%)  [upstream metric; tracked-only 96.39%]
+     Reward      : -24.323 ± 14.337
+     Ep length   : 221.0 steps
+     Sensors/step: 6.39
+
+  iter  2551/2800  reward= -48.999
+  iter  2552/2800  reward= -48.266
+  iter  2553/2800  reward= -46.984
+  iter  2554/2800  reward= -42.585
+  iter  2555/2800  reward= -40.251
+  iter  2556/2800  reward= -39.930
+  iter  2557/2800  reward= -37.408
+  iter  2558/2800  reward= -39.084
+  iter  2559/2800  reward= -40.850
+  iter  2560/2800  reward= -39.471
+
+  ── EVAL @ iter 2560 ──
+     Accuracy    : 0.9669  (96.69%)  [upstream metric; tracked-only 96.04%]
+     Reward      : -22.304 ± 17.502
+     Ep length   : 180.0 steps
+     Sensors/step: 6.35
+
+  iter  2561/2800  reward= -40.734
+  iter  2562/2800  reward= -43.054
+  iter  2563/2800  reward= -40.938
+  iter  2564/2800  reward= -43.323
+  iter  2565/2800  reward= -45.564
+  iter  2566/2800  reward= -45.527
+  iter  2567/2800  reward= -47.878
+  iter  2568/2800  reward= -49.589
+  iter  2569/2800  reward= -49.855
+  iter  2570/2800  reward= -47.438
+
+  ── EVAL @ iter 2570 ──
+     Accuracy    : 0.9637  (96.37%)  [upstream metric; tracked-only 95.64%]
+     Reward      : -24.932 ± 16.169
+     Ep length   : 175.7 steps
+     Sensors/step: 6.43
+
+  iter  2571/2800  reward= -47.203
+  iter  2572/2800  reward= -49.632
+  iter  2573/2800  reward= -48.608
+  iter  2574/2800  reward= -43.656
+  iter  2575/2800  reward= -42.045
+  iter  2576/2800  reward= -43.932
+  iter  2577/2800  reward= -39.939
+  iter  2578/2800  reward= -39.017
+  iter  2579/2800  reward= -40.253
+  iter  2580/2800  reward= -42.292
+
+  ── EVAL @ iter 2580 ──
+     Accuracy    : 0.9724  (97.24%)  [upstream metric; tracked-only 96.66%]
+     Reward      : -23.496 ± 20.155
+     Ep length   : 223.4 steps
+     Sensors/step: 6.29
+
+  iter  2581/2800  reward= -42.055
+  iter  2582/2800  reward= -42.766
+  iter  2583/2800  reward= -41.635
+  iter  2584/2800  reward= -41.863
+  iter  2585/2800  reward= -40.616
+  iter  2586/2800  reward= -39.666
+  iter  2587/2800  reward= -39.546
+  iter  2588/2800  reward= -39.233
+  iter  2589/2800  reward= -42.139
+  iter  2590/2800  reward= -43.037
+
+  ── EVAL @ iter 2590 ──
+     Accuracy    : 0.9608  (96.08%)  [upstream metric; tracked-only 95.91%]
+     Reward      : -17.592 ± 16.795
+     Ep length   : 200.2 steps
+     Sensors/step: 6.21
+
+  iter  2591/2800  reward= -41.671
+  iter  2592/2800  reward= -39.243
+  iter  2593/2800  reward= -38.472
+  iter  2594/2800  reward= -37.696
+  iter  2595/2800  reward= -35.846
+  iter  2596/2800  reward= -36.600
+  iter  2597/2800  reward= -39.765
+  iter  2598/2800  reward= -44.592
+  iter  2599/2800  reward= -41.572
+  iter  2600/2800  reward= -43.106
+
+  ── EVAL @ iter 2600 ──
+     Accuracy    : 0.9675  (96.75%)  [upstream metric; tracked-only 96.34%]
+     Reward      : -15.824 ± 16.630
+     Ep length   : 233.1 steps
+     Sensors/step: 6.08
+
+  iter  2601/2800  reward= -45.034
+  iter  2602/2800  reward= -43.046
+  iter  2603/2800  reward= -40.177
+  iter  2604/2800  reward= -42.165
+  iter  2605/2800  reward= -42.707
+  iter  2606/2800  reward= -41.083
+  iter  2607/2800  reward= -42.506
+  iter  2608/2800  reward= -42.042
+  iter  2609/2800  reward= -41.003
+  iter  2610/2800  reward= -39.026
+
+  ── EVAL @ iter 2610 ──
+     Accuracy    : 0.9702  (97.02%)  [upstream metric; tracked-only 96.58%]
+     Reward      : -14.094 ± 13.725
+     Ep length   : 214.2 steps
+     Sensors/step: 6.02
+
+  iter  2611/2800  reward= -36.409
+  iter  2612/2800  reward= -37.142
+  iter  2613/2800  reward= -33.788
+  iter  2614/2800  reward= -34.292
+  iter  2615/2800  reward= -32.010
+  iter  2616/2800  reward= -33.884
+  iter  2617/2800  reward= -34.188
+  iter  2618/2800  reward= -36.716
+  iter  2619/2800  reward= -38.449
+  iter  2620/2800  reward= -37.677
+
+  ── EVAL @ iter 2620 ──
+     Accuracy    : 0.9659  (96.59%)  [upstream metric; tracked-only 96.34%]
+     Reward      : -14.268 ± 13.131
+     Ep length   : 201.3 steps
+     Sensors/step: 6.14
+
+  iter  2621/2800  reward= -40.579
+  iter  2622/2800  reward= -40.859
+  iter  2623/2800  reward= -38.187
+  iter  2624/2800  reward= -39.414
+  iter  2625/2800  reward= -36.081
+  iter  2626/2800  reward= -33.953
+  iter  2627/2800  reward= -35.707
+  iter  2628/2800  reward= -37.450
+  iter  2629/2800  reward= -38.520
+  iter  2630/2800  reward= -38.999
+
+  ── EVAL @ iter 2630 ──
+     Accuracy    : 0.9649  (96.49%)  [upstream metric; tracked-only 96.20%]
+     Reward      : -15.266 ± 15.384
+     Ep length   : 220.2 steps
+     Sensors/step: 6.11
+
+  iter  2631/2800  reward= -39.880
+  iter  2632/2800  reward= -42.023
+  iter  2633/2800  reward= -36.949
+  iter  2634/2800  reward= -36.146
+  iter  2635/2800  reward= -37.959
+  iter  2636/2800  reward= -38.687
+  iter  2637/2800  reward= -41.552
+  iter  2638/2800  reward= -40.459
+  iter  2639/2800  reward= -40.657
+  iter  2640/2800  reward= -42.163
+
+  ── EVAL @ iter 2640 ──
+     Accuracy    : 0.9670  (96.70%)  [upstream metric; tracked-only 96.12%]
+     Reward      : -16.490 ± 15.960
+     Ep length   : 195.9 steps
+     Sensors/step: 6.14
+
+  iter  2641/2800  reward= -41.424
+  iter  2642/2800  reward= -42.646
+  iter  2643/2800  reward= -39.646
+  iter  2644/2800  reward= -37.353
+  iter  2645/2800  reward= -38.459
+  iter  2646/2800  reward= -35.582
+  iter  2647/2800  reward= -31.816
+  iter  2648/2800  reward= -31.062
+  iter  2649/2800  reward= -30.693
+  iter  2650/2800  reward= -28.929
+
+  ── EVAL @ iter 2650 ──
+     Accuracy    : 0.9607  (96.07%)  [upstream metric; tracked-only 96.03%]
+     Reward      : -13.990 ± 16.172
+     Ep length   : 188.7 steps
+     Sensors/step: 6.07
+
+  iter  2651/2800  reward= -30.893
+  iter  2652/2800  reward= -31.976
+  iter  2653/2800  reward= -32.409
+  iter  2654/2800  reward= -30.914
+  iter  2655/2800  reward= -29.729
+  iter  2656/2800  reward= -27.997
+  iter  2657/2800  reward= -32.245
+  iter  2658/2800  reward= -32.240
+  iter  2659/2800  reward= -32.576
+  iter  2660/2800  reward= -33.831
+
+  ── EVAL @ iter 2660 ──
+     Accuracy    : 0.9671  (96.71%)  [upstream metric; tracked-only 96.12%]
+     Reward      : -17.897 ± 17.860
+     Ep length   : 207.3 steps
+     Sensors/step: 6.19
+
+  iter  2661/2800  reward= -32.138
+  iter  2662/2800  reward= -34.625
+  iter  2663/2800  reward= -32.756
+  iter  2664/2800  reward= -31.712
+  iter  2665/2800  reward= -32.814
+  iter  2666/2800  reward= -33.794
+  iter  2667/2800  reward= -36.024
+  iter  2668/2800  reward= -34.695
+  iter  2669/2800  reward= -37.304
+  iter  2670/2800  reward= -37.531
+
+  ── EVAL @ iter 2670 ──
+     Accuracy    : 0.9733  (97.33%)  [upstream metric; tracked-only 96.64%]
+     Reward      : -13.576 ± 17.483
+     Ep length   : 226.7 steps
+     Sensors/step: 6.04
+
+  iter  2671/2800  reward= -37.771
+  iter  2672/2800  reward= -31.589
+  iter  2673/2800  reward= -33.134
+  iter  2674/2800  reward= -35.292
+  iter  2675/2800  reward= -33.501
+  iter  2676/2800  reward= -31.650
+  iter  2677/2800  reward= -31.783
+  iter  2678/2800  reward= -33.430
+  iter  2679/2800  reward= -31.121
+  iter  2680/2800  reward= -31.975
+
+  ── EVAL @ iter 2680 ──
+     Accuracy    : 0.9662  (96.62%)  [upstream metric; tracked-only 96.23%]
+     Reward      : -15.840 ± 14.050
+     Ep length   : 174.5 steps
+     Sensors/step: 6.15
+
+  iter  2681/2800  reward= -33.332
+  iter  2682/2800  reward= -35.597
+  iter  2683/2800  reward= -33.740
+  iter  2684/2800  reward= -33.456
+  iter  2685/2800  reward= -32.605
+  iter  2686/2800  reward= -29.673
+  iter  2687/2800  reward= -28.075
+  iter  2688/2800  reward= -28.678
+  iter  2689/2800  reward= -27.342
+  iter  2690/2800  reward= -28.962
+
+  ── EVAL @ iter 2690 ──
+     Accuracy    : 0.9663  (96.63%)  [upstream metric; tracked-only 96.12%]
+     Reward      : -12.978 ± 12.752
+     Ep length   : 194.4 steps
+     Sensors/step: 6.05
+
+  iter  2691/2800  reward= -32.346
+  iter  2692/2800  reward= -31.071
+  iter  2693/2800  reward= -31.809
+  iter  2694/2800  reward= -29.798
+  iter  2695/2800  reward= -32.591
+  iter  2696/2800  reward= -30.896
+  iter  2697/2800  reward= -33.793
+  iter  2698/2800  reward= -34.069
+  iter  2699/2800  reward= -34.336
+  iter  2700/2800  reward= -33.804
+
+  ── EVAL @ iter 2700 ──
+     Accuracy    : 0.9639  (96.39%)  [upstream metric; tracked-only 96.13%]
+     Reward      : -16.448 ± 16.395
+     Ep length   : 192.4 steps
+     Sensors/step: 6.17
+
+  iter  2701/2800  reward= -31.717
+  iter  2702/2800  reward= -31.770
+  iter  2703/2800  reward= -27.980
+  iter  2704/2800  reward= -28.997
+  iter  2705/2800  reward= -26.774
+  iter  2706/2800  reward= -27.967
+  iter  2707/2800  reward= -30.184
+  iter  2708/2800  reward= -30.812
+  iter  2709/2800  reward= -28.318
+  iter  2710/2800  reward= -28.498
+
+  ── EVAL @ iter 2710 ──
+     Accuracy    : 0.9603  (96.03%)  [upstream metric; tracked-only 95.96%]
+     Reward      : -13.954 ± 16.823
+     Ep length   : 167.1 steps
+     Sensors/step: 6.09
+
+  iter  2711/2800  reward= -26.768
+  iter  2712/2800  reward= -28.116
+  iter  2713/2800  reward= -28.056
+  iter  2714/2800  reward= -27.108
+  iter  2715/2800  reward= -27.898
+  iter  2716/2800  reward= -27.405
+  iter  2717/2800  reward= -25.736
+  iter  2718/2800  reward= -25.765
+  iter  2719/2800  reward= -26.609
+  iter  2720/2800  reward= -27.536
+
+  ── EVAL @ iter 2720 ──
+     Accuracy    : 0.9714  (97.14%)  [upstream metric; tracked-only 96.20%]
+     Reward      : -11.882 ± 14.854
+     Ep length   : 175.9 steps
+     Sensors/step: 5.96
+
+  iter  2721/2800  reward= -28.048
+  iter  2722/2800  reward= -30.794
+  iter  2723/2800  reward= -33.137
+  iter  2724/2800  reward= -31.875
+  iter  2725/2800  reward= -32.210
+  iter  2726/2800  reward= -30.371
+  iter  2727/2800  reward= -30.782
+  iter  2728/2800  reward= -30.196
+  iter  2729/2800  reward= -25.410
+  iter  2730/2800  reward= -25.590
+
+  ── EVAL @ iter 2730 ──
+     Accuracy    : 0.9669  (96.69%)  [upstream metric; tracked-only 96.33%]
+     Reward      : -12.118 ± 21.322
+     Ep length   : 210.1 steps
+     Sensors/step: 5.99
+
+  iter  2731/2800  reward= -28.134
+  iter  2732/2800  reward= -25.710
+  iter  2733/2800  reward= -27.601
+  iter  2734/2800  reward= -27.968
+  iter  2735/2800  reward= -28.145
+  iter  2736/2800  reward= -25.217
+*** SIGTERM received at time=1795016959 on cpu 5 ***
+PC: @     0x7b37cf6ac7c2  (unknown)  (unknown)
+    @     0x7b37cf645cb0  (unknown)  (unknown)
+    @     0x7b37cf6a06a7         32  (unknown)
+    @     0x7b37cf6a3342        208  pthread_cond_timedwait
+    @     0x7b37c899bc7f       1184  ray::core::GetRequest::Wait()
+    @     0x7b37c899ddd7       1328  ray::core::CoreWorkerMemoryStore::GetImpl()
+    @     0x7b37c899f03d       1360  ray::core::CoreWorkerMemoryStore::Wait()
+    @     0x7b37c88469db       1776  ray::core::CoreWorker::Wait()
+    @     0x7b37c877c24f        352  __pyx_pw_3ray_7_raylet_10CoreWorker_53wait()
+    @     0x59cf0cf9afcc        736  _PyEval_EvalFrameDefault
+    @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+    @     0x59cf0cfc8cae        736  _PyEval_EvalFrameDefault
+    @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+    @     0x59cf0cfc8cae        736  _PyEval_EvalFrameDefault
+    @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+    @     0x59cf0cfc8f0c        144  call_function
+    @     0x59cf0cfb0542        736  _PyEval_EvalFrameDefault
+    @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+    @     0x59cf0cf3bb09        128  method_vectorcall
+    @     0x59cf0cfc8f0c        144  call_function
+    @     0x59cf0cfb0542        736  _PyEval_EvalFrameDefault
+    @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+    @     0x59cf0cf3bb09        128  method_vectorcall
+    @     0x59cf0cfc8f0c        144  call_function
+    @     0x59cf0cfb0542        736  _PyEval_EvalFrameDefault
+    @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+    @     0x59cf0cf3bb09        128  method_vectorcall
+    @     0x59cf0cfc8f0c        144  call_function
+    @     0x59cf0cfb0542        736  _PyEval_EvalFrameDefault
+    @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+    @     0x59cf0cfc8f0c        144  call_function
+    @     0x59cf0cfb0542        736  _PyEval_EvalFrameDefault
+    @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+    @ ... and at least 28 more frames
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474: *** SIGTERM received at time=1795016959 on cpu 5 ***
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474: PC: @     0x7b37cf6ac7c2  (unknown)  (unknown)
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x7b37cf645cb0  (unknown)  (unknown)
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x7b37cf6a06a7         32  (unknown)
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x7b37cf6a3342        208  pthread_cond_timedwait
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x7b37c899bc7f       1184  ray::core::GetRequest::Wait()
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x7b37c899ddd7       1328  ray::core::CoreWorkerMemoryStore::GetImpl()
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x7b37c899f03d       1360  ray::core::CoreWorkerMemoryStore::Wait()
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x7b37c88469db       1776  ray::core::CoreWorker::Wait()
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x7b37c877c24f        352  __pyx_pw_3ray_7_raylet_10CoreWorker_53wait()
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf9afcc        736  _PyEval_EvalFrameDefault
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfc8cae        736  _PyEval_EvalFrameDefault
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfc8cae        736  _PyEval_EvalFrameDefault
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfc8f0c        144  call_function
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfb0542        736  _PyEval_EvalFrameDefault
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf3bb09        128  method_vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfc8f0c        144  call_function
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfb0542        736  _PyEval_EvalFrameDefault
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf3bb09        128  method_vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfc8f0c        144  call_function
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfb0542        736  _PyEval_EvalFrameDefault
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf3bb09        128  method_vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfc8f0c        144  call_function
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfb0542        736  _PyEval_EvalFrameDefault
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfc8f0c        144  call_function
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cfb0542        736  _PyEval_EvalFrameDefault
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @     0x59cf0cf396e3        208  _PyFunction_Vectorcall
+[2026-11-18 09:49:19,624 E 2153634 2153634] logging.cc:474:     @ ... and at least 28 more frames

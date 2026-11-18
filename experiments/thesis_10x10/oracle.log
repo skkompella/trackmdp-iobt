@@ -1,0 +1,7 @@
+ mat | reward-optimal: theta     acc  tracked cells rew/step | full coverage: acc  tracked cells
+  O0 |                   0.0 100.00%   99.47%  3.40    0.369 |            100.00%   99.47%  3.40
+  O1 |                   0.0 100.00%   99.47%  2.81    0.463 |            100.00%   99.47%  2.81
+  O2 |                   0.0 100.00%   99.47%  2.93    0.444 |            100.00%   99.47%  2.93
+  O3 |                   0.0 100.00%   99.47%  3.30    0.385 |            100.00%   99.47%  3.30
+
+Wrote oracle_standard_s1.json

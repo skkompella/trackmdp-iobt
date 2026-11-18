@@ -1,0 +1,2 @@
+warm 1552 mean accuracy 87.61% | cold 1553 mean accuracy 82.03%
+DECISION: warm outperforms cold -> train 10x10 base
