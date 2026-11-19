@@ -1,0 +1,151 @@
+============================================================
+  TRACK-MDP  —  RECTANGULAR GRID TRAINING
+============================================================
+  Run number  : 1572
+  Grid        : 10 rows × 10 cols (100 cells)
+  Iterations  : 2800
+  Eval every  : 10
+  Mode        : train + eval (from scratch)
+
+  Grid       : 10 rows × 10 cols  (100 cells)
+  num_trans  : 4
+  movement   : moore   max_sensors (k): 9   seed: 1   train ep cap: none   sensor budget: none
+  missing_state = 201
+  cum_probs  : [0.2817, 0.5633, 0.845, 0.995]
+2026-11-18 21:25:20,353	INFO worker.py:2013 -- Started a local Ray instance.
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/_private/worker.py:2052: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+2026-11-18 21:25:23,119	WARNING training_grid_rect.py:325 -- DeprecationWarning: `build` has been deprecated. Use `AlgorithmConfig.build_algo` instead. This will raise an error in the future!
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/rllib/algorithms/algorithm.py:527: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+`UnifiedLogger` will be removed in Ray 2.7.
+  return UnifiedLogger(config, logdir, loggers=None)
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `JsonLogger interface is deprecated in favor of the `ray.tune.json.JsonLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `CSVLogger interface is deprecated in favor of the `ray.tune.csv.CSVLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `TBXLogger interface is deprecated in favor of the `ray.tune.tensorboardx.TBXLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+[2026-11-18 21:25:23,192 E 1788826 1788826] core_worker.cc:2232: Actor with class name: 'RolloutWorker' and ID: 'ed30157b5d83e58a43c1b87401000000' has constructor arguments in the object store and max_restarts > 0. If the arguments in the object store go out of scope or are lost, the actor restart will fail. See https://github.com/ray-project/ray/issues/53727 for more details.
+2026-11-18 21:25:29,568	WARNING util.py:62 -- Install gputil for GPU system monitoring.
+Starting from checkpoint: /home/hari/Documents/Projects/trackmdp-iobt/experiments/thesis_10x10/general_base/agent_run1580_ppo/best
+2026-11-18 21:25:29,598	INFO trainable.py:578 -- Restored on 192.168.4.116 from checkpoint: Checkpoint(filesystem=local, path=/home/hari/Documents/Projects/trackmdp-iobt/experiments/thesis_10x10/general_base/agent_run1580_ppo/best)
+
+Training for 2800 iterations (eval every 10) ...
+
+  Detector: transition streams (784), delta_F 0.01, warm restart to /home/hari/Documents/Projects/trackmdp-iobt/experiments/thesis_10x10/general_base/agent_run1580_ppo/best
+
+  >>> movement model O0 (model 0) active in 5 worker envs + eval env
+
+2026-11-18 21:25:29,637	WARNING training_grid_rect.py:132 -- DeprecationWarning: `compute_single_action` has been deprecated. `Algorithm.compute_single_action` should no longer be used. Get the RLModule instance through `Algorithm.get_module([module ID])`, then compute actions through `RLModule.forward_inference({'obs': [obs batch]})`. This will raise an error in the future!
+
+  ── EVAL @ iter 0 (before training) ──
+     Accuracy    : 0.6878  (68.78%)  [upstream metric; tracked-only 59.59%]
+     Reward      : -360.175 ± 429.936
+     Ep length   : 190.8 steps
+     Sensors/step: 10.44
+
+2026-11-18 21:26:09,087	WARNING train_ops.py:114 -- DeprecationWarning: `ray.rllib.execution.train_ops.multi_gpu_train_one_step` has been deprecated. This will raise an error in the future!
+  iter     1/2800  reward=-404.755
+  iter     2/2800  reward=-495.555
+  iter     3/2800  reward=-519.565
+  iter     4/2800  reward=-556.545
+  iter     5/2800  reward=-500.876
+  iter     6/2800  reward=-497.779
+  iter     7/2800  reward=-514.993
+  iter     8/2800  reward=-471.358
+  iter     9/2800  reward=-458.210
+  iter    10/2800  reward=-439.986
+
+  ── EVAL @ iter 10 ──
+     Accuracy    : 0.7431  (74.31%)  [upstream metric; tracked-only 63.92%]
+     Reward      : -338.824 ± 341.547
+     Ep length   : 180.9 steps
+     Sensors/step: 10.14
+
+  ★ New best: 0.7431 (saved to ./agent_run1572_ppo/best)
+  iter    11/2800  reward=-456.330
+  iter    12/2800  reward=-399.236
+  iter    13/2800  reward=-367.858
+  iter    14/2800  reward=-374.089
+  iter    15/2800  reward=-396.795
+  iter    16/2800  reward=-360.081
+  iter    17/2800  reward=-344.492
+  iter    18/2800  reward=-344.253
+  iter    19/2800  reward=-310.418
+  iter    20/2800  reward=-348.127
+
+  ── EVAL @ iter 20 ──
+     Accuracy    : 0.7686  (76.86%)  [upstream metric; tracked-only 68.41%]
+     Reward      : -320.256 ± 327.354
+     Ep length   : 205.4 steps
+     Sensors/step: 9.62
+
+  ★ New best: 0.7686 (saved to ./agent_run1572_ppo/best)
+  iter    21/2800  reward=-363.928
+  iter    22/2800  reward=-364.549
+  iter    23/2800  reward=-351.636
+  iter    24/2800  reward=-356.136
+  iter    25/2800  reward=-391.326
+  iter    26/2800  reward=-379.390
+  iter    27/2800  reward=-394.173
+  iter    28/2800  reward=-443.057
+  iter    29/2800  reward=-367.216
+  iter    30/2800  reward=-367.830
+
+  ── EVAL @ iter 30 ──
+     Accuracy    : 0.7806  (78.06%)  [upstream metric; tracked-only 71.19%]
+     Reward      : -278.655 ± 236.905
+     Ep length   : 192.8 steps
+     Sensors/step: 9.61
+
+  ★ New best: 0.7806 (saved to ./agent_run1572_ppo/best)
+  iter    31/2800  reward=-383.836
+  iter    32/2800  reward=-355.208
+  iter    33/2800  reward=-351.886
+  iter    34/2800  reward=-370.506
+  iter    35/2800  reward=-384.898
+  iter    36/2800  reward=-380.015
+  iter    37/2800  reward=-367.252
+  iter    38/2800  reward=-339.546
+  iter    39/2800  reward=-353.505
+  iter    40/2800  reward=-309.269
+
+  ── EVAL @ iter 40 ──
+     Accuracy    : 0.7857  (78.57%)  [upstream metric; tracked-only 71.81%]
+     Reward      : -305.170 ± 309.092
+     Ep length   : 216.2 steps
+     Sensors/step: 9.48
+
+  ★ New best: 0.7857 (saved to ./agent_run1572_ppo/best)
+  iter    41/2800  reward=-320.038
+  iter    42/2800  reward=-346.179
+  iter    43/2800  reward=-355.614
+  iter    44/2800  reward=-347.658
+  iter    45/2800  reward=-340.943
+  iter    46/2800  reward=-337.464
+  iter    47/2800  reward=-328.813
+  iter    48/2800  reward=-331.346
+  iter    49/2800  reward=-316.200
+  iter    50/2800  reward=-352.465
+
+  ── EVAL @ iter 50 ──
+     Accuracy    : 0.7773  (77.73%)  [upstream metric; tracked-only 71.41%]
+     Reward      : -306.257 ± 305.827
+     Ep length   : 215.1 steps
+     Sensors/step: 9.39
+
+*** SIGTERM received at time=1795056108 on cpu 5 ***
+PC: @     0x783a139ca83b  (unknown)  at::native::(anonymous namespace)::_vec_host_softmax_backward_lastdim<>()::{lambda()#1}::operator()()
+    @     0x783af8e45cb0  (unknown)  (unknown)
+    @     0x783a139d899e        640  at::native::(anonymous namespace)::softmax_backward_lastdim_kernel_impl()
+    @     0x783a0e8fb8ab  (unknown)  at::native::structured_softmax_backward_cpu_out::impl()
+    @ ... and at least 3 more frames
+[2026-11-18 21:41:48,634 E 1788826 1788826] logging.cc:474: *** SIGTERM received at time=1795056108 on cpu 5 ***
+[2026-11-18 21:41:48,634 E 1788826 1788826] logging.cc:474: PC: @     0x783a139ca83b  (unknown)  at::native::(anonymous namespace)::_vec_host_softmax_backward_lastdim<>()::{lambda()#1}::operator()()
+[2026-11-18 21:41:48,634 E 1788826 1788826] logging.cc:474:     @     0x783af8e45cb0  (unknown)  (unknown)
+[2026-11-18 21:41:48,634 E 1788826 1788826] logging.cc:474:     @     0x783a139d899e        640  at::native::(anonymous namespace)::softmax_backward_lastdim_kernel_impl()
+[2026-11-18 21:41:48,634 E 1788826 1788826] logging.cc:474:     @     0x783a0e8fb8ab  (unknown)  at::native::structured_softmax_backward_cpu_out::impl()
+[2026-11-18 21:41:48,634 E 1788826 1788826] logging.cc:474:     @ ... and at least 3 more frames

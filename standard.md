@@ -242,8 +242,23 @@ best/current checkpoints and metric history).
 
 | Run | Policy at start | On a detected change |
 |---|---|---|
-| 1. No restart | cold (random initial policy) | nothing; PPO keeps training through every switch |
-| 2. Warm restart | cold, as run 1 (to confirm) | change detector fires → reload the general base's weights, keep training |
+| 1. No restart | cold (random initial policy, no prior) | nothing; PPO keeps training through every switch |
+| 2. Cold restart | cold (random initial policy, no prior) | change detector fires → reset the weights to the run's initial random policy |
+| 3. Warm restart | **the general base (prior)**, `--init-checkpoint <base>` | change detector fires → reload the general base's weights, keep training |
+
+**Starting policy rule:** warm-restart runs start from the warm prior (the
+general base they restart to); no-restart and cold-restart runs start cold, with
+no prior. (5×5 warm run 1552 predates this rule and started cold.)
+
+**A restart resets everything** (`--restart warm|cold`): the algorithm is
+stopped and rebuilt — new policy and value networks, a new Adam optimizer, PPO's
+adaptive KL coefficient back at its initial value (0.2), new rollout workers
+with fresh environments (in-progress episodes end; their env seeds are offset
+by the restart number so they do not replay the run's start). Warm then loads
+the general base's weights; cold keeps the fresh random initialisation. The
+detector's streams are cleared. Runs 1552, 1553 (5×5) and the first 10×10
+warm attempt reset only the network weights; they are superseded by 1554
+(warm, from the prior), 1555 (cold) and 1572 (10×10 warm, from the prior).
 
 - **General base:** a PPO policy trained on the equal-probability Moore walk
   (`--movement moore`). This is not arbitrary: averaged over the random slot

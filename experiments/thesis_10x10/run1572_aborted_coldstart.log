@@ -1,0 +1,160 @@
+============================================================
+  TRACK-MDP  —  RECTANGULAR GRID TRAINING
+============================================================
+  Run number  : 1572
+  Grid        : 10 rows × 10 cols (100 cells)
+  Iterations  : 2800
+  Eval every  : 10
+  Mode        : train + eval (from scratch)
+
+  Grid       : 10 rows × 10 cols  (100 cells)
+  num_trans  : 4
+  movement   : moore   max_sensors (k): 9   seed: 1   train ep cap: none   sensor budget: none
+  missing_state = 201
+  cum_probs  : [0.2817, 0.5633, 0.845, 0.995]
+2026-11-18 21:17:33,341	INFO worker.py:2013 -- Started a local Ray instance.
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/_private/worker.py:2052: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+2026-11-18 21:17:36,400	WARNING training_grid_rect.py:325 -- DeprecationWarning: `build` has been deprecated. Use `AlgorithmConfig.build_algo` instead. This will raise an error in the future!
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/rllib/algorithms/algorithm.py:527: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+`UnifiedLogger` will be removed in Ray 2.7.
+  return UnifiedLogger(config, logdir, loggers=None)
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `JsonLogger interface is deprecated in favor of the `ray.tune.json.JsonLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `CSVLogger interface is deprecated in favor of the `ray.tune.csv.CSVLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/hari/Documents/Projects/trackmdp-iobt/track_mdp_env/lib/python3.10/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `TBXLogger interface is deprecated in favor of the `ray.tune.tensorboardx.TBXLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+[2026-11-18 21:17:36,471 E 1747179 1747179] core_worker.cc:2232: Actor with class name: 'RolloutWorker' and ID: '1df46d9c01feed2b7833cb4801000000' has constructor arguments in the object store and max_restarts > 0. If the arguments in the object store go out of scope or are lost, the actor restart will fail. See https://github.com/ray-project/ray/issues/53727 for more details.
+2026-11-18 21:17:42,699	WARNING util.py:62 -- Install gputil for GPU system monitoring.
+Training from scratch (use --resume to continue from a checkpoint).
+
+Training for 2800 iterations (eval every 10) ...
+
+  Detector: transition streams (784), delta_F 0.01, warm restart to /home/hari/Documents/Projects/trackmdp-iobt/experiments/thesis_10x10/general_base/agent_run1580_ppo/best
+
+  >>> movement model O0 (model 0) active in 5 worker envs + eval env
+
+2026-11-18 21:17:42,732	WARNING training_grid_rect.py:132 -- DeprecationWarning: `compute_single_action` has been deprecated. `Algorithm.compute_single_action` should no longer be used. Get the RLModule instance through `Algorithm.get_module([module ID])`, then compute actions through `RLModule.forward_inference({'obs': [obs batch]})`. This will raise an error in the future!
+
+  ── EVAL @ iter 0 (before training) ──
+     Accuracy    : 0.5744  (57.44%)  [upstream metric; tracked-only 38.28%]
+     Reward      : -629.992 ± 754.418
+     Ep length   : 190.8 steps
+     Sensors/step: 12.96
+
+2026-11-18 21:18:21,666	WARNING train_ops.py:114 -- DeprecationWarning: `ray.rllib.execution.train_ops.multi_gpu_train_one_step` has been deprecated. This will raise an error in the future!
+  iter     1/2800  reward=-498.905
+  iter     2/2800  reward=-629.567
+  iter     3/2800  reward=-657.324
+  iter     4/2800  reward=-686.454
+  iter     5/2800  reward=-623.983
+  iter     6/2800  reward=-607.638
+  iter     7/2800  reward=-636.352
+  iter     8/2800  reward=-567.691
+  iter     9/2800  reward=-557.864
+  iter    10/2800  reward=-529.502
+
+  ── EVAL @ iter 10 ──
+     Accuracy    : 0.6684  (66.84%)  [upstream metric; tracked-only 56.88%]
+     Reward      : -363.620 ± 347.978
+     Ep length   : 180.9 steps
+     Sensors/step: 10.46
+
+  ★ New best: 0.6684 (saved to ./agent_run1572_ppo/best)
+  iter    11/2800  reward=-562.946
+  iter    12/2800  reward=-502.696
+  iter    13/2800  reward=-460.593
+  iter    14/2800  reward=-469.191
+  iter    15/2800  reward=-486.570
+  iter    16/2800  reward=-428.792
+  iter    17/2800  reward=-424.663
+  iter    18/2800  reward=-422.446
+  iter    19/2800  reward=-392.806
+  iter    20/2800  reward=-436.168
+
+  ── EVAL @ iter 20 ──
+     Accuracy    : 0.6836  (68.36%)  [upstream metric; tracked-only 59.68%]
+     Reward      : -358.924 ± 356.437
+     Ep length   : 205.4 steps
+     Sensors/step: 10.19
+
+  ★ New best: 0.6836 (saved to ./agent_run1572_ppo/best)
+  iter    21/2800  reward=-449.852
+  iter    22/2800  reward=-449.355
+  iter    23/2800  reward=-430.814
+  iter    24/2800  reward=-438.403
+  iter    25/2800  reward=-475.362
+*** SIGTERM received at time=1795055107 on cpu 7 ***
+PC: @     0x780796cac7c2  (unknown)  (unknown)
+    @     0x780796c45cb0  (unknown)  (unknown)
+    @     0x780796ca06a7         32  (unknown)
+    @     0x780796ca3342        208  pthread_cond_timedwait
+    @     0x78078ff9bc7f       1184  ray::core::GetRequest::Wait()
+    @     0x78078ff9ddd7       1328  ray::core::CoreWorkerMemoryStore::GetImpl()
+    @     0x78078ff9f03d       1360  ray::core::CoreWorkerMemoryStore::Wait()
+    @     0x78078fe469db       1776  ray::core::CoreWorker::Wait()
+    @     0x78078fd7c24f        352  __pyx_pw_3ray_7_raylet_10CoreWorker_53wait()
+    @     0x5a6053b74fcc        736  _PyEval_EvalFrameDefault
+    @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+    @     0x5a6053ba2cae        736  _PyEval_EvalFrameDefault
+    @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+    @     0x5a6053ba2cae        736  _PyEval_EvalFrameDefault
+    @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+    @     0x5a6053ba2f0c        144  call_function
+    @     0x5a6053b8a542        736  _PyEval_EvalFrameDefault
+    @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+    @     0x5a6053b15b09        128  method_vectorcall
+    @     0x5a6053ba2f0c        144  call_function
+    @     0x5a6053b8a542        736  _PyEval_EvalFrameDefault
+    @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+    @     0x5a6053b15b09        128  method_vectorcall
+    @     0x5a6053ba2f0c        144  call_function
+    @     0x5a6053b8a542        736  _PyEval_EvalFrameDefault
+    @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+    @     0x5a6053b15b09        128  method_vectorcall
+    @     0x5a6053ba2f0c        144  call_function
+    @     0x5a6053b8a542        736  _PyEval_EvalFrameDefault
+    @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+    @     0x5a6053ba2f0c        144  call_function
+    @     0x5a6053b8a542        736  _PyEval_EvalFrameDefault
+    @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+    @ ... and at least 28 more frames
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474: *** SIGTERM received at time=1795055107 on cpu 7 ***
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474: PC: @     0x780796cac7c2  (unknown)  (unknown)
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474:     @     0x780796c45cb0  (unknown)  (unknown)
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474:     @     0x780796ca06a7         32  (unknown)
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474:     @     0x780796ca3342        208  pthread_cond_timedwait
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474:     @     0x78078ff9bc7f       1184  ray::core::GetRequest::Wait()
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474:     @     0x78078ff9ddd7       1328  ray::core::CoreWorkerMemoryStore::GetImpl()
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474:     @     0x78078ff9f03d       1360  ray::core::CoreWorkerMemoryStore::Wait()
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474:     @     0x78078fe469db       1776  ray::core::CoreWorker::Wait()
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474:     @     0x78078fd7c24f        352  __pyx_pw_3ray_7_raylet_10CoreWorker_53wait()
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474:     @     0x5a6053b74fcc        736  _PyEval_EvalFrameDefault
+[2026-11-18 21:25:07,901 E 1747179 1747179] logging.cc:474:     @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053ba2cae        736  _PyEval_EvalFrameDefault
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053ba2cae        736  _PyEval_EvalFrameDefault
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053ba2f0c        144  call_function
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b8a542        736  _PyEval_EvalFrameDefault
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b15b09        128  method_vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053ba2f0c        144  call_function
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b8a542        736  _PyEval_EvalFrameDefault
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b15b09        128  method_vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053ba2f0c        144  call_function
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b8a542        736  _PyEval_EvalFrameDefault
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b15b09        128  method_vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053ba2f0c        144  call_function
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b8a542        736  _PyEval_EvalFrameDefault
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053ba2f0c        144  call_function
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b8a542        736  _PyEval_EvalFrameDefault
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @     0x5a6053b136e3        208  _PyFunction_Vectorcall
+[2026-11-18 21:25:07,902 E 1747179 1747179] logging.cc:474:     @ ... and at least 28 more frames

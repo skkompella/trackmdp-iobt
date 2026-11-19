@@ -89,3 +89,14 @@ every model.
 - Python stdout to a file is buffered: launch with `PYTHONUNBUFFERED=1`.
 - Uncommitted, not ours: `RESUME.md`, `src/core/iobt_environment.py` (pre-session),
   the confusion-test files (`ppo_detector_eval*`, other thread).
+
+## Update 2026-11-18 21:45
+
+- Restarts now reset **everything** (fresh algorithm: networks, Adam optimizer, KL
+  coefficient, rollout workers/envs); the earlier restart runs reset only weights.
+- Warm-restart runs start from the prior; no-restart and cold-restart runs start cold
+  (standard.md §7).
+- Running: 1572 (10×10 warm, from prior 1580), 1554 (5×5 warm, from prior 1560),
+  1555 (5×5 cold). Superseded (weights-only): 1552, 1553, first 1572 attempt.
+  Baselines: 1551 (5×5 no restart), 1570 (10×10 no restart, stopped at 2730 —
+  user said no need to rerun; 1571 rerun was stopped).

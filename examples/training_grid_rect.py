@@ -323,9 +323,6 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
     # Always search within this script's own save_dir to avoid accidentally
     # loading incompatible checkpoints from other scripts (e.g. in runs/).
     algo = ppo_cfg.build()
-    # The freshly initialised (random) policy, before any restore or training:
-    # the reset target for --restart cold.
-    initial_weights = algo.get_weights()
     if resume:
         ckpt, _ = find_latest_checkpoint(
             run_number, save_dir=save_dir_override or save_dir
@@ -391,9 +388,7 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
         monitor = TransitionMonitor(row_supports("grid_moore", nrows, ncols),
                                     delta_F=cfg["delta_f"], min_samples=30,
                                     max_window=2000)
-        if cfg.get("restart") == "cold":
-            base_weights = initial_weights
-        elif cfg.get("restart_checkpoint"):
+        if cfg.get("restart") == "warm" and cfg.get("restart_checkpoint"):
             from ray.rllib.policy.policy import Policy
             ck = os.path.abspath(cfg["restart_checkpoint"])
             pol = Policy.from_checkpoint(os.path.join(ck, "policies", "default_policy"))
@@ -401,9 +396,31 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
             del pol
         print(f"  Detector: transition streams ({monitor.detector.n_streams}), "
               f"delta_F {cfg['delta_f']}, "
-              + ("cold restart (initial random policy)" if cfg.get("restart") == "cold"
+              + ("cold restart (full: fresh algorithm, random init)" if cfg.get("restart") == "cold"
                  else "warm restart to " + cfg["restart_checkpoint"] if base_weights
                  else "monitor only"))
+
+    def full_restart(k):
+        """
+        Restart EVERYTHING (standard.md 7): stop the algorithm and build a fresh
+        one -- new policy/value networks, new Adam optimizer, PPO's KL
+        coefficient back at its initial value, new rollout workers with fresh
+        environments (in-progress episodes end; env seeds offset by restart k so
+        they do not replay the run's start). Warm: then load the general base's
+        weights. Cold: keep the fresh random initialisation.
+        """
+        algo.stop()
+        c = ppo_cfg.copy(copy_frozen=False)
+        ec = dict(env_config)
+        if ec.get("seed") is not None:
+            ec["seed"] = int(ec["seed"]) + 100003 * k
+        c.environment(grid_environment_rect, env_config=ec)
+        c.normalize_actions = False
+        new = c.build()
+        if cfg["restart"] == "warm":
+            new.set_weights(base_weights)
+            new.env_runner_group.sync_weights()
+        return new
 
     def eval_row(i, label, reward_mean=float("nan")):
         metrics = evaluate_policy(algo, qobj.grid_env, cfg, cfg["eval_episodes"])
@@ -462,11 +479,18 @@ def train(cfg, eval_only=False, checkpoint=None, save_dir_override=None, resume=
             alarm = monitor.update(algo, i, env_steps=i * 4000)
             if alarm is not None:
                 msg = f"  !!! ALARM at iteration {i} (model {names[model] if names else '-'})"
-                if base_weights is not None:
-                    algo.set_weights(base_weights)      # in place: no worker is mid-batch
-                    algo.env_runner_group.sync_weights()
+                if cfg.get("restart"):
                     n_restarts += 1
-                    msg += f" -> {cfg.get('restart')} restart #{n_restarts}"
+                    algo = full_restart(n_restarts)
+                    if names:
+                        set_model(model)           # the new workers get the active model
+                    if open_marks is not None:     # new envs: nothing left open
+                        open_marks = None
+                    pol = algo.get_policy()
+                    opt_state = sum(len(o.state) for o in getattr(pol, "_optimizers", []))
+                    msg += (f" -> {cfg['restart']} restart #{n_restarts} (full: new algorithm; "
+                            f"optimizer state entries {opt_state}, KL coeff "
+                            f"{getattr(pol, 'kl_coeff', float('nan')):.3g})")
                 print(msg)
 
         # Stop rule: at least min_iters; with --plateau-patience P, also wait
@@ -630,9 +654,10 @@ Examples
     parser.add_argument("--delta-f", type=float, default=DEFAULTS["delta_f"],
                         help="Detector family-wise false-alarm level (default: %(default)s)")
     parser.add_argument("--restart", choices=["warm", "cold"], default=None,
-                        help="On every detector alarm: warm = reload --restart-checkpoint "
-                             "(the general base); cold = reset to this run's initial random "
-                             "policy. Only weights are reset in both cases. Without it the "
+                        help="On every detector alarm, restart everything (new algorithm: "
+                             "networks, optimizer, KL coefficient, rollout workers and their "
+                             "envs). warm = then load --restart-checkpoint (the general base); "
+                             "cold = keep the fresh random initialisation. Without it the "
                              "detector only logs alarms (monitor mode)")
     parser.add_argument("--restart-checkpoint", type=str, default=None,
                         help="Warm restart: on every alarm, reload this checkpoint's policy "
